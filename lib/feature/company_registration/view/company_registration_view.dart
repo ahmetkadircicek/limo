@@ -167,7 +167,12 @@ Widget _buildActionButtons(
   return Column(
     children: [
       _buildDoneButton(context, viewModel),
-      _buildCancelButton(context),
+      Row(
+        children: [
+          Expanded(child: _buildCancelButton(context)),
+          Expanded(child: _buildContinueButton(context)),
+        ],
+      ),
     ],
   );
 }
@@ -191,6 +196,20 @@ Widget _buildDoneButton(
         }
       },
     ),
+  );
+}
+
+// Builds the "Continue" button
+Widget _buildContinueButton(BuildContext context) {
+  return GeneralButton(
+    fontSize: GeneralConstants.fontSizeSmall,
+    color: context.surface,
+    fontColor: context.primary,
+    text: 'Continue',
+    onPressed: () {
+      // TODO: Navigate to home page or main app without company registration
+      debugPrint('Continue without company registration');
+    },
   );
 }
 
