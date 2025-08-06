@@ -44,14 +44,16 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
         height: GeneralConstants.heightMedium,
         child: TextFormField(
           obscureText: widget.obscureText ?? false ? !_visible : false,
-          validator: widget.validator != null
-              ? widget.validator!
-              : (value) {
-                  setState(() {
-                    _hasError = value == null || value.isEmpty;
-                  });
-                  return null;
-                },
+          validator: widget.validator,
+          onChanged: (value) {
+            // Only update error state when necessary, not on every character
+            final hasError = value.isEmpty;
+            if (_hasError != hasError) {
+              setState(() {
+                _hasError = hasError;
+              });
+            }
+          },
           keyboardType: widget.keyboardType,
           maxLines: widget.maxLines,
           controller: widget.controller,

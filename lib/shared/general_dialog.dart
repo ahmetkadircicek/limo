@@ -1,125 +1,102 @@
+// This file is deprecated - use ModernDialog instead
+// Keeping compatibility methods but redirecting to ModernDialog
+
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
 import 'package:soforvarcom/core/enums/alert_type_enum.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/core/extensions/string_extension.dart';
-import 'package:soforvarcom/core/init/navigation/navigation_service.dart';
-import 'package:soforvarcom/shared/general_button.dart';
-import 'package:soforvarcom/shared/general_text.dart';
+import 'package:soforvarcom/shared/modern_dialog.dart';
 
-class GeneralDialog extends StatelessWidget {
-  final String title;
-  final String? message;
-  final String? action;
-  final AlertType alertType;
-  final VoidCallback? onPressed;
-
-  const GeneralDialog({
-    super.key,
-    required this.title,
-    this.message,
-    required this.alertType,
-    this.action,
-    this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Stack(
-        alignment: Alignment.topCenter,
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            padding:
-                PaddingConstants.allMedium + PaddingConstants.onlyTopMedium,
-            margin: PaddingConstants.symmetricHorizontalSmall,
-            decoration: BoxDecoration(
-              color: context.surfaceContainer,
-              borderRadius: GeneralConstants.borderRadius,
-            ),
-            child: Padding(
-              padding: PaddingConstants.symmetricHorizontalSmall,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  context.spacerHeight(1),
-                  GeneralText(
-                    text: title,
-                    fontSize: GeneralConstants.fontSizeMedium,
-                    fontWeight: GeneralConstants.fontWeightBold,
-                    textAlign: TextAlign.center,
-                  ),
-                  context.spacerHeight(1),
-                  if (message != null)
-                    GeneralText(
-                      text: message!,
-                      fontSize: GeneralConstants.fontSizeSmall,
-                      fontWeight: GeneralConstants.fontWeightLight,
-                      maxLines: 3,
-                      textAlign: TextAlign.center,
-                    ),
-                  context.spacerHeight(2),
-                  Row(
-                    children: [
-                      if (onPressed != null)
-                        Expanded(
-                          child: GeneralButton(
-                            onPressed: () {
-                              NavigationService.instance.goBack();
-                            },
-                            text: 'CLOSE',
-                            fontSize: GeneralConstants.fontSizeSmall,
-                            fontColor: context.onPrimary,
-                            color: AlertUtils.getColor(context, alertType),
-                          ),
-                        ),
-                      if (onPressed != null) context.spacerWidth(2),
-                      if (onPressed != null && action != null)
-                        Expanded(
-                          child: GeneralButton(
-                            onPressed: onPressed,
-                            text: action!.toUpperCaseTr(),
-                            fontSize: GeneralConstants.fontSizeSmall,
-                            fontColor: context.onPrimary,
-                            color: AlertUtils.getColor(context, alertType),
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: -GeneralConstants.heightExtraSmall,
-            child: Container(
-              width: GeneralConstants.heightExtraLarge,
-              decoration: BoxDecoration(
-                color: AlertUtils.getColor(context, alertType),
-                borderRadius: GeneralConstants.borderRadius,
-              ),
-              child: IconButton(
-                onPressed: () {
-                  NavigationService.instance.goBack();
-                },
-                icon: Icon(
-                  AlertUtils.getIcon(alertType),
-                  color: Colors.white,
-                  size: GeneralConstants.fontSizeExtraLarge,
-                ),
-              ),
-            ),
-          ),
-        ],
+// Helper extension for showing dialogs - Updated to use ModernDialog
+extension DialogHelper on BuildContext {
+  /// Show error dialog with modern styling
+  void showErrorDialog({
+    required String message,
+    String title = 'Error!',
+  }) {
+    showDialog(
+      context: this,
+      builder: (context) => ModernDialog(
+        type: DialogType.error,
+        title: title,
+        message: message,
+        primaryButtonText: 'OK',
       ),
     );
   }
-}
 
-// Helper extension for showing dialogs
-extension DialogHelper on BuildContext {
+  /// Show success dialog with modern styling
+  void showSuccessDialog({
+    required String message,
+    String title = 'Success!',
+  }) {
+    showDialog(
+      context: this,
+      builder: (context) => ModernDialog(
+        type: DialogType.success,
+        title: title,
+        message: message,
+        primaryButtonText: 'OK',
+      ),
+    );
+  }
+
+  /// Show confirmation dialog with modern styling
+  void showConfirmationDialog({
+    required String title,
+    required String message,
+    required String actionText,
+    required VoidCallback onConfirm,
+    String cancelText = 'Cancel',
+  }) {
+    showDialog(
+      context: this,
+      builder: (context) => ModernDialog(
+        type: DialogType.confirmation,
+        title: title,
+        message: message,
+        primaryButtonText: actionText,
+        secondaryButtonText: cancelText,
+        onPrimaryPressed: () {
+          Navigator.of(context).pop();
+          onConfirm();
+        },
+      ),
+    );
+  }
+
+  /// Show warning dialog with modern styling
+  void showWarningDialog({
+    required String message,
+    String title = 'Warning!',
+  }) {
+    showDialog(
+      context: this,
+      builder: (context) => ModernDialog(
+        type: DialogType.warning,
+        title: title,
+        message: message,
+        primaryButtonText: 'OK',
+      ),
+    );
+  }
+
+  /// Show info dialog with modern styling
+  void showInfoDialog({
+    required String message,
+    String title = 'Information',
+  }) {
+    showDialog(
+      context: this,
+      builder: (context) => ModernDialog(
+        type: DialogType.info,
+        title: title,
+        message: message,
+        primaryButtonText: 'OK',
+      ),
+    );
+  }
+
+  // Deprecated method - use ModernDialog directly
+  @deprecated
   void showGeneralDialog({
     required String title,
     String? message,
@@ -127,80 +104,37 @@ extension DialogHelper on BuildContext {
     String? action,
     VoidCallback? onPressed,
   }) {
+    DialogType dialogType;
+    switch (alertType) {
+      case AlertType.error:
+        dialogType = DialogType.error;
+        break;
+      case AlertType.success:
+        dialogType = DialogType.success;
+        break;
+      case AlertType.warning:
+        dialogType = DialogType.warning;
+        break;
+      case AlertType.info:
+        dialogType = DialogType.info;
+        break;
+      case AlertType.confirmation:
+        dialogType = DialogType.confirmation;
+        break;
+      case AlertType.basic:
+        dialogType = DialogType.info;
+        break;
+    }
+
     showDialog(
       context: this,
-      builder: (context) => GeneralDialog(
+      builder: (context) => ModernDialog(
+        type: dialogType,
         title: title,
-        message: message,
-        alertType: alertType,
-        action: action,
-        onPressed: onPressed,
+        message: message ?? '',
+        primaryButtonText: action ?? 'OK',
+        onPrimaryPressed: onPressed,
       ),
-    );
-  }
-
-  /// Show error dialog with predefined styling
-  void showErrorDialog({
-    required String message,
-    String title = 'Error!',
-  }) {
-    showGeneralDialog(
-      title: title,
-      message: message,
-      alertType: AlertType.error,
-    );
-  }
-
-  /// Show success dialog with predefined styling
-  void showSuccessDialog({
-    required String message,
-    String title = 'Success!',
-  }) {
-    showGeneralDialog(
-      title: title,
-      message: message,
-      alertType: AlertType.success,
-    );
-  }
-
-  /// Show confirmation dialog with action
-  void showConfirmationDialog({
-    required String title,
-    required String message,
-    required String actionText,
-    required VoidCallback onConfirm,
-    String cancelText = 'CANCEL',
-  }) {
-    showGeneralDialog(
-      title: title,
-      message: message,
-      alertType: AlertType.confirmation,
-      action: actionText,
-      onPressed: onConfirm,
-    );
-  }
-
-  /// Show warning dialog
-  void showWarningDialog({
-    required String message,
-    String title = 'Warning!',
-  }) {
-    showGeneralDialog(
-      title: title,
-      message: message,
-      alertType: AlertType.warning,
-    );
-  }
-
-  /// Show info dialog
-  void showInfoDialog({
-    required String message,
-    String title = 'Information',
-  }) {
-    showGeneralDialog(
-      title: title,
-      message: message,
-      alertType: AlertType.info,
     );
   }
 }

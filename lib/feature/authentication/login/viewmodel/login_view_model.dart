@@ -1,64 +1,52 @@
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:soforvarcom/core/enums/login_error_enum.dart';
 import 'package:soforvarcom/core/enums/success_message_enum.dart';
+import 'package:soforvarcom/feature/authentication/login/widget/forget_password_dialog.dart';
 import 'package:soforvarcom/shared/general_dialog.dart';
 
 class LoginViewModel with ChangeNotifier {
   final formKey = GlobalKey<FormState>();
-  late TextEditingController phoneNumberController;
+  late TextEditingController emailController;
   late TextEditingController passwordController;
-  late TextEditingController forgetPasswordPhoneController;
-
-  String selectedCountryCode = '+90'; // Default to Turkey
 
   // UserModel? currentUser;
   // LicenceModel? userLicence;
 
   LoginViewModel(BuildContext context) {
     print('LoginViewModel created');
-    phoneNumberController = TextEditingController();
+    emailController = TextEditingController();
     passwordController = TextEditingController();
-    forgetPasswordPhoneController = TextEditingController();
   }
 
-  /// Updates the selected country code when user selects a different country
-  void onCountryCodeChanged(CountryCode countryCode) {
-    selectedCountryCode = countryCode.dialCode ?? '+90';
-    notifyListeners();
-  }
-
-  /// Returns the full phone number with country code
-  String get fullPhoneNumber {
-    String phoneDigits =
-        phoneNumberController.text.replaceAll(RegExp(r'\D'), '');
-    return '$selectedCountryCode$phoneDigits';
+  /// Validates email format
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
   /// Login user with professional dialog validation
   Future<bool> loginUser(BuildContext context) async {
-    String fullPhoneNumber = this.fullPhoneNumber;
+    String email = emailController.text.trim();
     String password = passwordController.text;
 
     // Validate inputs with proper error handling
     LoginErrorEnum? validationError;
 
-    if (fullPhoneNumber.isEmpty && password.isEmpty) {
+    if (email.isEmpty && password.isEmpty) {
       validationError = LoginErrorEnum.invalidData;
-    } else if (fullPhoneNumber.isEmpty || fullPhoneNumber.length < 10) {
-      validationError = LoginErrorEnum.emptyPhoneNumber;
-    } else if (fullPhoneNumber.length < 11) {
-      validationError = LoginErrorEnum.invalidPhoneNumber;
+    } else if (email.isEmpty) {
+      validationError = LoginErrorEnum.emptyEmail;
+    } else if (!_isValidEmail(email)) {
+      validationError = LoginErrorEnum.invalidEmail;
     } else if (password.isEmpty) {
       validationError = LoginErrorEnum.emptyPassword;
-    } else if (password.length > 16) {
+    } else if (password.length < 6) {
       validationError = LoginErrorEnum.invalidPassword;
     }
 
     if (validationError != null) {
       // Show error dialog with predefined styling
       context.showErrorDialog(
-        title: 'Login Error!',
+        title: 'Login Error',
         message: validationError.errorMessage,
       );
       return false;
@@ -66,7 +54,7 @@ class LoginViewModel with ChangeNotifier {
 
     // Debug print to show the login data
     debugPrint('Login Data:');
-    debugPrint('Full Phone Number: $fullPhoneNumber');
+    debugPrint('Email: $email');
     debugPrint('Password: $password');
 
     // TODO: Implement actual login logic here
@@ -90,6 +78,7 @@ class LoginViewModel with ChangeNotifier {
 
     // For demo purposes, show success dialog
     context.showSuccessDialog(
+      title: 'Login Successful',
       message: SuccessMessageEnum.loginSuccess.successMessage,
     );
 
@@ -163,29 +152,19 @@ class LoginViewModel with ChangeNotifier {
   //   );
   // }
 
-  /// Show forget password dialog with professional styling
+  /// Show forget password dialog with email input
   void showForgetPasswordDialog(BuildContext context) {
-    context.showConfirmationDialog(
-      title: 'Reset Password',
-      message: 'Please enter your registered phone number!',
-      actionText: 'SEND',
-      onConfirm: () {
-        // TODO: Implement forget password logic
-        debugPrint(
-            'Forget password for: ${forgetPasswordPhoneController.text}');
-        context.showInfoDialog(
-          message: 'Password reset link has been sent to your phone number.',
-        );
-      },
+    showDialog(
+      context: context,
+      builder: (context) => const ForgetPasswordDialog(),
     );
   }
 
   @override
   void dispose() {
     print('LoginViewModel disposed');
-    phoneNumberController.dispose();
+    emailController.dispose();
     passwordController.dispose();
-    forgetPasswordPhoneController.dispose();
     super.dispose();
   }
 }

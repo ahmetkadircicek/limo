@@ -8,7 +8,7 @@ import 'package:soforvarcom/feature/authentication/register/view/register_view.d
 import 'package:soforvarcom/shared/elevated_container.dart';
 import 'package:soforvarcom/shared/general_button.dart';
 import 'package:soforvarcom/shared/general_text.dart';
-import 'package:soforvarcom/shared/phone_number_field.dart';
+import 'package:soforvarcom/shared/general_text_field.dart';
 import 'package:soforvarcom/shared/prefix_text_field.dart';
 
 import '../viewmodel/login_view_model.dart';
@@ -63,8 +63,9 @@ Widget _buildBottomCard() {
 
 // Builds the buttons for login and navigation
 Widget _buildButtons() {
-  return Consumer<LoginViewModel>(
-    builder: (context, loginViewModel, child) {
+  return Builder(
+    builder: (context) {
+      final loginViewModel = context.read<LoginViewModel>();
       return Column(
         children: [
           _buildForgotPasswordButton(context, loginViewModel),
@@ -153,17 +154,28 @@ Widget _buildSignUpButton(BuildContext context) {
 
 // Builds the login form with input fields
 Widget _buildLoginForm() {
-  return Consumer<LoginViewModel>(
-    builder: (context, loginViewModel, child) {
+  return Builder(
+    builder: (context) {
+      final loginViewModel = context.read<LoginViewModel>();
       return Form(
         key: loginViewModel.formKey,
         child: Column(
           children: [
-            PhoneNumberField(
-              hintText: '(555) 123-4567',
-              controller: loginViewModel.phoneNumberController,
-              onCountryChanged: loginViewModel.onCountryCodeChanged,
-              initialCountryCode: 'TR',
+            GeneralTextField(
+              hintText: 'Enter your email address',
+              prefixIcon: const Icon(Icons.email),
+              controller: loginViewModel.emailController,
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email address';
+                }
+                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                    .hasMatch(value)) {
+                  return 'Please enter a valid email address';
+                }
+                return null;
+              },
             ),
             context.spacerHeight(1),
             PrefixedTextField(

@@ -1,121 +1,66 @@
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:soforvarcom/shared/modern_dialog.dart';
+import 'package:soforvarcom/shared/modern_snackbar.dart';
 
-// import '../../../../core/components/general/general_button.dart';
-// import '../../../../core/components/general/general_text.dart';
-// import '../../../../core/components/general/text_field/prefix_text_field.dart';
-// import '../../../../core/extensions/general_extensions.dart';
-// import '../../../../core/extensions/string_extension.dart';
-// import '../../../../core/init/lang/locale_keys.g.dart';
-// import '../../../../core/init/navigation/navigation_service.dart';
-// import '../../../../core/utilities/constants/general_constants.dart';
-// import '../../../../core/utilities/constants/padding_constants.dart';
-// import '../../../../core/utilities/enums/alert_type_enum.dart';
+class ForgetPasswordDialog extends StatelessWidget {
+  const ForgetPasswordDialog({super.key});
 
-// class ForgetPasswordDialog extends StatelessWidget {
-//   final String title;
-//   final String action;
-//   final AlertType alertType;
-//   final TextEditingController controller;
-//   final VoidCallback? onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return ModernDialog(
+      type: DialogType.input,
+      title: 'Reset Password',
+      message:
+          'Enter your email address and we\'ll send you a password reset link.',
+      inputHint: 'Email Address',
+      inputType: TextInputType.emailAddress,
+      inputValidator: _validateEmail,
+      primaryButtonText: 'Send Reset Link',
+      secondaryButtonText: 'Cancel',
+      onPrimaryPressed: () => _handleForgetPassword(context),
+    );
+  }
 
-//   const ForgetPasswordDialog({
-//     super.key,
-//     required this.title,
-//     required this.alertType,
-//     required this.action,
-//     required this.controller,
-//     this.onPressed,
-//   });
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email address is required';
+    }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Stack(
-//         alignment: Alignment.topCenter,
-//         clipBehavior: Clip.none,
-//         children: [
-//           Container(
-//             padding: PaddingConstants.allMedium + PaddingConstants.onlyTopMedium,
-//             margin: EdgeInsets.symmetric(horizontal: context.width * 0.05),
-//             decoration: BoxDecoration(
-//               color: context.surfaceContainer,
-//               borderRadius: GeneralConstants.borderRadius,
-//             ),
-//             child: Padding(
-//               padding: PaddingConstants.symmetricHorizontalSmall,
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   context.spacerHeight(1),
-//                   GeneralText(
-//                     text: title,
-//                     fontSize: GeneralConstants.fontSizeMedium,
-//                     fontWeight: GeneralConstants.fontWeightBold,
-//                     textAlign: TextAlign.center,
-//                   ),
-//                   context.spacerHeight(1),
-//                   Column(
-//                     children: [
-//                       PrefixedTextField(
-//                         hintText: LocaleKeys.fieldNumberHint,
-//                         controller: controller,
-//                         prefixIcon: const Icon(Icons.phone),
-//                         isPhoneNumber: true,
-//                       ),
-//                       context.spacerHeight(2),
-//                       Row(
-//                         children: [
-//                           Expanded(
-//                             child: GeneralButton(
-//                               onPressed: () {
-//                                 NavigationService.instance.goBack();
-//                               },
-//                               text: 'KAPAT',
-//                               fontSize: GeneralConstants.fontSizeSmall,
-//                               fontColor: context.onPrimary,
-//                               color: context.error,
-//                             ),
-//                           ),
-//                           context.spacerWidth(3),
-//                           Expanded(
-//                             child: GeneralButton(
-//                               onPressed: onPressed,
-//                               text: action.toUpperCaseTr(),
-//                               fontSize: GeneralConstants.fontSizeSmall,
-//                               fontColor: context.onPrimary,
-//                               color: AlertUtils.getColor(context, alertType),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           Positioned(
-//             top: -GeneralConstants.heightExtraSmall,
-//             child: Container(
-//               width: GeneralConstants.heightExtraLarge,
-//               decoration: BoxDecoration(
-//                 color: AlertUtils.getColor(context, alertType),
-//                 borderRadius: GeneralConstants.borderRadius,
-//               ),
-//               child: IconButton(
-//                 onPressed: () {
-//                   NavigationService.instance.goBack();
-//                 },
-//                 icon: Icon(
-//                   AlertUtils.getIcon(alertType),
-//                   color: Colors.white,
-//                   size: GeneralConstants.fontSizeExtraLarge,
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+
+    return null;
+  }
+
+  void _handleForgetPassword(BuildContext context) async {
+    try {
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (context.mounted) {
+        // Close dialog first
+        Navigator.of(context).pop();
+
+        // Show success snackbar
+        context.showSuccessSnackbar(
+          title: 'Email Sent',
+          message: 'Password reset link has been sent to your email address.',
+          duration: const Duration(seconds: 4),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // Close dialog first
+        Navigator.of(context).pop();
+
+        // Show error snackbar
+        context.showErrorSnackbar(
+          title: 'Error',
+          message: 'An error occurred. Please try again.',
+        );
+      }
+    }
+  }
+}

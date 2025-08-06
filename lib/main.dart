@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:soforvarcom/core/init/theme/app_theme.dart';
-import 'package:soforvarcom/feature/authentication/splash/view/splash_view.dart';
+import 'package:soforvarcom/feature/home/view/home_view.dart';
 
 import 'core/init/navigation/navigation_service.dart';
 import 'core/init/notifier/provider_manager.dart';
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'Soforvar.com',
       theme: LightTheme.theme,
       debugShowCheckedModeBanner: false,
-      home: const SplashView(),
+      home: const HomeView(),
       navigatorKey: NavigationService.instance.navigatorKey,
     );
   }
