@@ -38,7 +38,7 @@ class LoadingPage extends StatelessWidget {
           Center(
             child: Image.asset(
               ImageConstants.imageSoforvarcom,
-              width: context.width * 0.6,
+              width: context.width * 0.7,
             ),
           ),
           // Loading indicator removed

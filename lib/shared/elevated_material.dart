@@ -12,11 +12,15 @@ class ElevatedMaterial extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       clipBehavior: Clip.antiAlias,
-      elevation: 3,
+      elevation: 2,
       borderRadius: GeneralConstants.borderRadius,
-      shadowColor: context.secondary.withOpacity(0.1),
+      shadowColor: GeneralConstants.shadowColor,
       child: Container(
-        color: context.surfaceContainer,
+        decoration: BoxDecoration(
+          color: context.surfaceContainer,
+          borderRadius: GeneralConstants.borderRadius,
+          boxShadow: GeneralConstants.boxShadowDefault,
+        ),
         child: child,
       ),
     );

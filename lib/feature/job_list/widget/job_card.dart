@@ -32,7 +32,7 @@ class JobCard extends StatelessWidget {
                 ? context.secondary.withValues(alpha: 0.01)
                 : context.secondary.withValues(alpha: 0.06),
           ),
-          height: GeneralConstants.heightExtraLarge,
+          height: GeneralConstants.heightMedium * 2,
           child: Row(
             children: [
               Expanded(flex: 2, child: _LocationSection(job: job)),

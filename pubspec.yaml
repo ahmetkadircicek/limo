@@ -7,15 +7,34 @@ environment:
   sdk: ^3.6.0
 
 dependencies:
+  # --- Flutter SDK ---
   flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.8
-  provider: ^6.1.5
-  lottie: ^3.3.1
-  intl: ^0.20.2
-  google_fonts: ^6.3.0
-  mask_text_input_formatter: ^2.9.0
-  country_code_picker: ^3.0.0
+    sdk: flutter # Core Flutter SDK, required for all Flutter apps
+
+  # --- UI & Design ---
+  cupertino_icons: ^1.0.8 # Provides iOS style icons for Cupertino widgets
+  lottie: ^3.3.1 # For displaying Lottie animations (JSON-based vector animations)
+  google_fonts: ^6.3.0 # Enables the use of Google Fonts in the app for custom typography
+
+  # --- State Management ---
+  provider: ^6.1.5 # Popular state management solution for Flutter, used for dependency injection and state sharing
+
+  # --- Internationalization & Formatting ---
+  intl: ^0.20.2 # Provides internationalization and localization utilities (date, number formatting, etc.)
+
+  # --- Input & Form Utilities ---
+  mask_text_input_formatter: ^2.9.0 # Allows masking user input in text fields (e.g., phone numbers, dates)
+
+  # --- Country & Region Selection ---
+  country_code_picker: ^3.0.0 # Widget for selecting country codes, useful for phone number inputs
+
+  # --- Maps & Location ---
+  google_maps_flutter: ^2.8.0 # Embeds Google Maps in Flutter apps
+  geolocator: ^13.0.1 # Provides geolocation functionalities (get current location, etc.)
+  geocoding: ^3.0.0 # Converts addresses to coordinates and vice versa (geocoding/reverse geocoding)
+
+  # --- Networking ---
+  http: ^1.2.2 # Simplifies making HTTP requests (REST API calls, etc.)
 
 dev_dependencies:
   flutter_test:

@@ -34,10 +34,10 @@ Widget _buildBackground(BuildContext context) {
       child: Column(
         children: [
           SizedBox(
-            width: context.width * 0.8,
+            width: context.width * 0.7,
             child: Image.asset(
               ImageConstants.imageSoforvarcom,
-              fit: BoxFit.cover,
+              fit: BoxFit.fitWidth,
             ),
           ),
           context.spacerHeight(2),

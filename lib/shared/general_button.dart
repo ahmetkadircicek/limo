@@ -9,46 +9,62 @@ class GeneralButton extends StatelessWidget {
   final Color color;
   final Icon? icon;
   final bool? isValid;
-  final double fontSize;
+  final double? fontSize;
   final Color? fontColor;
   final VoidCallback? onPressed;
+  final double? height;
+  final Widget? child;
 
   const GeneralButton({
     super.key,
     required this.text,
     required this.color,
     this.onPressed,
-    required this.fontSize,
+    this.fontSize,
     this.fontColor,
     this.isValid,
     this.icon,
+    this.height,
+    this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        splashFactory: NoSplash.splashFactory,
-        padding: PaddingConstants.zeroPadding,
-        backgroundColor: color,
-        disabledBackgroundColor: color.withOpacity(0.5),
-        disabledForegroundColor: color,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: GeneralConstants
-              .borderRadius, // Updated to use GeneralConstants for border radius
+    final double buttonHeight = height ?? GeneralConstants.buttonHeight;
+    final double effectiveFontSize = fontSize ?? GeneralConstants.fontSizeBody;
+
+    return SizedBox(
+      height: buttonHeight,
+      child: TextButton.icon(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          splashFactory: NoSplash.splashFactory,
+          padding: PaddingConstants.horizontalL,
+          backgroundColor: color,
+          disabledBackgroundColor:
+              color.withOpacity(GeneralConstants.opacityDisabled),
+          disabledForegroundColor: color,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: GeneralConstants.borderRadius,
+          ),
+          elevation: 0,
+          shadowColor: Colors.transparent,
         ),
-      ),
-      icon: icon,
-      label: FittedBox(
-        child: GeneralText(
-          text: text,
-          color: fontColor ?? context.onPrimary,
-          fontWeight: GeneralConstants.fontWeightBold,
-          fontSize: fontSize,
-          textAlign: TextAlign.center,
-        ),
+        icon: icon != null
+            ? Icon(icon!.icon,
+                size: GeneralConstants.iconSizeSmall, color: icon!.color)
+            : null,
+        label: child ??
+            FittedBox(
+              child: GeneralText(
+                text: text,
+                color: fontColor ?? context.onPrimary,
+                fontWeight: GeneralConstants.fontWeightSubtitle,
+                fontSize: effectiveFontSize,
+                textAlign: TextAlign.center,
+              ),
+            ),
       ),
     );
   }

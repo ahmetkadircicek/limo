@@ -42,7 +42,7 @@ Widget _buildBottomCard() {
         child: ElevatedContainer(
           child: SingleChildScrollView(
             child: Padding(
-              padding: PaddingConstants.allMedium,
+              padding: PaddingConstants.horizontalXl,
               child: Column(
                 children: [
                   _buildTitle(),
@@ -92,15 +92,15 @@ Widget _buildForgotPasswordButton(
             ),
             GeneralText(
               text: 'Remember me',
-              fontSize: GeneralConstants.fontSizeSmall,
-              fontWeight: GeneralConstants.fontWeightLight,
+              fontSize: GeneralConstants.fontSizeBody,
+              fontWeight: GeneralConstants.fontWeightBody,
             ),
           ],
         ),
       ),
       Expanded(
         child: GeneralButton(
-          fontSize: GeneralConstants.fontSizeSmall,
+          fontSize: GeneralConstants.fontSizeBody,
           onPressed: () {
             loginViewModel.showForgetPasswordDialog(context);
           },
@@ -117,17 +117,16 @@ Widget _buildForgotPasswordButton(
 Widget _buildSignInButton(BuildContext context, LoginViewModel loginViewModel) {
   return SizedBox(
     width: double.infinity,
-    height: GeneralConstants.heightMedium,
     child: GeneralButton(
-      fontSize: GeneralConstants.fontSizeMedium,
+      fontSize: GeneralConstants.fontSizeBody,
       color: context.primary,
       text: 'Sign in',
       onPressed: () async {
         // Use the new professional dialog-based validation
         bool success = await loginViewModel.loginUser(context);
         if (success) {
-          // TODO: Navigate to home page or handle successful login
-          debugPrint('Login successful, should navigate now');
+          // Navigate to home page
+          Navigator.pushReplacementNamed(context, '/home');
         }
       },
     ),
@@ -137,7 +136,7 @@ Widget _buildSignInButton(BuildContext context, LoginViewModel loginViewModel) {
 // Builds the "Don't have an account? Sign up" button
 Widget _buildSignUpButton(BuildContext context) {
   return GeneralButton(
-    fontSize: GeneralConstants.fontSizeSmall,
+    fontSize: GeneralConstants.fontSizeBody,
     color: context.surface,
     fontColor: context.secondary,
     text: 'Don\'t have an account? Sign up',
@@ -201,13 +200,13 @@ Widget _buildTitle() {
           children: [
             GeneralText(
               text: 'Welcome',
-              fontSize: GeneralConstants.fontSizeLarge,
-              fontWeight: GeneralConstants.fontWeightRegular,
+              fontSize: GeneralConstants.fontSizeTitle,
+              fontWeight: GeneralConstants.fontWeightTitle,
             ),
             GeneralText(
               text: 'Sign in to proceed.',
-              fontSize: GeneralConstants.fontSizeSmall,
-              fontWeight: GeneralConstants.fontWeightLight,
+              fontSize: GeneralConstants.fontSizeBody,
+              fontWeight: GeneralConstants.fontWeightBody,
             ),
           ],
         ),
@@ -224,13 +223,12 @@ Widget _buildBackground(BuildContext context) {
       child: Column(
         children: [
           SizedBox(
-            width: context.width * 0.8,
+            width: context.width * 0.7,
             child: Image.asset(
               ImageConstants.imageSoforvarcom,
               fit: BoxFit.cover,
             ),
           ),
-          context.spacerHeight(2),
           SizedBox(
             child: Image.asset(
               width: context.width * 0.7,

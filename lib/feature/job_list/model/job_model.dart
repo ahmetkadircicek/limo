@@ -1,5 +1,7 @@
 import 'package:soforvarcom/core/enums/pickup_type_enum.dart';
 import 'package:soforvarcom/feature/job_list/model/coordinate_model.dart';
+import 'package:soforvarcom/feature/job_list/model/pricing_model.dart';
+import 'package:soforvarcom/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:soforvarcom/feature/vehicle_registration/model/vehicle_model.dart';
 
 class JobModel {
@@ -18,6 +20,8 @@ class JobModel {
   final int? vehicleCount;
   final List<VehicleModel>? vehicles;
   final JobType? jobType;
+  final List<VehicleRequirement> vehicleRequirements;
+  final PricingModel? pricing;
 
   JobModel({
     required this.id,
@@ -35,6 +39,8 @@ class JobModel {
     this.vehicleCount,
     this.vehicles,
     this.jobType,
+    this.vehicleRequirements = const [],
+    this.pricing,
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -64,6 +70,13 @@ class JobModel {
           ? JobType.values.firstWhere((e) => e.name == json['jobType'],
               orElse: () => JobType.pointToPoint)
           : null,
+      vehicleRequirements: (json['vehicleRequirements'] as List<dynamic>?)
+              ?.map((req) => VehicleRequirement.fromJson(req))
+              .toList() ??
+          [],
+      pricing: json['pricing'] != null
+          ? PricingModel.fromJson(json['pricing'])
+          : null,
     );
   }
 
@@ -84,6 +97,9 @@ class JobModel {
       'vehicleCount': vehicleCount,
       'vehicles': vehicles?.map((v) => v.toJson()).toList(),
       'jobType': jobType?.name,
+      'vehicleRequirements':
+          vehicleRequirements.map((req) => req.toJson()).toList(),
+      'pricing': pricing?.toJson(),
     };
   }
 }

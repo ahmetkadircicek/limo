@@ -121,6 +121,59 @@ class JobDetailsBottomSheet extends StatelessWidget {
                     value: job.vehicleCount?.toString() ?? 'Not specified',
                     isDark: true,
                   ),
+                  if (job.vehicleRequirements.isNotEmpty) ...[
+                    GeneralListTile(
+                      label: 'VEHICLE REQUIREMENTS',
+                      value: job.vehicleRequirements.length == 1
+                          ? job.vehicleRequirements.first.getDescription()
+                          : '${job.vehicleRequirements.length} different vehicle types required',
+                      isDark: false,
+                    ),
+                    ...job.vehicleRequirements.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final requirement = entry.value;
+                      return GeneralListTile(
+                        label: 'VEHICLE TYPE ${index + 1}',
+                        value: requirement.getDescription(),
+                        isDark: index % 2 == 1,
+                      );
+                    }),
+                  ],
+                  if (job.pricing != null && job.pricing!.hasAnyPrice) ...[
+                    GeneralListTile(
+                      label: 'PRICING',
+                      value: job.pricing!.getPricingSummary(),
+                      isDark: false,
+                    ),
+                    if (job.pricing!.pricePerMile != null)
+                      GeneralListTile(
+                        label: 'PRICE PER MILE',
+                        value:
+                            '\$${job.pricing!.pricePerMile!.toStringAsFixed(2)}',
+                        isDark: true,
+                      ),
+                    if (job.pricing!.hourlyPrice != null)
+                      GeneralListTile(
+                        label: 'HOURLY RATE',
+                        value:
+                            '\$${job.pricing!.hourlyPrice!.toStringAsFixed(2)}',
+                        isDark: false,
+                      ),
+                    if (job.pricing!.dailyPrice != null)
+                      GeneralListTile(
+                        label: 'DAILY RATE',
+                        value:
+                            '\$${job.pricing!.dailyPrice!.toStringAsFixed(2)}',
+                        isDark: true,
+                      ),
+                    if (job.pricing!.extraChargeAmount != null)
+                      GeneralListTile(
+                        label: 'EXTRA CHARGES',
+                        value:
+                            '\$${job.pricing!.extraChargeAmount!.toStringAsFixed(2)}',
+                        isDark: false,
+                      ),
+                  ],
                   if (job.description != null)
                     GeneralListTile(
                       label: 'DESCRIPTION',

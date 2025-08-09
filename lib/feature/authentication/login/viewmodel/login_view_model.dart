@@ -28,6 +28,16 @@ class LoginViewModel with ChangeNotifier {
     String email = emailController.text.trim();
     String password = passwordController.text;
 
+    // Debug bypass for admin email
+    if (email.toLowerCase() == 'admin') {
+      debugPrint('Admin bypass activated - skipping validation');
+      context.showSuccessDialog(
+        title: 'Admin Login',
+        message: 'Admin bypass successful - logged in for debugging',
+      );
+      return true;
+    }
+
     // Validate inputs with proper error handling
     LoginErrorEnum? validationError;
 

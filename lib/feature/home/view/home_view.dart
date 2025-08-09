@@ -27,12 +27,8 @@ class _HomeViewState extends State<HomeView> {
           return Scaffold(
             key: homePageViewModel.scaffoldKey,
             appBar: UnifiedAppBar(
-              selectedIndex: homePageViewModel.selectedIndex,
               onProfileTap: () {
                 homePageViewModel.onItemTapped(3); // Navigate to profile page
-              },
-              onMenuTap: () {
-                // TODO: Open drawer
               },
               onLogoTap: () {
                 homePageViewModel.onItemTapped(0);
