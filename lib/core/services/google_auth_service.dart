@@ -10,6 +10,9 @@ class GoogleAuthService {
   static GoogleAuthService? _instance;
   static GoogleAuthService get instance => _instance ??= GoogleAuthService._();
 
+  // Flag to prevent duplicate initialization
+  static bool _isInitialized = false;
+
   GoogleAuthService._();
 
   // Configure GoogleSignIn instance
@@ -105,6 +108,11 @@ class GoogleAuthService {
   /// Check if user is signed in and restore session if possible
   static Future<bool> checkAndRestoreSession() async {
     try {
+      // Ensure Google Sign-In is initialized
+      if (!_isInitialized) {
+        await initialize();
+      }
+
       // Check if there's already a current user
       if (currentUser != null) {
         developer.log('User already signed in: ${currentUser!.email}');
@@ -112,8 +120,9 @@ class GoogleAuthService {
       }
 
       // Try to restore user session
-      final restoredUser = await _googleSignIn.attemptLightweightAuthentication();
-      
+      final restoredUser =
+          await _googleSignIn.attemptLightweightAuthentication();
+
       if (restoredUser != null) {
         currentUser = restoredUser;
         developer.log('User session restored: ${restoredUser.email}');
@@ -149,6 +158,12 @@ class GoogleAuthService {
   /// Call this method in main() or app initialization
   static Future<void> initialize() async {
     try {
+      // Check if already initialized
+      if (_isInitialized) {
+        developer.log('Google Sign-In already initialized, skipping...');
+        return;
+      }
+
       developer.log('Initializing Google Sign-In...');
 
       // Initialize Google Sign-In
@@ -175,6 +190,10 @@ class GoogleAuthService {
       } else {
         developer.log('No previous user session found');
       }
+
+      // Mark as initialized
+      _isInitialized = true;
+      developer.log('Google Sign-In initialization completed');
     } catch (error) {
       developer.log('Google Sign-In initialization error: $error');
     }

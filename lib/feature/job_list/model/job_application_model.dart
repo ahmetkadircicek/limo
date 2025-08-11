@@ -5,9 +5,11 @@ import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
+/// Job Application Model - Her araç gereksinimi için ayrı başvuru
 class JobApplication {
   final String id;
   final String jobId;
+  final String vehicleRequirementId; // Hangi araç gereksinimine başvurulduğu
   final String driverId;
   final String driverName;
   final String driverEmail;
@@ -16,12 +18,21 @@ class JobApplication {
   final DateTime applicationDate;
   final ApplicationStatus status;
   final String? notes;
-  final double? proposedPrice;
   final String? rejectionReason;
+
+  // Fiyatlandırma bilgileri
+  final double? proposedHourlyRate; // Saatlik ücret
+  final double? proposedPricePerMile; // Mil başına ücret
+  final double? totalProposedPrice; // Toplam önerilen fiyat
+
+  // Araç uygunluk kontrolü
+  final bool vehicleMeetsRequirements;
+  final String? vehicleCompatibilityNotes;
 
   const JobApplication({
     required this.id,
     required this.jobId,
+    required this.vehicleRequirementId,
     required this.driverId,
     required this.driverName,
     required this.driverEmail,
@@ -30,67 +41,118 @@ class JobApplication {
     required this.applicationDate,
     this.status = ApplicationStatus.pending,
     this.notes,
-    this.proposedPrice,
     this.rejectionReason,
+    this.proposedHourlyRate,
+    this.proposedPricePerMile,
+    this.totalProposedPrice,
+    this.vehicleMeetsRequirements = false,
+    this.vehicleCompatibilityNotes,
   });
 
-  /// Check if this application meets the job requirements
-  bool meetsJobRequirements(JobModel job) {
-    // Check if any vehicle requirement matches this vehicle
-    for (final requirement in job.vehicleRequirements) {
-      if (requirement.matchesVehicle(appliedVehicle)) {
-        return true;
-      }
-    }
-    return false;
+  /// Check if this application meets the specific vehicle requirement
+  bool meetsVehicleRequirement(VehicleRequirement requirement) {
+    return requirement.matchesVehicle(appliedVehicle);
   }
 
-  /// Get the best matching vehicle requirement for this application
-  VehicleRequirement? getBestMatchingRequirement(JobModel job) {
-    VehicleRequirement? bestMatch;
-    int? bestCategoryId;
+  /// Calculate the total proposed price based on job type and requirements
+  double calculateTotalProposedPrice(
+      JobModel job, VehicleRequirement requirement) {
+    // Eğer zaten hesaplanmışsa onu kullan
+    if (totalProposedPrice != null) {
+      return totalProposedPrice!;
+    }
 
-    for (final requirement in job.vehicleRequirements) {
-      if (requirement.matchesVehicle(appliedVehicle)) {
-        final categoryId = requirement.minimumCategory?.id ?? 0;
-        if (bestMatch == null || categoryId > (bestCategoryId ?? 0)) {
-          bestMatch = requirement;
-          bestCategoryId = categoryId;
-        }
+    double totalPrice = 0.0;
+
+    if (job.jobType == JobType.hourly) {
+      // Saatlik iş için
+      if (proposedHourlyRate != null) {
+        totalPrice = proposedHourlyRate!;
+      } else if (requirement.hourlyRate != null) {
+        totalPrice = requirement.hourlyRate!;
       }
-    }
-
-    return bestMatch;
-  }
-
-  /// Calculate the proposed price based on job requirements
-  double? calculateProposedPrice(JobModel job) {
-    final requirement = getBestMatchingRequirement(job);
-    if (requirement == null) return null;
-
-    // Use the requirement's pricing if available
-    if (requirement.hourlyRate != null || requirement.pricePerMile != null) {
-      return proposedPrice ?? 0.0;
-    }
-
-    // Calculate based on job type and vehicle category
-    if (job.jobType == JobType.hourly && requirement.hourlyRate != null) {
-      return requirement.hourlyRate;
-    } else if (job.jobType == JobType.pointToPoint &&
-        requirement.pricePerMile != null) {
-      // Calculate total price based on distance
-      if (job.toLocation != null) {
+    } else if (job.jobType == JobType.pointToPoint) {
+      // Noktadan noktaya iş için
+      if (proposedPricePerMile != null &&
+          job.toLocation != null &&
+          job.fromLocation != null) {
         final distance = _calculateDistance(
-          job.fromLocation.latitude,
-          job.fromLocation.longitude,
+          job.fromLocation!.latitude,
+          job.fromLocation!.longitude,
           job.toLocation!.latitude,
           job.toLocation!.longitude,
         );
-        return distance * requirement.pricePerMile!;
+        totalPrice = distance * proposedPricePerMile!;
+      } else if (requirement.pricePerMile != null &&
+          job.toLocation != null &&
+          job.fromLocation != null) {
+        final distance = _calculateDistance(
+          job.fromLocation!.latitude,
+          job.fromLocation!.longitude,
+          job.toLocation!.latitude,
+          job.toLocation!.longitude,
+        );
+        totalPrice = distance * requirement.pricePerMile!;
       }
     }
 
-    return proposedPrice;
+    return totalPrice;
+  }
+
+  /// Get pricing summary for this application
+  String getPricingSummary(JobModel job, VehicleRequirement requirement) {
+    final totalPrice = calculateTotalProposedPrice(job, requirement);
+
+    List<String> pricing = [];
+
+    if (proposedHourlyRate != null) {
+      pricing.add('Saatlik: \$${proposedHourlyRate!.toStringAsFixed(2)}');
+    } else if (requirement.hourlyRate != null) {
+      pricing.add('Saatlik: \$${requirement.hourlyRate!.toStringAsFixed(2)}');
+    }
+
+    if (proposedPricePerMile != null) {
+      pricing.add('Mil: \$${proposedPricePerMile!.toStringAsFixed(2)}');
+    } else if (requirement.pricePerMile != null) {
+      pricing.add('Mil: \$${requirement.pricePerMile!.toStringAsFixed(2)}');
+    }
+
+    if (totalPrice > 0) {
+      pricing.add('Toplam: \$${totalPrice.toStringAsFixed(2)}');
+    }
+
+    if (pricing.isEmpty) return 'Fiyat belirtilmemiş';
+    return pricing.join(', ');
+  }
+
+  /// Check if driver has higher hierarchy vehicle for this requirement
+  bool hasHigherHierarchyVehicle(VehicleRequirement requirement) {
+    if (requirement.minimumCategory == null) return true;
+
+    // Araç kategorisini kontrol et
+    return appliedVehicle.canHandleJob(requirement.minimumCategory!);
+  }
+
+  /// Get application priority score (higher is better)
+  double getPriorityScore(VehicleRequirement requirement) {
+    double score = 0.0;
+
+    // Araç uygunluğu
+    if (vehicleMeetsRequirements) score += 10.0;
+
+    // Kategori uygunluğu
+    if (requirement.minimumCategory != null) {
+      final vehicleCategory = appliedVehicle.getHighestCategory();
+      score +=
+          vehicleCategory.id * 2.0; // Daha yüksek kategori = daha yüksek puan
+    }
+
+    // Fiyat uygunluğu (daha düşük fiyat = daha yüksek puan)
+    if (totalProposedPrice != null && totalProposedPrice! > 0) {
+      score += 100.0 / totalProposedPrice!; // Ters orantı
+    }
+
+    return score;
   }
 
   double _calculateDistance(
@@ -113,6 +175,7 @@ class JobApplication {
     return {
       'id': id,
       'jobId': jobId,
+      'vehicleRequirementId': vehicleRequirementId,
       'driverId': driverId,
       'driverName': driverName,
       'driverEmail': driverEmail,
@@ -121,8 +184,12 @@ class JobApplication {
       'applicationDate': applicationDate.toIso8601String(),
       'status': status.name,
       'notes': notes,
-      'proposedPrice': proposedPrice,
       'rejectionReason': rejectionReason,
+      'proposedHourlyRate': proposedHourlyRate,
+      'proposedPricePerMile': proposedPricePerMile,
+      'totalProposedPrice': totalProposedPrice,
+      'vehicleMeetsRequirements': vehicleMeetsRequirements,
+      'vehicleCompatibilityNotes': vehicleCompatibilityNotes,
     };
   }
 
@@ -130,6 +197,7 @@ class JobApplication {
     return JobApplication(
       id: json['id'] ?? '',
       jobId: json['jobId'] ?? '',
+      vehicleRequirementId: json['vehicleRequirementId'] ?? '',
       driverId: json['driverId'] ?? '',
       driverName: json['driverName'] ?? '',
       driverEmail: json['driverEmail'] ?? '',
@@ -141,14 +209,19 @@ class JobApplication {
         orElse: () => ApplicationStatus.pending,
       ),
       notes: json['notes'],
-      proposedPrice: json['proposedPrice']?.toDouble(),
       rejectionReason: json['rejectionReason'],
+      proposedHourlyRate: json['proposedHourlyRate']?.toDouble(),
+      proposedPricePerMile: json['proposedPricePerMile']?.toDouble(),
+      totalProposedPrice: json['totalProposedPrice']?.toDouble(),
+      vehicleMeetsRequirements: json['vehicleMeetsRequirements'] ?? false,
+      vehicleCompatibilityNotes: json['vehicleCompatibilityNotes'],
     );
   }
 
   JobApplication copyWith({
     String? id,
     String? jobId,
+    String? vehicleRequirementId,
     String? driverId,
     String? driverName,
     String? driverEmail,
@@ -157,12 +230,17 @@ class JobApplication {
     DateTime? applicationDate,
     ApplicationStatus? status,
     String? notes,
-    double? proposedPrice,
     String? rejectionReason,
+    double? proposedHourlyRate,
+    double? proposedPricePerMile,
+    double? totalProposedPrice,
+    bool? vehicleMeetsRequirements,
+    String? vehicleCompatibilityNotes,
   }) {
     return JobApplication(
       id: id ?? this.id,
       jobId: jobId ?? this.jobId,
+      vehicleRequirementId: vehicleRequirementId ?? this.vehicleRequirementId,
       driverId: driverId ?? this.driverId,
       driverName: driverName ?? this.driverName,
       driverEmail: driverEmail ?? this.driverEmail,
@@ -171,17 +249,26 @@ class JobApplication {
       applicationDate: applicationDate ?? this.applicationDate,
       status: status ?? this.status,
       notes: notes ?? this.notes,
-      proposedPrice: proposedPrice ?? this.proposedPrice,
       rejectionReason: rejectionReason ?? this.rejectionReason,
+      proposedHourlyRate: proposedHourlyRate ?? this.proposedHourlyRate,
+      proposedPricePerMile: proposedPricePerMile ?? this.proposedPricePerMile,
+      totalProposedPrice: totalProposedPrice ?? this.totalProposedPrice,
+      vehicleMeetsRequirements:
+          vehicleMeetsRequirements ?? this.vehicleMeetsRequirements,
+      vehicleCompatibilityNotes:
+          vehicleCompatibilityNotes ?? this.vehicleCompatibilityNotes,
     );
   }
 }
 
+/// Application Status Enum
 enum ApplicationStatus {
   pending('Beklemede'),
   accepted('Kabul Edildi'),
   rejected('Reddedildi'),
-  withdrawn('Geri Çekildi');
+  withdrawn('Geri Çekildi'),
+  underReview('İnceleniyor'),
+  shortlisted('Ön Elemeden Geçti');
 
   const ApplicationStatus(this.displayName);
   final String displayName;

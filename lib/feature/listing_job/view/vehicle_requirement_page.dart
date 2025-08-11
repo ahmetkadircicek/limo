@@ -364,6 +364,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
                       'Save',
                       onPressed: () {
                         final requirement = VehicleRequirement.specific(
+                          id: 'req_${DateTime.now().millisecondsSinceEpoch}',
                           brand: _selectedBrand,
                           vehicleType: _selectedVehicleType,
                           exteriorColor: _selectedExteriorColor,

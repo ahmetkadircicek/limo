@@ -53,7 +53,7 @@ class _LocationSection extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AppText.body(
-            job.fromProvince.toUpperCase(),
+            job.fromProvince!.toUpperCase(),
             color: context.onSurface,
           ),
           Padding(
@@ -65,7 +65,7 @@ class _LocationSection extends StatelessWidget {
             ),
           ),
           AppText.body(
-            job.toProvince.toUpperCase(),
+            job.toProvince!.toUpperCase(),
             color: context.onSurface,
           ),
         ],

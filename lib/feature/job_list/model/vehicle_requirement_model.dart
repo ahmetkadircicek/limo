@@ -2,6 +2,7 @@ import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
 class VehicleRequirement {
+  final String id; // Unique identifier for each requirement
   final String? specificBrand; // null = "Any brand"
   final String? specificModel; // null = "Any model"
   final String? specificVehicleType; // null = "Any type"
@@ -13,12 +14,14 @@ class VehicleRequirement {
   final int? maximumYear; // null = "No max year"
   final VehicleCategory? minimumCategory; // null = "Any category"
   final bool isFlexible; // Overall flexibility flag
-  
+  final String? notes; // Additional notes about the requirement
+
   // Pricing for this specific vehicle requirement
   final double? hourlyRate;
   final double? pricePerMile;
 
   const VehicleRequirement({
+    required this.id,
     this.specificBrand,
     this.specificModel,
     this.specificVehicleType,
@@ -30,6 +33,7 @@ class VehicleRequirement {
     this.maximumYear,
     this.minimumCategory,
     this.isFlexible = true,
+    this.notes,
     this.hourlyRate,
     this.pricePerMile,
   });
@@ -37,12 +41,14 @@ class VehicleRequirement {
   /// Factory constructor for completely flexible requirements
   factory VehicleRequirement.anyVehicle() {
     return const VehicleRequirement(
+      id: 'any_vehicle',
       isFlexible: true,
     );
   }
 
   /// Factory constructor for specific requirements
   factory VehicleRequirement.specific({
+    required String id,
     String? brand,
     String? model,
     String? vehicleType,
@@ -53,10 +59,12 @@ class VehicleRequirement {
     int? minYear,
     int? maxYear,
     VehicleCategory? minCategory,
+    String? notes,
     double? hourlyRate,
     double? pricePerMile,
   }) {
     return VehicleRequirement(
+      id: id,
       specificBrand: brand,
       specificModel: model,
       specificVehicleType: vehicleType,
@@ -68,6 +76,7 @@ class VehicleRequirement {
       maximumYear: maxYear,
       minimumCategory: minCategory,
       isFlexible: false,
+      notes: notes,
       hourlyRate: hourlyRate,
       pricePerMile: pricePerMile,
     );
@@ -75,17 +84,16 @@ class VehicleRequirement {
 
   /// Check if a vehicle matches this requirement
   bool matchesVehicle(VehicleModel vehicle) {
-    // If completely flexible, any vehicle matches
-    if (isFlexible &&
-        specificBrand == null &&
-        specificModel == null &&
-        specificVehicleType == null &&
-        specificExteriorColor == null &&
-        specificInteriorColor == null &&
-        minimumCapacity == null &&
-        maximumCapacity == null &&
-        minimumCategory == null) {
-      return true;
+    // Check capacity requirement
+    if (minimumCapacity != null && vehicle.capacity < minimumCapacity!) {
+      return false;
+    }
+
+    // Check category requirement
+    if (minimumCategory != null) {
+      if (!vehicle.canHandleJob(minimumCategory!)) {
+        return false;
+      }
     }
 
     // Check brand requirement
@@ -104,108 +112,76 @@ class VehicleRequirement {
       return false;
     }
 
-    // Check exterior color requirement
-    if (specificExteriorColor != null &&
-        vehicle.exteriorColor != specificExteriorColor) {
-      return false;
-    }
-
-    // Check interior color requirement
-    if (specificInteriorColor != null &&
-        vehicle.interiorColor != specificInteriorColor) {
-      return false;
-    }
-
-    // Check minimum capacity requirement
-    if (minimumCapacity != null && vehicle.capacity < minimumCapacity!) {
-      return false;
-    }
-
-    // Check maximum capacity requirement
-    if (maximumCapacity != null && vehicle.capacity > maximumCapacity!) {
-      return false;
-    }
-
-    // Check minimum year requirement
+    // Check year requirement
     if (minimumYear != null && vehicle.year < minimumYear!) {
       return false;
     }
-
-    // Check maximum year requirement
     if (maximumYear != null && vehicle.year > maximumYear!) {
       return false;
     }
 
-    // Check minimum category requirement
-    if (minimumCategory != null && !vehicle.canHandleJob(minimumCategory!)) {
+    // Check color requirements
+    if (specificExteriorColor != null &&
+        vehicle.exteriorColor != specificExteriorColor) {
+      return false;
+    }
+    if (specificInteriorColor != null &&
+        vehicle.interiorColor != specificInteriorColor) {
       return false;
     }
 
     return true;
   }
 
-  /// Get human-readable description of requirements
+  /// Get a human-readable description of this requirement
   String getDescription() {
-    if (isFlexible &&
-        specificBrand == null &&
-        specificModel == null &&
-        specificVehicleType == null &&
-        specificExteriorColor == null &&
-        minimumCapacity == null &&
-        minimumCategory == null) {
-      return "Any vehicle accepted";
-    }
+    final parts = <String>[];
 
-    List<String> requirements = [];
-
-    if (specificBrand != null) requirements.add("Brand: $specificBrand");
-    if (specificModel != null) requirements.add("Model: $specificModel");
-    if (specificVehicleType != null)
-      requirements.add("Type: $specificVehicleType");
-    if (specificExteriorColor != null)
-      requirements.add("Color: $specificExteriorColor");
-    if (minimumCapacity != null) {
-      if (maximumCapacity != null) {
-        requirements.add("Capacity: $minimumCapacity-$maximumCapacity persons");
-      } else {
-        requirements.add("Min Capacity: $minimumCapacity+ persons");
-      }
+    if (specificBrand != null) {
+      parts.add('Marka: $specificBrand');
     }
-    if (minimumYear != null) {
-      if (maximumYear != null) {
-        requirements.add("Year: $minimumYear-$maximumYear");
-      } else {
-        requirements.add("Min Year: $minimumYear+");
-      }
+    if (specificModel != null) {
+      parts.add('Model: $specificModel');
     }
     if (minimumCategory != null) {
-      requirements.add("Min Category: ${minimumCategory!.displayName}");
+      parts.add('Kategori: ${minimumCategory!.displayName}');
+    }
+    if (minimumCapacity != null) {
+      parts.add('Kapasite: $minimumCapacity+ kişi');
+    }
+    if (minimumYear != null) {
+      parts.add('Yıl: $minimumYear+');
+    }
+    if (specificVehicleType != null) {
+      parts.add('Tip: $specificVehicleType');
     }
 
-    if (requirements.isEmpty) {
-      requirements.add("Flexible requirements");
+    if (parts.isEmpty) {
+      return 'Herhangi bir araç';
     }
 
-    return requirements.join(", ");
+    return parts.join(', ');
   }
 
   /// Get pricing summary for this vehicle requirement
   String getPricingSummary() {
     List<String> pricing = [];
-    
+
     if (hourlyRate != null) {
       pricing.add('\$${hourlyRate!.toStringAsFixed(2)}/hour');
     }
     if (pricePerMile != null) {
       pricing.add('\$${pricePerMile!.toStringAsFixed(2)}/mile');
     }
-    
+
     if (pricing.isEmpty) return 'No pricing specified';
     return pricing.join(', ');
   }
 
+  /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'specificBrand': specificBrand,
       'specificModel': specificModel,
       'specificVehicleType': specificVehicleType,
@@ -217,13 +193,16 @@ class VehicleRequirement {
       'maximumYear': maximumYear,
       'minimumCategory': minimumCategory?.id,
       'isFlexible': isFlexible,
+      'notes': notes,
       'hourlyRate': hourlyRate,
       'pricePerMile': pricePerMile,
     };
   }
 
+  /// Create from JSON
   factory VehicleRequirement.fromJson(Map<String, dynamic> json) {
     return VehicleRequirement(
+      id: json['id'] ?? '',
       specificBrand: json['specificBrand'],
       specificModel: json['specificModel'],
       specificVehicleType: json['specificVehicleType'],
@@ -233,10 +212,14 @@ class VehicleRequirement {
       maximumCapacity: json['maximumCapacity'],
       minimumYear: json['minimumYear'],
       maximumYear: json['maximumYear'],
-      minimumCategory: json['minimumCategory'] != null 
-          ? VehicleCategory.fromId(json['minimumCategory'])
+      minimumCategory: json['minimumCategory'] != null
+          ? VehicleCategory.values.firstWhere(
+              (cat) => cat.id == json['minimumCategory'],
+              orElse: () => VehicleCategory.standardSedan,
+            )
           : null,
       isFlexible: json['isFlexible'] ?? true,
+      notes: json['notes'],
       hourlyRate: json['hourlyRate']?.toDouble(),
       pricePerMile: json['pricePerMile']?.toDouble(),
     );
@@ -246,6 +229,7 @@ class VehicleRequirement {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is VehicleRequirement &&
+        other.id == id &&
         other.specificBrand == specificBrand &&
         other.specificModel == specificModel &&
         other.specificVehicleType == specificVehicleType &&
@@ -263,7 +247,8 @@ class VehicleRequirement {
 
   @override
   int get hashCode {
-    return specificBrand.hashCode ^
+    return id.hashCode ^
+        specificBrand.hashCode ^
         specificModel.hashCode ^
         specificVehicleType.hashCode ^
         specificExteriorColor.hashCode ^

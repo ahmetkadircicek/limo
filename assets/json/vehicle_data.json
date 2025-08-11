@@ -38,6 +38,71 @@
       "category": "standardSedan",
       "hourlyRate": 80.0,
       "pricePerMile": 1.5
+    },
+    {
+      "licencePlate": "34 JKL 012",
+      "brand": "Mercedes",
+      "model": "Sprinter",
+      "year": 2022,
+      "capacity": 12,
+      "vehicleType": "Van",
+      "interiorColor": "Black",
+      "exteriorColor": "White",
+      "category": "luxurySuv",
+      "hourlyRate": 200.0,
+      "pricePerMile": 3.0
+    },
+    {
+      "licencePlate": "34 MNO 345",
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2021,
+      "capacity": 7,
+      "vehicleType": "SUV",
+      "interiorColor": "Beige",
+      "exteriorColor": "Blue",
+      "category": "premiumSuv",
+      "hourlyRate": 180.0,
+      "pricePerMile": 2.8
+    },
+    {
+      "licencePlate": "34 PQR 678",
+      "brand": "Toyota",
+      "model": "Hilux",
+      "year": 2020,
+      "capacity": 5,
+      "vehicleType": "Pickup",
+      "interiorColor": "Gray",
+      "exteriorColor": "Black",
+      "category": "standardSuv",
+      "hourlyRate": 100.0,
+      "pricePerMile": 1.8
+    },
+    {
+      "licencePlate": "34 STU 901",
+      "brand": "Ford",
+      "model": "Transit",
+      "year": 2019,
+      "capacity": 15,
+      "vehicleType": "Van",
+      "interiorColor": "White",
+      "exteriorColor": "Silver",
+      "category": "standardSuv",
+      "hourlyRate": 120.0,
+      "pricePerMile": 2.2
+    },
+    {
+      "licencePlate": "34 VWX 234",
+      "brand": "Honda",
+      "model": "Civic",
+      "year": 2021,
+      "capacity": 5,
+      "vehicleType": "Sedan",
+      "interiorColor": "Black",
+      "exteriorColor": "Red",
+      "category": "economySedan",
+      "hourlyRate": 60.0,
+      "pricePerMile": 1.2
     }
   ]
 }

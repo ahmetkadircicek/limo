@@ -32,12 +32,12 @@ class _JobListViewState extends State<JobListView> {
 
     _filteredJobs = _jobs.where((job) {
       final matchesSearch = query.isEmpty ||
-          job.fromProvince.toLowerCase().contains(query) ||
-          job.toProvince.toLowerCase().contains(query) ||
-          job.fromCity?.toLowerCase().contains(query) == true ||
-          job.toCity?.toLowerCase().contains(query) == true ||
-          job.companyName?.toLowerCase().contains(query) == true ||
-          job.description?.toLowerCase().contains(query) == true;
+          (job.fromProvince?.toLowerCase().contains(query) ?? false) ||
+          (job.toProvince?.toLowerCase().contains(query) ?? false) ||
+          (job.fromCity?.toLowerCase().contains(query) ?? false) ||
+          (job.toCity?.toLowerCase().contains(query) ?? false) ||
+          (job.companyName?.toLowerCase().contains(query) ?? false) ||
+          (job.description?.toLowerCase().contains(query) ?? false);
 
       final matchesJobType = _selectedJobType == 'All' ||
           job.jobType.toString().split('.').last == _selectedJobType;
@@ -327,7 +327,7 @@ class _JobListViewState extends State<JobListView> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  job.fromProvince.toUpperCase(),
+                                  job.fromProvince?.toUpperCase() ?? '',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -380,7 +380,7 @@ class _JobListViewState extends State<JobListView> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  job.toProvince.toUpperCase(),
+                                  job.toProvince?.toUpperCase() ?? '',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

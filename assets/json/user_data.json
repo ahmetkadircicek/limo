@@ -1,0 +1,38 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "email": "akadircicek@outlook.com",
+      "displayName": "Ahmet Kadir Çiçek",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocL5XqNuJ-s0vV0CFUbWNVRTzHkxdf2AWSAt8jrJY_hm0CKGpPPA=s1337",
+      "phoneNumber": "+90 555 123 45 67",
+      "companyName": "Limo Services Ltd.",
+      "companyAddress": "İstanbul, Türkiye",
+      "driverLicenseNumber": "TR-123456789",
+      "driverLicenseExpiry": "2025-12-31",
+      "experienceYears": 5,
+      "rating": 4.8,
+      "totalJobs": 127,
+      "isVerified": true,
+      "createdAt": "2023-01-15T10:30:00Z",
+      "lastLoginAt": "2024-01-20T14:45:00Z"
+    },
+    {
+      "id": "user_002",
+      "email": "driver2@example.com",
+      "displayName": "Mehmet Yılmaz",
+      "photoUrl": "https://example.com/photo2.jpg",
+      "phoneNumber": "+90 555 987 65 43",
+      "companyName": "Premium Transport",
+      "companyAddress": "Ankara, Türkiye",
+      "driverLicenseNumber": "TR-987654321",
+      "driverLicenseExpiry": "2026-06-30",
+      "experienceYears": 3,
+      "rating": 4.6,
+      "totalJobs": 89,
+      "isVerified": true,
+      "createdAt": "2023-03-20T09:15:00Z",
+      "lastLoginAt": "2024-01-20T12:30:00Z"
+    }
+  ]
+}

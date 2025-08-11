@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/init/navigation/navigation_service.dart';
-import 'package:limo/core/services/google_auth_service.dart';
 import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/services/google_auth_service.dart';
 import 'package:limo/feature/home/view/home_view.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
@@ -32,20 +32,22 @@ class LoginViewModel extends ChangeNotifier {
       if (user != null) {
         // Get comprehensive user profile data and log it
         await GoogleAuthService.getComprehensiveUserProfile();
-        
+
         // Create user model and set it in provider
         final userModel = await GoogleAuthService.getUserModel();
         if (userModel != null) {
           // Set user in provider (this will be accessed from main.dart)
-          final context = NavigationService.instance.navigatorKey.currentContext;
+          final context =
+              NavigationService.instance.navigatorKey.currentContext;
           if (context != null) {
-            Provider.of<UserProvider>(context, listen: false).setUser(userModel);
+            Provider.of<UserProvider>(context, listen: false)
+                .setUser(userModel);
           }
         }
-        
+
         // Successful Google Sign-In
         await _handleSuccessfulLogin(
-          user.displayName ?? user.email ?? 'Google User',
+          user.displayName ?? 'Google User',
         );
       } else {
         // User cancelled or error

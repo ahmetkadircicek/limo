@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/init/theme/app_theme.dart';
 import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/core/services/google_auth_service.dart';
 import 'package:limo/feature/splash/view/splash_view.dart';
 import 'package:provider/provider.dart';
 
@@ -13,8 +12,8 @@ import 'feature/login/view/login_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Google Authentication
-  await GoogleAuthService.initialize();
+  // Google Auth Service will be initialized in SplashView
+  // await GoogleAuthService.initialize();
 
   runApp(
     MultiProvider(

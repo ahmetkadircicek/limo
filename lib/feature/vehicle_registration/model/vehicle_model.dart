@@ -128,6 +128,11 @@ class VehicleModel {
     return category.canApplyToJob(requirement.minimumCategory!);
   }
 
+  /// Get the highest category this vehicle can achieve
+  VehicleCategory getHighestCategory() {
+    return category;
+  }
+
   /// Get upgrade options for this vehicle
   List<VehicleCategory> getUpgradeOptions() {
     return category.getUpgradeOptions();
@@ -219,6 +224,20 @@ class VehicleModel {
   }
 
   factory VehicleModel.fromJson(Map<String, dynamic> json) {
+    // Handle category parsing - it can come as string name or int id
+    VehicleCategory category;
+    if (json['category'] is String) {
+      // Try to find category by name
+      final categoryName = json['category'] as String;
+      category = VehicleCategory.values.firstWhere(
+        (cat) => cat.name == categoryName || cat.displayName == categoryName,
+        orElse: () => VehicleCategory.standardSedan,
+      );
+    } else {
+      // Parse as int ID
+      category = VehicleCategory.fromId(json['category'] ?? 6);
+    }
+
     return VehicleModel(
       licencePlate: json['licencePlate'] ?? '',
       brand: json['brand'] ?? '',
@@ -228,7 +247,7 @@ class VehicleModel {
       vehicleType: json['vehicleType'] ?? '',
       interiorColor: json['interiorColor'] ?? '',
       exteriorColor: json['exteriorColor'] ?? '',
-      category: VehicleCategory.fromId(json['category'] ?? 1),
+      category: category,
       hourlyRate: json['hourlyRate']?.toDouble(),
       pricePerMile: json['pricePerMile']?.toDouble(),
     );

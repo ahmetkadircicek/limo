@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/shared/app_components.dart';
@@ -14,17 +12,13 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  final _formKey = GlobalKey<FormState>();
-
-  // User Information Controllers
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-
-  // Company Information Controllers
-  final _companyNameController = TextEditingController();
-  final _companyAddressController = TextEditingController();
-  final _taxNumberController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _licenseController = TextEditingController();
+  final TextEditingController _expiryController = TextEditingController();
 
   // Vehicle Information
   final List<Map<String, String>> _vehicles = [];
@@ -38,9 +32,9 @@ class _ProfileViewState extends State<ProfileView> {
   void _loadUserData() {
     // User data will be loaded from UserProvider
     // Mock data is kept as fallback for company and vehicle information
-    _companyNameController.text = 'ABC Transport Company';
-    _companyAddressController.text = 'Istanbul, Turkey';
-    _taxNumberController.text = '1234567890';
+    _companyController.text = 'ABC Transport Company';
+    _addressController.text = 'Istanbul, Turkey';
+    _licenseController.text = '1234567890';
 
     _vehicles.addAll([
       {
@@ -121,51 +115,56 @@ class _ProfileViewState extends State<ProfileView> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _companyNameController.dispose();
-    _companyAddressController.dispose();
-    _taxNumberController.dispose();
+    _companyController.dispose();
+    _addressController.dispose();
+    _licenseController.dispose();
+    _expiryController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) {
-        // Update controllers with user data if available
-        if (userProvider.isLoggedIn) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (userProvider.userDisplayName != null) {
-              _nameController.text = userProvider.userDisplayName!;
-            }
-            if (userProvider.userEmail != null) {
-              _emailController.text = userProvider.userEmail!;
-            }
-          });
-        }
+    // Add a red background container
+    return Container(
+      color: context.surfaceContainer,
+      child: Consumer<UserProvider>(
+        builder: (context, userProvider, child) {
+          // Update controllers with user data if available
+          if (userProvider.isLoggedIn) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (userProvider.userDisplayName != null) {
+                _nameController.text = userProvider.userDisplayName!;
+              }
+              if (userProvider.userEmail != null) {
+                _emailController.text = userProvider.userEmail!;
+              }
+            });
+          }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Header
-              _buildProfileHeader(context, userProvider),
-              const SizedBox(height: 24),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Header
+                _buildProfileHeader(context, userProvider),
+                const SizedBox(height: 24),
 
-              // User Information Section
-              _buildUserInfoSection(context),
-              const SizedBox(height: 24),
+                // User Information Section
+                _buildUserInfoSection(context),
+                const SizedBox(height: 24),
 
-              // Company Information Section
-              _buildCompanyInfoSection(context),
-              const SizedBox(height: 24),
+                // Company Information Section
+                _buildCompanyInfoSection(context),
+                const SizedBox(height: 24),
 
-              // Vehicles Section
-              _buildVehiclesSection(context),
-            ],
-          ),
-        );
-      },
+                // Vehicles Section
+                _buildVehiclesSection(context),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -491,14 +490,14 @@ class _ProfileViewState extends State<ProfileView> {
             child: Column(
               children: [
                 AppInput.primary(
-                  controller: _companyNameController,
+                  controller: _companyController,
                   labelText: 'Şirket Adı',
                   hintText: 'Şirket adını girin',
                   prefixIcon: Icons.business,
                 ),
                 const SizedBox(height: 16),
                 AppInput.primary(
-                  controller: _companyAddressController,
+                  controller: _addressController,
                   labelText: 'Şirket Adresi',
                   hintText: 'Şirket adresini girin',
                   prefixIcon: Icons.location_on,
@@ -506,7 +505,7 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 const SizedBox(height: 16),
                 AppInput.primary(
-                  controller: _taxNumberController,
+                  controller: _licenseController,
                   labelText: 'Vergi Numarası',
                   hintText: 'Vergi numarasını girin',
                   prefixIcon: Icons.receipt,
@@ -667,98 +666,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buildChangePassword() {
-    return ExpansionTile(
-      title: Row(
-        children: [
-          Icon(
-            Icons.lock_outline,
-            size: GeneralConstants.fontSizeMedium,
-            color: context.primary,
-          ),
-          const SizedBox(width: 8),
-          AppText.body(
-            'Change Password',
-            color: context.onSurface,
-          ),
-        ],
-      ),
-      children: [
-        Padding(
-          padding: PaddingConstants.allMedium,
-          child: Column(
-            children: [
-              _buildTextField('Current Password', TextEditingController(),
-                  isPassword: true),
-              const SizedBox(height: 16),
-              _buildTextField('New Password', TextEditingController(),
-                  isPassword: true),
-              const SizedBox(height: 16),
-              _buildTextField('Confirm New Password', TextEditingController(),
-                  isPassword: true),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: AppButton.secondary(
-                  'Update Password',
-                  onPressed: _updatePassword,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-    bool isPassword = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppText.body(
-          label,
-          color: context.onSurface,
-        ),
-        const SizedBox(height: 8),
-        AppInput.primary(
-          controller: controller,
-          hintText: label,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          obscureText: isPassword,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: AppButton.primary(
-            'Save Profile',
-            onPressed: _saveProfile,
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: AppButton.tertiary(
-            'Delete Account',
-            onPressed: _deleteAccount,
-          ),
-        ),
-      ],
-    );
-  }
-
   void _showAddVehicleDialog(BuildContext context) {
     // TODO: Implement add vehicle dialog
   }
@@ -769,49 +676,5 @@ class _ProfileViewState extends State<ProfileView> {
 
   void _deleteVehicle(BuildContext context, Map<String, String> vehicle) {
     // TODO: Implement delete vehicle
-  }
-
-  void _updatePassword() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('Password update functionality will be implemented')),
-    );
-  }
-
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved successfully!')),
-      );
-    }
-  }
-
-  void _deleteAccount() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-            'Are you sure you want to delete your account? This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // TODO: Implement account deletion
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text(
-                        'Account deletion functionality will be implemented')),
-              );
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
   }
 }

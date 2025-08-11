@@ -32,7 +32,10 @@ class _MultipleVehicleRequirementsFormState
     super.initState();
     _requirements = List.from(widget.initialRequirements);
     if (_requirements.isEmpty) {
-      _requirements.add(VehicleRequirement(isFlexible: true));
+      _requirements.add(VehicleRequirement(
+        id: 'req_${DateTime.now().millisecondsSinceEpoch}',
+        isFlexible: true,
+      ));
     }
   }
 

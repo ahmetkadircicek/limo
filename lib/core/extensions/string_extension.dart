@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 
 // extension StringLocalization on String {
@@ -70,19 +67,6 @@ extension StringExtensions on String {
       }
     }
     return nameParts.join(' ');
-  }
-
-  String hashPassword() {
-    try {
-      var bytes = utf8.encode(this);
-      var hash = sha256.convert(bytes);
-
-      var hashedPassword = hash.toString();
-
-      return hashedPassword;
-    } catch (e) {
-      throw Exception('Şifre hash oluşturma hatası: $e');
-    }
   }
 
   String toTurkishDateFormat() {

@@ -110,12 +110,12 @@ class _ListingJobViewState extends State<ListingJobView> {
 
   Widget _buildJobTypeSection() {
     return _buildSection(
-      title: 'Job Type',
+      title: 'İş Türü',
       icon: Icons.work_outline,
       children: [
         AppInput.dropdown(
-          labelText: 'Job Type',
-          hintText: 'Select job type',
+          labelText: 'İş Türü',
+          hintText: 'İş türünü seçin',
           dropdownItems: [
             'Point to Point',
             'Daily Rental',
@@ -126,12 +126,45 @@ class _ListingJobViewState extends State<ListingJobView> {
             setState(() {
               _selectedJobType = value;
 
+              // Sadece Point to Point için varış noktası gerekli
               if (value != 'Point to Point') {
                 _toLocation = null;
               }
             });
           },
           prefixIcon: Icons.work,
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                color: const Color(0xFF6B7280),
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _selectedJobType == 'Point to Point'
+                      ? 'Noktadan noktaya transfer için başlangıç ve varış noktası gerekli'
+                      : 'Günlük/Saatlik kiralama için sadece başlangıç noktası gerekli',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF6B7280),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -142,14 +175,14 @@ class _ListingJobViewState extends State<ListingJobView> {
       title: 'Lokasyon Bilgileri',
       icon: Icons.location_on_outlined,
       children: [
-        // Pickup Location
+        // Başlangıç Lokasyonu (Tüm iş türleri için gerekli)
         _buildLocationCard(
-          title: 'Pickup Location',
+          title: 'Başlangıç Lokasyonu',
           icon: Icons.radio_button_checked,
           color: const Color(0xFF10B981),
           location: _fromLocation,
           onTap: () => _showLocationPicker(
-            title: 'Select Pickup Location',
+            title: 'Başlangıç Lokasyonu Seçin',
             onLocationSelected: (location) {
               setState(() {
                 _fromLocation = location;
@@ -160,15 +193,15 @@ class _ListingJobViewState extends State<ListingJobView> {
 
         const SizedBox(height: 16),
 
-        // Drop-off Location (only for Point to Point)
+        // Varış Lokasyonu (Sadece Point to Point için)
         if (_selectedJobType == 'Point to Point') ...[
           _buildLocationCard(
-            title: 'Destination Location',
+            title: 'Varış Lokasyonu',
             icon: Icons.location_on,
             color: const Color(0xFFEF4444),
             location: _toLocation,
             onTap: () => _showLocationPicker(
-              title: 'Select Destination Location',
+              title: 'Varış Lokasyonu Seçin',
               onLocationSelected: (location) {
                 setState(() {
                   _toLocation = location;
@@ -177,11 +210,42 @@ class _ListingJobViewState extends State<ListingJobView> {
             ),
           ),
 
-          // Route Distance Info
+          // Rota Bilgisi (Sadece her iki lokasyon da seçildiğinde)
           if (_fromLocation != null && _toLocation != null) ...[
             const SizedBox(height: 16),
             _buildRouteInfo(),
           ],
+        ] else ...[
+          // Diğer iş türleri için bilgi kartı
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF3C7),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFFF59E0B),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: const Color(0xFFF59E0B),
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '$_selectedJobType iş türü için sadece başlangıç lokasyonu yeterli. Müşteriler bu noktadan hizmet alacak.',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF92400E),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ],
     );
@@ -360,18 +424,20 @@ class _ListingJobViewState extends State<ListingJobView> {
       return const SizedBox.shrink();
     }
 
-    final distance = _calculateDistanceInMiles(
+    final distanceMiles = _calculateDistanceInMiles(
       _fromLocation!.latitude,
       _fromLocation!.longitude,
       _toLocation!.latitude,
       _toLocation!.longitude,
     );
 
+    final distanceKm = distanceMiles * 1.60934; // Convert miles to kilometers
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16), // Daha yuvarlak köşeler
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: context.primary.withValues(alpha: 0.2),
           width: 1.0,
@@ -384,18 +450,101 @@ class _ListingJobViewState extends State<ListingJobView> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.route,
-            color: context.primary,
-            size: 20,
+          Row(
+            children: [
+              Icon(
+                Icons.route,
+                color: context.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Rota Bilgileri',
+                style: TextStyle(
+                  color: context.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: context.primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Mesafe',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: context.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      Text(
+                        '${distanceKm.toStringAsFixed(1)} km',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: context.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: context.primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Tahmini Süre',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: context.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      Text(
+                        '${(distanceKm / 80).ceil()} saat',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: context.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
-            'Rota mesafesi: ${distance.toStringAsFixed(1)} mil',
+            '${_fromLocation!.placeName} → ${_toLocation!.placeName}',
             style: TextStyle(
-              color: context.primary,
+              fontSize: 14,
+              color: context.onSurface.withValues(alpha: 0.8),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -473,19 +622,6 @@ class _ListingJobViewState extends State<ListingJobView> {
         ),
       ),
     );
-  }
-
-  String _getJobTypeDisplayText(String value) {
-    switch (value) {
-      case 'Point to Point':
-        return 'Nokta-Nokta';
-      case 'Daily Rental':
-        return 'Günlük Kiralama';
-      case 'Hourly Rental':
-        return 'Saatlik Kiralama';
-      default:
-        return value;
-    }
   }
 
   void _createJob() {
