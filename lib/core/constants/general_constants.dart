@@ -1,79 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/design_tokens.dart';
 
 class GeneralConstants {
-  // DESIGN SYSTEM CONSTANTS
+  // MODERN DESIGN SYSTEM CONSTANTS - Following Professional Design Language
 
-  // Heights
-  static const buttonHeight = 48.0;
-  static const inputHeight = 48.0;
-  static const heightLarge = 56.0;
-  static const heightMedium = 48.0;
-  static const heightSmall = 40.0;
-  static const heightExtraSmall = 32.0;
+  // Heights - Reference Sizes from Design System
+  static const buttonHeight = DesignTokens.primaryButtonHeight; // 48.0
+  static const inputHeight = DesignTokens.inputHeight; // 48.0
+  static const heightLarge = DesignTokens.listItemDouble; // 72.0
+  static const heightMedium = DesignTokens.listItemSingle; // 56.0
+  static const heightSmall = DesignTokens.secondaryButtonHeight; // 44.0
+  static const heightExtraSmall = DesignTokens.smallButtonHeight; // 36.0
 
-  // Border Radius
-  static final borderRadius = BorderRadius.circular(12.0);
-  static final borderRadiusSmall = BorderRadius.circular(8.0);
-  static final borderRadiusLarge = BorderRadius.circular(16.0);
-  static const borderRadiusValue = 12.0;
+  // Border Radius - Following 4/8/16 system
+  static final borderRadius =
+      BorderRadius.circular(DesignTokens.radiusMedium); // 8.0
+  static final borderRadiusSmall =
+      BorderRadius.circular(DesignTokens.radiusSmall); // 4.0
+  static final borderRadiusLarge =
+      BorderRadius.circular(DesignTokens.radiusLarge); // 16.0
+  static const borderRadiusValue = DesignTokens.radiusMedium; // 8.0
 
-  // Font Sizes
-  static const fontSizeCaption = 12.0; // Caption / Footnote
-  static const fontSizeBody = 16.0; // Body Text
-  static const fontSizeSubtitle = 18.0; // Subtitle
-  static const fontSizeTitle = 24.0; // Title (AppBar / Headings)
+  // Typography Sizes - Professional Design Language
+  static const fontSizeCaption = 12.0; // caption
+  static const fontSizeSmall = 14.0; // bodySmall
+  static const fontSizeBody = 16.0; // bodyLarge
+  static const fontSizeSubtitle = 18.0; // h3
+  static const fontSizeTitle = 22.0; // h2
+  static const fontSizeHeading = 28.0; // h1
 
-  // Legacy font sizes for gradual migration
+  // Legacy font sizes (deprecated - use DesignTokens.* directly)
   static const fontSizeExtraSmall = 12.0;
-  static const fontSizeSmall = 16.0;
   static const fontSizeMedium = 18.0;
-  static const fontSizeLarge = 24.0;
+  static const fontSizeLarge = 22.0;
   static const fontSizeExtraLarge = 28.0;
 
-  // Font Weights
-  static const fontWeightCaption = FontWeight.w300; // Caption
-  static const fontWeightBody = FontWeight.w400; // Body
-  static const fontWeightSubtitle = FontWeight.w500; // Subtitle
-  static const fontWeightTitle = FontWeight.w600; // Title
+  // Icon Sizes - Professional scaling
+  static const iconSizeSmall = DesignTokens.iconSmall; // 16.0
+  static const iconSizeDefault = DesignTokens.iconLarge; // 24.0
+  static const iconSizeMedium = DesignTokens.iconXL; // 32.0
+  static const iconSizeLarge = DesignTokens.iconXL; // 32.0
 
-  // Legacy font weights for gradual migration
+  // Animation Durations - Optimized for modern feel
+  static const animationDurationFast = DesignTokens.durationSmall; // 100ms
+  static const animationDurationMedium = DesignTokens.durationMedium; // 200ms
+  static const animationDurationSlow = DesignTokens.durationLarge; // 350ms
+
+  // Spacing shortcuts - 4pt base system
+  static const spacingXS = DesignTokens.spacing1; // 4
+  static const spacingS = DesignTokens.spacing2; // 8
+  static const spacingM = DesignTokens.spacing3; // 12
+  static const spacingL = DesignTokens.spacing4; // 16
+  static const spacingXL = DesignTokens.spacing5; // 20
+  static const spacingXXL = DesignTokens.spacing6; // 24
+  static const spacingXXXL = DesignTokens.spacing8; // 32
+
+  // Hit Areas - Accessibility compliant
+  static const minTapArea = DesignTokens.iconHitArea; // 44.0
+
+  // Top App Bar
+  static const appBarHeight = DesignTokens.topAppBarHeight; // 56.0
+
+  // Bottom Navigation
+  static const bottomNavHeight = DesignTokens.bottomNavHeight; // 56.0
+
+  // Floating Action Button
+  static const fabSize = DesignTokens.fabRegular; // 56.0
+  static const fabSizeSmall = DesignTokens.fabSmall; // 40.0
+
+  // Font weights for backward compatibility
   static const fontWeightLight = FontWeight.w300;
-  static const fontWeightRegular = FontWeight.w400;
   static const fontWeightMedium = FontWeight.w500;
-  static const fontWeightSemiBold = FontWeight.w600;
-  static const fontWeightBold = FontWeight.w700;
-
-  // Icon Sizes
-  static const iconSizeDefault = 24.0;
-  static const iconSizeSmall = 20.0;
-  static const iconSizeLarge = 32.0;
-
-  // Opacity
-  static const opacityDisabled = 0.5;
-  static const opacityOverlay = 0.4;
-  static const opacityShadow = 0.1;
-  static const opacityShadowMedium = 0.15;
-  static const opacityShadowStrong = 0.2;
-
-  // Shadow
-  static const shadowBlurRadius = 8.0;
-  static const shadowOffset = Offset(0, 2);
-  static const shadowColor = Color(0x1A000000); // Black with 0.1 opacity
-
-  // BoxShadow presets
-  static const boxShadowDefault = [
-    BoxShadow(
-      color: shadowColor,
-      blurRadius: shadowBlurRadius,
-      offset: shadowOffset,
-    ),
-  ];
-
-  static const boxShadowMedium = [
-    BoxShadow(
-      color: Color(0x26000000), // Black with 0.15 opacity
-      blurRadius: 12.0,
-      offset: Offset(0, 4),
-    ),
-  ];
+  static const fontWeightSubtitle = FontWeight.w500;
+  static const fontWeightCaption = FontWeight.w400;
 }

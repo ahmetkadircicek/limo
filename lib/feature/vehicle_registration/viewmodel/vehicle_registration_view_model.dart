@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/enums/field_error_enum.dart';
-import 'package:soforvarcom/core/enums/success_message_enum.dart';
-import 'package:soforvarcom/shared/general_dialog.dart';
+import 'package:limo/core/enums/field_error_enum.dart';
+import 'package:limo/core/enums/success_message_enum.dart';
+import 'package:limo/shared/app_components.dart';
 
 import '../model/vehicle_model.dart';
 
@@ -179,7 +179,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
 
     if (validationError != null) {
       // Show error dialog
-      context.showErrorDialog(message: validationError.message);
+      context.showErrorDialog(validationError.message);
       return false;
     }
 
@@ -211,7 +211,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
 
     // Show success dialog
     context.showSuccessDialog(
-      message: SuccessMessageEnum.vehicleRegisterSuccess.successMessage,
+      SuccessMessageEnum.vehicleRegisterSuccess.successMessage,
     );
 
     return true;

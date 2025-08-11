@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/feature/map/models/location_model.dart';
-import 'package:soforvarcom/feature/map/widgets/location_picker.dart';
-import 'package:soforvarcom/shared/elevated_material.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/map/models/location_model.dart';
+import 'package:limo/feature/map/widgets/location_picker.dart';
+import 'package:limo/shared/app_components.dart';
 
 class LocationField extends StatelessWidget {
   final String? hintText;
@@ -42,7 +42,7 @@ class LocationField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedMaterial(
+    return AppCard.primary(
       child: FormField<LocationModel>(
         validator: (_) => validator?.call(selectedLocation),
         builder: (field) {
@@ -50,13 +50,15 @@ class LocationField extends StatelessWidget {
             children: [
               InkWell(
                 onTap: enabled ? () => _openLocationPicker(context) : null,
-                borderRadius: GeneralConstants.borderRadius,
+                borderRadius:
+                    BorderRadius.circular(16), // Daha yuvarlak köşeler
                 child: Container(
                   width: double.infinity,
                   height: GeneralConstants.inputHeight,
                   padding: PaddingConstants.inputHorizontal,
                   decoration: BoxDecoration(
-                    borderRadius: GeneralConstants.borderRadius,
+                    borderRadius:
+                        BorderRadius.circular(16), // Daha yuvarlak köşeler
                     border: Border.all(
                       color: field.hasError
                           ? context.error
@@ -77,7 +79,6 @@ class LocationField extends StatelessWidget {
                                   : context.secondary.withOpacity(0.5),
                           size: GeneralConstants.iconSizeSmall,
                         ),
-                      if (prefixIcon != null) context.spacerWidth(1),
                       Expanded(
                         child: selectedLocation != null
                             ? Column(
@@ -87,7 +88,6 @@ class LocationField extends StatelessWidget {
                                   Text(
                                     selectedLocation!.placeName,
                                     style: TextStyle(
-                                      fontSize: GeneralConstants.fontSizeBody,
                                       fontWeight:
                                           GeneralConstants.fontWeightSubtitle,
                                       color: enabled
@@ -116,8 +116,6 @@ class LocationField extends StatelessWidget {
                             : Text(
                                 hintText ?? 'Select location',
                                 style: TextStyle(
-                                  fontSize: GeneralConstants.fontSizeBody,
-                                  fontWeight: GeneralConstants.fontWeightBody,
                                   color: enabled
                                       ? context.secondary.withOpacity(0.7)
                                       : context.secondary.withOpacity(0.5),
@@ -143,8 +141,6 @@ class LocationField extends StatelessWidget {
                     child: Text(
                       field.errorText!,
                       style: TextStyle(
-                        fontSize: GeneralConstants.fontSizeCaption,
-                        fontWeight: GeneralConstants.fontWeightCaption,
                         color: context.error,
                       ),
                     ),

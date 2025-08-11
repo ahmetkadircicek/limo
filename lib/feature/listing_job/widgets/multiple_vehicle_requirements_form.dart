@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:soforvarcom/feature/listing_job/widgets/vehicle_requirement_bottom_sheet.dart';
-import 'package:soforvarcom/shared/general_text.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
+import 'package:limo/shared/app_components.dart';
+
+import '../view/vehicle_requirement_page.dart';
 
 class MultipleVehicleRequirementsForm extends StatefulWidget {
   final List<VehicleRequirement> initialRequirements;
@@ -36,45 +36,37 @@ class _MultipleVehicleRequirementsFormState
     }
   }
 
-  void _showAddBottomSheet() {
+  void _showAddVehicleRequirement() {
     if (!widget.enabled) return;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.8,
-      ),
-      builder: (context) => VehicleRequirementBottomSheet(
-        onSave: (requirement) {
-          setState(() {
-            _requirements.add(requirement);
-          });
-          _notifyChanges();
-        },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VehicleRequirementPage(
+          onSave: (requirement) {
+            setState(() {
+              _requirements.add(requirement);
+            });
+            _notifyChanges();
+          },
+        ),
       ),
     );
   }
 
-  void _showEditBottomSheet(int index) {
+  void _showEditVehicleRequirement(int index) {
     if (!widget.enabled) return;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.8,
-      ),
-      builder: (context) => VehicleRequirementBottomSheet(
-        initialRequirement: _requirements[index],
-        onSave: (requirement) {
-          setState(() {
-            _requirements[index] = requirement;
-          });
-          _notifyChanges();
-        },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VehicleRequirementPage(
+          initialRequirement: _requirements[index],
+          onSave: (requirement) {
+            setState(() {
+              _requirements[index] = requirement;
+            });
+            _notifyChanges();
+          },
+        ),
       ),
     );
   }
@@ -103,66 +95,130 @@ class _MultipleVehicleRequirementsFormState
             final requirement = _requirements[index];
             return Container(
               margin: EdgeInsets.only(bottom: PaddingConstants.spacingM),
-              height: 48.0, // Same as text fields
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: context.surface,
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(
-                  color: context.onSurface.withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  // Vehicle icon (like text field prefix icons)
-                  Icon(
-                    Icons.directions_car,
-                    size: 24.0,
-                    color: context.onSurface.withOpacity(0.6),
-                  ),
-                  SizedBox(width: PaddingConstants.spacingM),
-
-                  // Requirement details
-                  Expanded(
-                    child: GeneralText(
-                      text: requirement.isFlexible
-                          ? 'Any Vehicle Accepted'
-                          : requirement.getDescription(),
-                      fontSize: 16.0, // Same as text field font size
-                      fontWeight: GeneralConstants.fontWeightBody,
-                      color: context.onSurface,
-                      maxLines: 1,
-                    ),
-                  ),
-
-                  // Action buttons
-                  if (widget.enabled) ...[
-                    InkWell(
-                      onTap: () => _showEditBottomSheet(index),
-                      child: Padding(
-                        padding: EdgeInsets.all(PaddingConstants.spacingS),
-                        child: Icon(
-                          Icons.edit_outlined,
-                          size: 20.0,
-                          color: context.primary,
-                        ),
-                      ),
-                    ),
-                    if (_requirements.length > 1)
-                      InkWell(
-                        onTap: () => _removeRequirement(index),
-                        child: Padding(
+              child: AppCard.secondary(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        // Vehicle icon
+                        Container(
                           padding: EdgeInsets.all(PaddingConstants.spacingS),
+                          decoration: BoxDecoration(
+                            color: context.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           child: Icon(
-                            Icons.delete_outline,
+                            Icons.directions_car,
                             size: 20.0,
-                            color: context.error,
+                            color: context.primary,
                           ),
                         ),
+                        SizedBox(width: PaddingConstants.spacingM),
+
+                        // Requirement details
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppText.body(
+                                requirement.isFlexible
+                                    ? 'Any Vehicle Accepted'
+                                    : requirement.getDescription(),
+                                color: context.onSurface,
+                                maxLines: 2,
+                              ),
+
+                              // Show category if specified
+                              if (!requirement.isFlexible &&
+                                  requirement.minimumCategory != null) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        context.primary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'Min: ${requirement.minimumCategory!.displayName}',
+                                    style: TextStyle(
+                                      color: context.primary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        // Action buttons
+                        if (widget.enabled) ...[
+                          _buildActionButton(
+                            icon: Icons.edit_outlined,
+                            color: Color(0xFF9CA3AF),
+                            onTap: () => _showEditVehicleRequirement(index),
+                          ),
+                          if (_requirements.length > 1)
+                            _buildActionButton(
+                              icon: Icons.delete_outline,
+                              color: context.error,
+                              onTap: () => _removeRequirement(index),
+                            ),
+                        ],
+                      ],
+                    ),
+
+                    // Show pricing if specified
+                    if (!requirement.isFlexible &&
+                        (requirement.hourlyRate != null ||
+                            requirement.pricePerMile != null)) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color:
+                                const Color(0xFF10B981).withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Icon(
+                                Icons.attach_money,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                requirement.getPricingSummary(),
+                                style: const TextStyle(
+                                  color: Color(0xFF10B981),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                    ],
                   ],
-                ],
+                ),
               ),
             );
           }),
@@ -170,40 +226,46 @@ class _MultipleVehicleRequirementsFormState
 
         // Add button
         if (widget.enabled) ...[
-          InkWell(
-            onTap: _showAddBottomSheet,
-            borderRadius: BorderRadius.circular(12.0),
-            child: Container(
-              height: 48.0, // Same as text fields
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(
-                  color: context.primary.withOpacity(0.3),
-                  width: 1,
-                  style: BorderStyle.solid,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.add_circle_outline,
-                    color: context.primary,
-                    size: 24.0, // Same as other icons
-                  ),
-                  SizedBox(width: PaddingConstants.spacingM),
-                  GeneralText(
-                    text: 'Add Vehicle Requirement',
-                    fontSize: 16.0, // Same as text field font size
-                    color: context.primary,
-                    fontWeight: GeneralConstants.fontWeightBody,
-                  ),
-                ],
-              ),
+          Container(
+            margin: EdgeInsets.only(top: PaddingConstants.spacingM),
+            width: double.infinity,
+            child: AppButton.secondary(
+              'Add Vehicle Requirement',
+              onPressed: _showAddVehicleRequirement,
+              icon: Icons.add_circle_outline,
+              width: double.infinity,
             ),
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(left: PaddingConstants.spacingS),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: EdgeInsets.all(PaddingConstants.spacingS),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 18.0,
+              color: color,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

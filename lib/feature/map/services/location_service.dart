@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:soforvarcom/core/constants/constants.dart';
-import 'package:soforvarcom/feature/map/models/location_model.dart';
+import 'package:limo/core/constants/constants.dart';
+import 'package:limo/feature/map/models/location_model.dart';
 
 class LocationService {
   static const String _baseUrl = 'https://maps.googleapis.com/maps/api';
@@ -69,8 +69,9 @@ class LocationService {
     if (query.isEmpty) return [];
 
     try {
+      // Search for exact matches and similar results
       final String url =
-          '$_baseUrl/place/textsearch/json?query=$query&key=${Constants.googleMapsApiKey}';
+          '$_baseUrl/place/textsearch/json?query=$query&key=${Constants.googleMapsApiKey}&maxresults=20&type=establishment';
 
       final response = await http.get(Uri.parse(url));
 
@@ -78,7 +79,8 @@ class LocationService {
         final data = json.decode(response.body);
         final List results = data['results'] ?? [];
 
-        return results.map<LocationModel>((place) {
+        // Also search for nearby places if we have coordinates
+        List<LocationModel> allResults = results.map<LocationModel>((place) {
           final geometry = place['geometry']?['location'];
           return LocationModel(
             placeName: place['name'] ?? '',
@@ -88,6 +90,40 @@ class LocationService {
             placeId: place['place_id'] ?? '',
           );
         }).toList();
+
+        // Add nearby search if we have results
+        if (allResults.isNotEmpty) {
+          try {
+            final nearbyUrl =
+                '$_baseUrl/place/nearbysearch/json?location=${allResults.first.latitude},${allResults.first.longitude}&radius=5000&key=${Constants.googleMapsApiKey}&type=establishment';
+            final nearbyResponse = await http.get(Uri.parse(nearbyUrl));
+
+            if (nearbyResponse.statusCode == 200) {
+              final nearbyData = json.decode(nearbyResponse.body);
+              final List nearbyResults = nearbyData['results'] ?? [];
+
+              final nearbyLocations = nearbyResults.map<LocationModel>((place) {
+                final geometry = place['geometry']?['location'];
+                return LocationModel(
+                  placeName: place['name'] ?? '',
+                  address: place['formatted_address'] ?? '',
+                  latitude: geometry?['lat']?.toDouble() ?? 0.0,
+                  longitude: geometry?['lng']?.toDouble() ?? 0.0,
+                  placeId: place['place_id'] ?? '',
+                );
+              }).toList();
+
+              // Combine and remove duplicates
+              allResults.addAll(nearbyLocations);
+              allResults = allResults.toSet().toList(); // Remove duplicates
+            }
+          } catch (e) {
+            // If nearby search fails, continue with original results
+            print('Nearby search failed: $e');
+          }
+        }
+
+        return allResults;
       }
 
       return [];

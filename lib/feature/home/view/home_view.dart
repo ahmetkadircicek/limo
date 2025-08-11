@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/services/google_auth_service.dart';
+import 'package:limo/feature/home/viewmodel/home_view_model.dart';
+import 'package:limo/feature/job_list/view/job_list_view.dart';
+import 'package:limo/feature/job_tracking/view/job_tracking_view.dart';
+import 'package:limo/feature/listing_job/view/listing_job_view.dart';
+import 'package:limo/feature/profile/view/profile_view.dart';
+import 'package:limo/shared/app_components.dart';
+import 'package:limo/shared/app_drawer.dart';
 import 'package:provider/provider.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/feature/home/viewmodel/home_view_model.dart';
-import 'package:soforvarcom/feature/job_list/view/job_list_view.dart';
-import 'package:soforvarcom/feature/job_tracking/view/job_tracking_view.dart';
-import 'package:soforvarcom/feature/listing_job/view/listing_job_view.dart';
-import 'package:soforvarcom/feature/profile/view/profile_view.dart';
-import 'package:soforvarcom/shared/general_text.dart';
-import 'package:soforvarcom/shared/unified_app_bar.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -19,6 +21,29 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   @override
+  void initState() {
+    super.initState();
+    _initializeUserProvider();
+  }
+
+  /// Initialize UserProvider with current user data if available
+  void _initializeUserProvider() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Check if user is already in provider
+      if (!userProvider.isLoggedIn) {
+        // Try to get user from Google Auth Service
+        final userModel = await GoogleAuthService.getUserModel();
+        if (userModel != null) {
+          userProvider.setUser(userModel);
+          debugPrint('UserProvider initialized with: ${userModel.displayName}');
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => HomeViewModel(),
@@ -26,122 +51,156 @@ class _HomeViewState extends State<HomeView> {
         builder: (context, homePageViewModel, child) {
           return Scaffold(
             key: homePageViewModel.scaffoldKey,
-            appBar: UnifiedAppBar(
+            drawer: AppDrawer(
               onProfileTap: () {
                 homePageViewModel.onItemTapped(3); // Navigate to profile page
+                Navigator.pop(context); // Close drawer
               },
-              onLogoTap: () {
-                homePageViewModel.onItemTapped(0);
+              onSettingsTap: () {
+                // TODO: Navigate to settings
+                Navigator.pop(context);
+              },
+              onLogoutTap: () async {
+                // Handle logout
+                final userProvider =
+                    Provider.of<UserProvider>(context, listen: false);
+
+                // Clear user data
+                userProvider.clearUser();
+
+                // Sign out from Google
+                await GoogleAuthService.signOut();
+
+                // Navigate to login
+                if (mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login',
+                    (route) => false,
+                  );
+                }
+
+                Navigator.pop(context); // Close drawer
+              },
+              onJobHistoryTap: () {
+                // TODO: Navigate to job history
+                Navigator.pop(context);
+              },
+              onVehicleManagementTap: () {
+                // TODO: Navigate to vehicle management
+                Navigator.pop(context);
               },
             ),
-            body: _buildBody(homePageViewModel),
-            bottomNavigationBar: _buildBottomNavigationBar(homePageViewModel),
+            appBar: AppTopBar(
+              onMenuTap: () {
+                homePageViewModel.scaffoldKey.currentState?.openDrawer();
+              },
+            ),
+            // Use a Stack to extend the navigation bar below the page content
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _buildBody(homePageViewModel),
+                    ),
+                    // BottomNavigationBar'ı overflow hatalarına karşı SingleChildScrollView ile sarmalıyoruz
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth,
+                        ),
+                        child: _buildBottomNavigationBar(
+                            context, homePageViewModel),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            // Remove the default bottomNavigationBar property
           );
         },
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: context.surface,
-      elevation: 0,
-      centerTitle: true,
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GeneralText(
-            text: 'Sofor',
-            fontSize: GeneralConstants.fontSizeLarge,
-            fontWeight: GeneralConstants.fontWeightBold,
-            color: context.onSurface,
-          ),
-          GeneralText(
-            text: 'var',
-            fontSize: GeneralConstants.fontSizeLarge,
-            fontWeight: GeneralConstants.fontWeightBold,
-            color: context.primary,
-          ),
-          GeneralText(
-            text: '.com',
-            fontSize: GeneralConstants.fontSizeLarge,
-            fontWeight: GeneralConstants.fontWeightBold,
-            color: context.onSurface,
-          ),
-        ],
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            // TODO: Implement profile navigation
-          },
-          icon: Icon(
-            Icons.person_outline,
-            color: context.secondary,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildBody(HomeViewModel homePageViewModel) {
-    return PageView(
-      physics: const NeverScrollableScrollPhysics(),
-      controller: homePageViewModel.pageController,
-      onPageChanged: homePageViewModel.onPageChanged,
-      children: [
-        const JobListView(), // Jobs
-        const ListingJobView(), // Post job
-        const JobTrackingView(), // Job tracking
-        const ProfileView(), // Profile
-      ],
+    return SafeArea(
+      // SafeArea ile üst ve alt çakışmaları önle
+      top: false, // AppBar zaten var
+      left: false,
+      right: false,
+      bottom: false,
+      child: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: homePageViewModel.pageController,
+        onPageChanged: homePageViewModel.onPageChanged,
+        children: [
+          const JobListView(), // Jobs
+          const ListingJobView(), // Post job
+          const JobTrackingView(), // Job tracking
+          const ProfileView(), // Profile
+        ],
+      ),
     );
   }
 
-  Widget _buildBottomNavigationBar(HomeViewModel viewModel) {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: context.surface,
-        boxShadow: [
-          BoxShadow(
-            color: context.secondary.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _CustomNavBarItem(
-              icon: Icons.list_alt,
-              text: 'JOBS',
-              index: 0,
-              selectedIndex: viewModel.selectedIndex,
-              onTap: viewModel.onItemTapped,
+  Widget _buildBottomNavigationBar(
+      BuildContext context, HomeViewModel viewModel) {
+    // Uber-style bottom navigation
+    return SafeArea(
+      top: false,
+      left: false,
+      right: false,
+      child: Container(
+        height: 72, // Increased height for better touch
+        margin: PaddingConstants.allM,
+        decoration: BoxDecoration(
+          color: context.primary, // Black like Uber
+          borderRadius: BorderRadius.circular(24), // More rounded
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
             ),
-          ),
-          Expanded(
-            child: _CustomNavBarItem(
-              icon: Icons.add_circle_outline,
-              text: 'POST JOB',
-              index: 1,
-              selectedIndex: viewModel.selectedIndex,
-              isHighlighted: true,
-              onTap: viewModel.onItemTapped,
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _CustomNavBarItem(
+                icon: Icons.work_outline,
+                text: 'JOBS',
+                index: 0,
+                selectedIndex: viewModel.selectedIndex,
+                onTap: viewModel.onItemTapped,
+              ),
             ),
-          ),
-          Expanded(
-            child: _CustomNavBarItem(
-              icon: Icons.timeline,
-              text: 'TRACKING',
-              index: 2,
-              selectedIndex: viewModel.selectedIndex,
-              onTap: viewModel.onItemTapped,
+            Expanded(
+              child: _CustomNavBarItem(
+                icon: Icons.add_circle_outline,
+                text: 'POST',
+                index: 1,
+                selectedIndex: viewModel.selectedIndex,
+                isHighlighted: true,
+                onTap: viewModel.onItemTapped,
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: _CustomNavBarItem(
+                icon: Icons.location_on_outlined,
+                text: 'TRACK',
+                index: 2,
+                selectedIndex: viewModel.selectedIndex,
+                onTap: viewModel.onItemTapped,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -167,40 +226,33 @@ class _CustomNavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isSelected = index == selectedIndex;
-    Color backgroundColor = isSelected ? context.secondary : context.primary;
+    final Color iconColor = isSelected
+        ? context.secondary // Uber green for selected
+        : context.surface
+            .withValues(alpha: 0.6); // White with opacity for unselected
 
+    // Text'in taşmasını önlemek için Flexible ve overflow ayarı ekliyoruz
     return GestureDetector(
       onTap: () => onTap(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        color: backgroundColor,
-        height: MediaQuery.of(context).size.height * 0.09,
-        child: Column(
-          children: [
-            context.spacerHeight(1),
-            AnimatedOpacity(
-              opacity: isSelected ? 1.0 : 0.8,
-              duration: const Duration(milliseconds: 300),
-              child: Icon(
-                icon,
-                color: context.surface,
-                size: 30,
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+            size: 24,
+          ),
+          Text(
+            text,
+            style: TextStyle(
+              color: iconColor,
             ),
-            context.spacerHeight(0.1),
-            AnimatedOpacity(
-              opacity: isSelected ? 1.0 : 0.8,
-              duration: const Duration(milliseconds: 300),
-              child: GeneralText(
-                text: text,
-                fontSize: GeneralConstants.fontSizeExtraSmall,
-                fontWeight: GeneralConstants.fontWeightRegular,
-                color: context.surface,
-              ),
-            ),
-            context.spacerHeight(0.1),
-          ],
-        ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

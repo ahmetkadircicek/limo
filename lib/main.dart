@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/init/theme/app_theme.dart';
+import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/services/google_auth_service.dart';
+import 'package:limo/feature/splash/view/splash_view.dart';
 import 'package:provider/provider.dart';
-import 'package:soforvarcom/core/init/theme/app_theme.dart';
-import 'package:soforvarcom/feature/home/view/home_view.dart';
 
 import 'core/init/navigation/navigation_service.dart';
 import 'core/init/notifier/provider_manager.dart';
+import 'feature/home/view/home_view.dart';
+import 'feature/login/view/login_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Google Authentication
+  await GoogleAuthService.initialize();
+
   runApp(
     MultiProvider(
       providers: [
         ...ProviderManager.instance.providers,
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: const MyApp(),
     ),
@@ -24,11 +33,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Soforvar.com',
-      theme: LightTheme.theme,
+      title: 'Limo',
+      theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
-      home: const HomeView(),
+      home: const SplashView(),
       navigatorKey: NavigationService.instance.navigatorKey,
+      routes: {
+        '/login': (context) => const LoginView(),
+        '/home': (context) => const HomeView(),
+      },
     );
   }
 }

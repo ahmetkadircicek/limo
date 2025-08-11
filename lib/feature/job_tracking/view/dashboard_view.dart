@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/shared/elevated_material.dart';
-import 'package:soforvarcom/shared/general_text.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/shared/app_components.dart';
 
 class JobTrackingView extends StatefulWidget {
   const JobTrackingView({super.key});
@@ -13,261 +11,25 @@ class JobTrackingView extends StatefulWidget {
 }
 
 class _JobTrackingViewState extends State<JobTrackingView> {
-  int selectedIndex = 0;
+  int _selectedSegment = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: context.surfaceContainer,
-      child: Padding(
-        padding: PaddingConstants.allMedium,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16),
-            _CustomSegmentedButton(
-              selectedIndex: selectedIndex,
-              onItemTapped: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-            ),
-            context.spacerHeight(2),
-            Expanded(child: _JobTrackingLists(selectedIndex: selectedIndex)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _JobTrackingLists extends StatelessWidget {
-  final int selectedIndex;
-
-  const _JobTrackingLists({required this.selectedIndex});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        if (selectedIndex == 0) const _ReceivedJobs(),
-        if (selectedIndex == 1) const _SentOffers(),
-        if (selectedIndex == 2) const _MyJobs(),
-      ],
-    );
-  }
-}
-
-class _ReceivedJobs extends StatelessWidget {
-  const _ReceivedJobs();
-
-  @override
-  Widget build(BuildContext context) {
-    // Mock received jobs
-    final receivedJobs = [
-      {
-        'title': 'Istanbul - Ankara Transportation',
-        'company': 'ABC Logistics',
-        'price': '₺2,500',
-        'date': '25/12/2024',
-        'status': 'Pending',
-        'statusColor': Colors.orange,
-      },
-      {
-        'title': 'Airport Transfer Service',
-        'company': 'XYZ Transport',
-        'price': '₺150',
-        'date': '24/12/2024',
-        'status': 'Accepted',
-        'statusColor': Colors.green,
-      },
-      {
-        'title': 'City Tour Guide Transport',
-        'company': 'City Tours',
-        'price': '₺75/hour',
-        'date': '23/12/2024',
-        'status': 'Rejected',
-        'statusColor': Colors.red,
-      },
-    ];
-
-    return ListView.builder(
-      itemCount: receivedJobs.length,
-      itemBuilder: (context, index) {
-        final job = receivedJobs[index];
-        return _JobTrackingCard(
-          title: job['title'] as String,
-          subtitle: job['company'] as String,
-          price: job['price'] as String,
-          date: job['date'] as String,
-          status: job['status'] as String,
-          statusColor: job['statusColor'] as Color,
-        );
-      },
-    );
-  }
-}
-
-class _SentOffers extends StatelessWidget {
-  const _SentOffers();
-
-  @override
-  Widget build(BuildContext context) {
-    // Empty offers list - show message like in the screenshot
-    return Center(
-      child: Padding(
-        padding: PaddingConstants.allLarge,
-        child: GeneralText(
-          text: 'Kayıtlı teklifiniz bulunmamaktadır.',
-          fontSize: GeneralConstants.fontSizeSmall,
-          color: context.primary,
-          fontWeight: GeneralConstants.fontWeightRegular,
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-}
-
-class _MyJobs extends StatelessWidget {
-  const _MyJobs();
-
-  @override
-  Widget build(BuildContext context) {
-    // Mock my jobs
-    final myJobs = [
-      {
-        'title': 'Besiktas - Galata Transport',
-        'company': 'My Job',
-        'price': '₺300',
-        'date': '27/12/2024',
-        'status': 'Active',
-        'statusColor': Colors.green,
-      },
-      {
-        'title': 'Hotel Transfer Service',
-        'company': 'My Job',
-        'price': '₺200',
-        'date': '21/12/2024',
-        'status': 'Completed',
-        'statusColor': Colors.blue,
-      },
-    ];
-
-    return ListView.builder(
-      itemCount: myJobs.length,
-      itemBuilder: (context, index) {
-        final job = myJobs[index];
-        return _JobTrackingCard(
-          title: job['title'] as String,
-          subtitle: job['company'] as String,
-          price: job['price'] as String,
-          date: job['date'] as String,
-          status: job['status'] as String,
-          statusColor: job['statusColor'] as Color,
-        );
-      },
-    );
-  }
-}
-
-class _JobTrackingCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String price;
-  final String date;
-  final String status;
-  final Color statusColor;
-
-  const _JobTrackingCard({
-    required this.title,
-    required this.subtitle,
-    required this.price,
-    required this.date,
-    required this.status,
-    required this.statusColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: PaddingConstants.symmetricVerticalSmall / 2,
-      child: ElevatedMaterial(
-        child: Container(
-          padding: PaddingConstants.allMedium,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F6F6),
+      body: SafeArea(
+        child: Padding(
+          padding: PaddingConstants.allL,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: GeneralText(
-                      text: title,
-                      fontSize: GeneralConstants.fontSizeSmall,
-                      fontWeight: GeneralConstants.fontWeightBold,
-                      color: context.onSurface,
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: GeneralText(
-                      text: status,
-                      fontSize: GeneralConstants.fontSizeExtraSmall,
-                      color: statusColor,
-                      fontWeight: GeneralConstants.fontWeightBold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.business,
-                    size: 16,
-                    color: context.secondary,
-                  ),
-                  const SizedBox(width: 4),
-                  GeneralText(
-                    text: subtitle,
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
-                    color: context.secondary,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(
-                    Icons.monetization_on,
-                    size: 16,
-                    color: context.secondary,
-                  ),
-                  const SizedBox(width: 4),
-                  GeneralText(
-                    text: price,
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
-                    color: context.secondary,
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: context.secondary,
-                  ),
-                  const SizedBox(width: 4),
-                  GeneralText(
-                    text: date,
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
-                    color: context.secondary,
-                  ),
-                ],
+              // Segment Control
+              _buildSegmentedControl(),
+
+              const SizedBox(height: 20),
+
+              // Content based on selection
+              Expanded(
+                child: _buildContent(),
               ),
             ],
           ),
@@ -275,110 +37,213 @@ class _JobTrackingCard extends StatelessWidget {
       ),
     );
   }
-}
 
-class _CustomSegmentedButton extends StatelessWidget {
-  final int selectedIndex;
-  final Function(int) onItemTapped;
-
-  const _CustomSegmentedButton({
-    required this.selectedIndex,
-    required this.onItemTapped,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedMaterial(
+  Widget _buildSegmentedControl() {
+    return AppCard.secondary(
+      padding: const EdgeInsets.all(4),
       child: Row(
         children: [
           Expanded(
-            child: SizedBox(
-              height: GeneralConstants.heightMedium,
-              child: TextButton(
-                onPressed: () => onItemTapped(0),
-                style: TextButton.styleFrom(
-                  foregroundColor: context.surface,
-                  shape: _shapeLeft(),
-                  backgroundColor: _backgroundColor(0, context),
-                ),
-                child: FittedBox(
-                  child: GeneralText(
-                    text: 'ALINAN İŞLER',
-                    color: context.surface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildSegmentButton('Aktif İşler', 0),
           ),
           Expanded(
-            child: SizedBox(
-              height: GeneralConstants.heightMedium,
-              child: TextButton(
-                onPressed: () => onItemTapped(1),
-                style: TextButton.styleFrom(
-                  foregroundColor: context.surface,
-                  shape: _shape(),
-                  backgroundColor: _backgroundColor(1, context),
-                ),
-                child: FittedBox(
-                  child: GeneralText(
-                    text: 'TEKLİFLERİM',
-                    color: context.surface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildSegmentButton('Geçmiş İşler', 1),
           ),
           Expanded(
-            child: SizedBox(
-              height: GeneralConstants.heightMedium,
-              child: TextButton(
-                onPressed: () => onItemTapped(2),
-                style: TextButton.styleFrom(
-                  foregroundColor: context.surface,
-                  shape: _shapeRight(),
-                  backgroundColor: _backgroundColor(2, context),
-                ),
-                child: FittedBox(
-                  child: GeneralText(
-                    text: 'YÜK İLANLARIM',
-                    color: context.surface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildSegmentButton('Teklifler', 2),
           ),
         ],
       ),
     );
   }
 
-  Color _backgroundColor(int index, BuildContext context) {
-    return selectedIndex == index ? context.primary : context.secondary;
-  }
+  Widget _buildSegmentButton(String title, int index) {
+    final isSelected = _selectedSegment == index;
 
-  RoundedRectangleBorder _shape() {
-    return const RoundedRectangleBorder(borderRadius: BorderRadius.zero);
-  }
-
-  RoundedRectangleBorder _shapeLeft() {
-    return const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(8.0),
-        bottomLeft: Radius.circular(8.0),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedSegment = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? context.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: AppText.body(
+          title,
+          textAlign: TextAlign.center,
+          color: isSelected ? context.onPrimary : context.onSurface,
+        ),
       ),
     );
   }
 
-  RoundedRectangleBorder _shapeRight() {
-    return const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topRight: Radius.circular(8.0),
-        bottomRight: Radius.circular(8.0),
-      ),
+  Widget _buildContent() {
+    switch (_selectedSegment) {
+      case 0:
+        return _buildActiveJobs();
+      case 1:
+        return _buildPastJobs();
+      case 2:
+        return _buildOffers();
+      default:
+        return _buildActiveJobs();
+    }
+  }
+
+  Widget _buildActiveJobs() {
+    return ListView.builder(
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: PaddingConstants.onlyBottomM,
+          child: AppCard.primary(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText.subtitle(
+                      'İş #${1000 + index}',
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: context.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: AppText.caption(
+                        'Aktif',
+                        color: context.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                AppText.body('İstanbul → Ankara'),
+                const SizedBox(height: 4),
+                AppText.caption(
+                  'Kamyon • 1 Araç • \$${(500 + index * 100)}',
+                  color: context.onSurface.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPastJobs() {
+    return ListView.builder(
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: PaddingConstants.onlyBottomM,
+          child: AppCard.primary(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText.subtitle(
+                      'İş #${900 + index}',
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: AppText.caption(
+                        'Tamamlandı',
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                AppText.body('Bursa → İzmir'),
+                const SizedBox(height: 4),
+                AppText.caption(
+                  'Tır • 2 Araç • \$${(800 + index * 150)}',
+                  color: context.onSurface.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOffers() {
+    return ListView.builder(
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: PaddingConstants.onlyBottomM,
+          child: AppCard.primary(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText.subtitle(
+                      'Teklif #${200 + index}',
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: AppText.caption(
+                        'Bekliyor',
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                AppText.body('Antalya → Trabzon'),
+                const SizedBox(height: 4),
+                AppText.caption(
+                  'Kamyonet • 1 Araç • \$${(300 + index * 75)}',
+                  color: context.onSurface.withValues(alpha: 0.6),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.tertiary(
+                        'Reddet',
+                        onPressed: () {},
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: AppButton.primary(
+                        'Kabul Et',
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/core/init/navigation/navigation_service.dart';
+import 'package:limo/feature/company_registration/view/company_registration_view.dart';
+import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/core/init/navigation/navigation_service.dart';
-import 'package:soforvarcom/feature/company_registration/view/company_registration_view.dart';
-import 'package:soforvarcom/shared/general_button.dart';
-import 'package:soforvarcom/shared/general_dropdown.dart';
-import 'package:soforvarcom/shared/general_text.dart';
-import 'package:soforvarcom/shared/general_text_field.dart';
 
 import '../viewmodel/vehicle_registration_view_model.dart';
 
@@ -32,13 +28,12 @@ Widget _buildFullScreenContent() {
     builder: (context, viewModel, child) {
       return SafeArea(
         child: Padding(
-          padding: PaddingConstants.allMedium,
+          padding: const EdgeInsets.fromLTRB(
+              16, 16, 16, 96), // Added 80px bottom padding for navigation bar
           child: Column(
             children: [
               _buildTitle(),
-              context.spacerHeight(1),
               _buildSubtitle(),
-              context.spacerHeight(3),
               Expanded(
                 child: SingleChildScrollView(
                   child: Form(
@@ -46,7 +41,6 @@ Widget _buildFullScreenContent() {
                     child: Column(
                       children: [
                         _buildVehicleForm(viewModel),
-                        context.spacerHeight(3),
                         _buildActionButtons(context, viewModel),
                       ],
                     ),
@@ -63,10 +57,8 @@ Widget _buildFullScreenContent() {
 
 // Builds the title
 Widget _buildTitle() {
-  return GeneralText(
-    text: 'Vehicle Registration',
-    fontSize: GeneralConstants.fontSizeLarge,
-    fontWeight: GeneralConstants.fontWeightBold,
+  return AppText.body(
+    'Vehicle Registration',
   );
 }
 
@@ -74,11 +66,8 @@ Widget _buildTitle() {
 Widget _buildSubtitle() {
   return Builder(
     builder: (context) {
-      return GeneralText(
-        text:
-            'To continue using the platform, please add at least one vehicle.',
-        fontSize: GeneralConstants.fontSizeSmall,
-        fontWeight: GeneralConstants.fontWeightLight,
+      return AppText.body(
+        'To continue using the platform, please add at least one vehicle.',
         color: context.secondary,
         textAlign: TextAlign.center,
       );
@@ -91,79 +80,79 @@ Widget _buildVehicleForm(VehicleRegistrationViewModel viewModel) {
   return Column(
     children: [
       // Licence Plate
-      GeneralTextField(
+      AppInput.primary(
         controller: viewModel.licencePlateController,
         hintText: 'Licence Plate',
-        prefixIcon: const Icon(Icons.confirmation_number),
+        prefixIcon: Icons.confirmation_number,
         validator: viewModel.validateLicencePlate,
       ),
       const SizedBox(height: 16),
 
       // Brand
-      GeneralTextField(
+      AppInput.primary(
         controller: viewModel.brandController,
         hintText: 'Brand',
-        prefixIcon: const Icon(Icons.branding_watermark),
+        prefixIcon: Icons.branding_watermark,
         validator: viewModel.validateBrand,
       ),
       const SizedBox(height: 16),
 
       // Model
-      GeneralTextField(
+      AppInput.primary(
         controller: viewModel.modelController,
         hintText: 'Model',
-        prefixIcon: const Icon(Icons.directions_car),
+        prefixIcon: Icons.directions_car,
         validator: viewModel.validateModel,
       ),
       const SizedBox(height: 16),
 
       // Year
-      GeneralDropdown(
-        items: VehicleRegistrationViewModel.yearOptions,
+      AppInput.dropdown(
+        dropdownItems: VehicleRegistrationViewModel.yearOptions,
         hintText: 'Year',
-        value: viewModel.selectedYear,
-        prefixIcon: const Icon(Icons.calendar_today),
-        onChanged: viewModel.updateYear,
+        dropdownValue: viewModel.selectedYear,
+        prefixIcon: Icons.calendar_today,
+        onDropdownChanged: viewModel.updateYear,
       ),
       const SizedBox(height: 16),
 
       // Capacity
-      GeneralDropdown(
-        items: VehicleRegistrationViewModel.capacityOptions,
+      AppInput.dropdown(
+        dropdownItems: VehicleRegistrationViewModel.capacityOptions,
         hintText: 'Capacity',
-        value: viewModel.selectedCapacity,
-        prefixIcon: const Icon(Icons.people),
-        onChanged: viewModel.updateCapacity,
+        dropdownValue: viewModel.selectedCapacity,
+        prefixIcon: Icons.people,
+        onDropdownChanged: viewModel.updateCapacity,
       ),
       const SizedBox(height: 16),
 
       // Vehicle Type
-      GeneralDropdown(
-        items: VehicleRegistrationViewModel.vehicleTypes,
+      AppInput.dropdown(
+        dropdownItems: VehicleRegistrationViewModel.vehicleTypes,
         hintText: 'Vehicle Type',
-        value: viewModel.selectedVehicleType,
-        prefixIcon: const Icon(Icons.car_repair),
-        onChanged: viewModel.updateVehicleType,
+        dropdownValue: viewModel.selectedVehicleType,
+        prefixIcon: Icons.car_repair,
+        onDropdownChanged: viewModel.updateVehicleType,
       ),
       const SizedBox(height: 16),
 
       // Interior Color
-      GeneralDropdown(
-        items: VehicleRegistrationViewModel.colorOptions,
+      AppInput.dropdown(
+        dropdownItems: VehicleRegistrationViewModel.colorOptions,
         hintText: 'Interior Color',
-        value: viewModel.selectedInteriorColor,
-        prefixIcon: const Icon(Icons.color_lens),
-        onChanged: viewModel.updateInteriorColor,
+        dropdownValue: viewModel.selectedInteriorColor,
+        prefixIcon: Icons.color_lens,
+        onDropdownChanged: viewModel.updateInteriorColor,
       ),
       const SizedBox(height: 16),
 
       // Exterior Color
-      GeneralDropdown(
-        items: VehicleRegistrationViewModel.colorOptions,
+      AppInput.dropdown(
+        dropdownItems: VehicleRegistrationViewModel.colorOptions,
         hintText: 'Exterior Color',
-        value: viewModel.selectedExteriorColor,
-        prefixIcon: const Icon(Icons.palette),
-        onChanged: viewModel.updateExteriorColor,
+        dropdownValue: viewModel.selectedExteriorColor,
+        prefixIcon: Icons.palette,
+        onDropdownChanged: viewModel.updateExteriorColor,
       ),
     ],
   );
@@ -186,10 +175,8 @@ Widget _buildAddVehicleButton(
   return SizedBox(
     width: double.infinity,
     height: GeneralConstants.heightMedium,
-    child: GeneralButton(
-      fontSize: GeneralConstants.fontSizeMedium,
-      color: context.primary,
-      text: 'Add Vehicle',
+    child: AppButton.primary(
+      'Add Vehicle',
       onPressed: () async {
         bool success = await viewModel.registerVehicle(context);
         if (success) {
@@ -205,11 +192,8 @@ Widget _buildAddVehicleButton(
 
 // Builds the "Cancel" button
 Widget _buildCancelButton(BuildContext context) {
-  return GeneralButton(
-    fontSize: GeneralConstants.fontSizeSmall,
-    color: context.surface,
-    fontColor: context.secondary,
-    text: 'Cancel',
+  return AppButton.primary(
+    'Cancel',
     onPressed: () {
       Navigator.pop(context);
     },

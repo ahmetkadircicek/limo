@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/enums/pickup_type_enum.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/feature/job_list/model/pricing_model.dart';
-import 'package:soforvarcom/shared/general_text_field.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/job_list/model/pricing_model.dart';
+import 'package:limo/shared/app_components.dart';
 
 class PricingInputForm extends StatefulWidget {
   final PricingModel? initialPricing;
@@ -128,10 +128,10 @@ class _PricingInputFormState extends State<PricingInputForm> {
       children: [
         if (widget.jobType != null) ...[
           // Primary price based on job type
-          GeneralTextField(
+          AppInput.primary(
             controller: _getPrimaryController(),
             hintText: _getPrimaryPriceHint(),
-            prefixIcon: Icon(_getPrimaryPriceIcon()),
+            prefixIcon: _getPrimaryPriceIcon(),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             enabled: widget.enabled,
             onChanged: (value) => _updatePricing(),
@@ -162,7 +162,7 @@ class _PricingInputFormState extends State<PricingInputForm> {
                   child: Text(
                     _getJobTypePricingInfo(),
                     style: TextStyle(
-                      fontSize: 16.0, // Same as text fields
+                      // Same as text fields
                       color: context.onSurface.withOpacity(0.7),
                       height: 1.0,
                     ),
@@ -176,10 +176,10 @@ class _PricingInputFormState extends State<PricingInputForm> {
           SizedBox(height: PaddingConstants.spacingM),
 
           // Extra charge (always available)
-          GeneralTextField(
+          AppInput.primary(
             controller: _extraChargeController,
             hintText: 'Extra charges (optional, e.g., 50.00)',
-            prefixIcon: const Icon(Icons.add_circle_outline),
+            prefixIcon: Icons.add_circle_outline,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             enabled: widget.enabled,
             onChanged: (value) => _updatePricing(),

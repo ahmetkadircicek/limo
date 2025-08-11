@@ -1,5 +1,5 @@
 class Constants {
-  static const String appName = 'Soforvar.com';
+  static const String appName = 'Limo';
 
   // Google Maps API Key
   static const String googleMapsApiKey =

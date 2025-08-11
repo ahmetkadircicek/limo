@@ -1,67 +1,217 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:limo/core/constants/design_tokens.dart';
+import 'package:limo/core/constants/padding_constants.dart';
 
-extension BuildContextExtension<T> on BuildContext {
-  // Size Extensions
+/// MERKEZI TEMA SİSTEMİ - Tüm tema özellikleri burada!
+extension ThemeExtensions on BuildContext {
+  // =============================================================================
+  // COLORS - Tüm renkler context üzerinden
+  // =============================================================================
+
+  /// Primary Colors (Ana renkler)
+  Color get primary => Theme.of(this).colorScheme.primary; // #0A0A0A
+  Color get onPrimary => Theme.of(this).colorScheme.onPrimary; // #FFFFFF
+
+  /// Secondary/Accent Colors (Vurgu renkleri)
+  Color get secondary => Theme.of(this).colorScheme.secondary; // #06B6D4
+  Color get onSecondary => Theme.of(this).colorScheme.onSecondary; // #FFFFFF
+  Color get accent => secondary; // Alias for secondary
+
+  /// Surface Colors (Yüzey renkleri)
+  Color get surface => Theme.of(this).colorScheme.surface; // #FFFFFF
+  Color get onSurface => Theme.of(this).colorScheme.onSurface; // #0A0A0A
+  Color get surfaceContainer =>
+      Theme.of(this).colorScheme.surfaceContainer; // #F6F6F6
+
+  /// Tertiary Colors (Üçüncül renkler)
+  Color get tertiary => Theme.of(this).colorScheme.tertiary; // #F6F6F6
+  Color get onTertiary => Theme.of(this).colorScheme.onTertiary; // #0A0A0A
+
+  /// Semantic Colors (Anlamsal renkler)
+  Color get error => Theme.of(this).colorScheme.error; // #EF4444
+  Color get onError => Theme.of(this).colorScheme.onError; // #FFFFFF
+  Color get success => DesignTokens.success; // #16A34A
+  Color get warning => DesignTokens.warning; // #F59E0B
+  Color get danger => error; // Alias for error
+
+  /// Text Colors (Metin renkleri)
+  Color get textPrimary => DesignTokens.textPrimary; // #0A0A0A
+  Color get textSecondary => DesignTokens.textSecondary; // #6B6B6B
+  Color get textInverse => DesignTokens.textInverse; // #FFFFFF
+
+  // =============================================================================
+  // TYPOGRAPHY - Tüm text style'lar context üzerinden
+  // =============================================================================
+
+  TextStyle get displayXL => Theme.of(this).textTheme.displayLarge!;
+  TextStyle get h1 => Theme.of(this).textTheme.headlineLarge!;
+  TextStyle get h2 => Theme.of(this).textTheme.headlineMedium!;
+  TextStyle get h3 => Theme.of(this).textTheme.titleLarge!;
+  TextStyle get bodyLarge => Theme.of(this).textTheme.bodyLarge!;
+  TextStyle get bodySmall => Theme.of(this).textTheme.bodyMedium!;
+  TextStyle get caption => Theme.of(this).textTheme.bodySmall!;
+
+  // =============================================================================
+  // SPACING - Tüm spacing'ler context üzerinden
+  // =============================================================================
+
+  /// Base Spacing Values
+  double get spacingXs => PaddingConstants.spacingXs; // 4
+  double get spacingS => PaddingConstants.spacingS; // 8
+  double get spacingM => PaddingConstants.spacingM; // 12
+  double get spacingL => PaddingConstants.spacingL; // 16
+  double get spacingXl => PaddingConstants.spacingXl; // 24
+  double get spacingXxl => PaddingConstants.spacingXxl; // 32
+  double get spacingXxxl => PaddingConstants.spacingXxxl; // 40
+
+  /// EdgeInsets Shortcuts
+  EdgeInsets get paddingXs => PaddingConstants.allXs;
+  EdgeInsets get paddingS => PaddingConstants.allS;
+  EdgeInsets get paddingM => PaddingConstants.allM;
+  EdgeInsets get paddingL => PaddingConstants.allL;
+  EdgeInsets get paddingXl => PaddingConstants.allXl;
+  EdgeInsets get paddingXxl => PaddingConstants.allXxl;
+  EdgeInsets get paddingXxxl => PaddingConstants.allXxxl;
+
+  EdgeInsets get horizontalXs => PaddingConstants.horizontalXs;
+  EdgeInsets get horizontalS => PaddingConstants.horizontalS;
+  EdgeInsets get horizontalM => PaddingConstants.horizontalM;
+  EdgeInsets get horizontalL => PaddingConstants.horizontalL;
+  EdgeInsets get horizontalXl => PaddingConstants.horizontalXl;
+  EdgeInsets get horizontalXxl => PaddingConstants.horizontalXxl;
+
+  EdgeInsets get verticalXs => PaddingConstants.verticalXs;
+  EdgeInsets get verticalS => PaddingConstants.verticalS;
+  EdgeInsets get verticalM => PaddingConstants.verticalM;
+  EdgeInsets get verticalL => PaddingConstants.verticalL;
+  EdgeInsets get verticalXl => PaddingConstants.verticalXl;
+  EdgeInsets get verticalXxl => PaddingConstants.verticalXxl;
+
+  // =============================================================================
+  // BORDER RADIUS - Tüm radius'lar context üzerinden
+  // =============================================================================
+
+  BorderRadius get radiusSmall =>
+      BorderRadius.circular(DesignTokens.radiusSmall); // 4
+  BorderRadius get radiusMedium =>
+      BorderRadius.circular(DesignTokens.radiusMedium); // 8
+  BorderRadius get radiusLarge =>
+      BorderRadius.circular(DesignTokens.radiusLarge); // 16
+  BorderRadius get radiusRound =>
+      BorderRadius.circular(DesignTokens.radiusRound); // 9999
+
+  // =============================================================================
+  // ELEVATION - Tüm shadow'lar context üzerinden
+  // =============================================================================
+
+  List<BoxShadow> get elevationNone => DesignTokens.elevationNone;
+  List<BoxShadow> get elevationLow => DesignTokens.elevationLow;
+  List<BoxShadow> get elevationMedium => DesignTokens.elevationMedium;
+  List<BoxShadow> get elevationHigh => DesignTokens.elevationHigh;
+
+  // =============================================================================
+  // COMPONENT SIZES - Tüm component boyutları context üzerinden
+  // =============================================================================
+
+  double get buttonHeight => DesignTokens.primaryButtonHeight; // 48
+  double get buttonHeightSecondary => DesignTokens.secondaryButtonHeight; // 44
+  double get buttonHeightSmall => DesignTokens.smallButtonHeight; // 36
+  double get inputHeight => DesignTokens.inputHeight; // 48
+  double get appBarHeight => DesignTokens.topAppBarHeight; // 56
+  double get bottomNavHeight => DesignTokens.bottomNavHeight; // 56
+  double get fabSize => DesignTokens.fabRegular; // 56
+  double get fabSizeSmall => DesignTokens.fabSmall; // 40
+
+  // =============================================================================
+  // ICON SIZES - Tüm icon boyutları context üzerinden
+  // =============================================================================
+
+  double get iconSmall => DesignTokens.iconSmall; // 16
+  double get iconMedium => DesignTokens.iconMedium; // 20
+  double get iconLarge => DesignTokens.iconLarge; // 24
+  double get iconXL => DesignTokens.iconXL; // 32
+  double get iconHitArea => DesignTokens.iconHitArea; // 44
+
+  // =============================================================================
+  // ANIMATION DURATIONS - Tüm animasyon süreleri context üzerinden
+  // =============================================================================
+
+  Duration get durationSmall => DesignTokens.durationSmall; // 100ms
+  Duration get durationMedium => DesignTokens.durationMedium; // 200ms
+  Duration get durationLarge => DesignTokens.durationLarge; // 350ms
+
+  // =============================================================================
+  // SCREEN DIMENSIONS - Ekran boyutları
+  // =============================================================================
+
+  double get width => MediaQuery.of(this).size.width;
+  double get height => MediaQuery.of(this).size.height;
+  Size get size => MediaQuery.of(this).size;
+
+  // =============================================================================
+  // RESPONSIVE BREAKPOINTS - Responsive tasarım
+  // =============================================================================
+
   bool get isMobile => width <= 500.0;
   bool get isTablet => width < 1024.0 && width >= 650.0;
   bool get isSmallTablet => width < 650.0 && width > 500.0;
   bool get isDesktop => width >= 1024.0;
   bool get isSmall => width < 850.0 && width >= 560.0;
 
-  double get width => MediaQuery.of(this).size.width;
-  double get height => MediaQuery.of(this).size.height;
-  Size get size => MediaQuery.of(this).size;
+  // =============================================================================
+  // UTILITY METHODS - Yardımcı metodlar
+  // =============================================================================
 
-  // Text Style Extensions
+  /// Responsive padding based on screen width
+  EdgeInsets get responsivePadding => width > 600 ? horizontalXxl : horizontalL;
+
+  /// Theme aware colors with opacity
+  Color colorWithOpacity(Color color, double opacity) =>
+      color.withValues(alpha: opacity);
+}
+
+// =============================================================================
+// DEPRECATED - Backward Compatibility
+// =============================================================================
+
+extension BuildContextExtension<T> on BuildContext {
+  // Text Style Extensions (DEPRECATED - Use context.h1, context.h2 etc.)
   TextStyle? get displayMedium => Theme.of(this).textTheme.displayMedium;
   TextStyle? get displaySmall => Theme.of(this).textTheme.displaySmall;
   TextStyle? get headlineLarge => Theme.of(this).textTheme.headlineLarge;
   TextStyle? get headlineMedium => Theme.of(this).textTheme.headlineMedium;
+  TextStyle? get headlineSmall => Theme.of(this).textTheme.headlineSmall;
   TextStyle? get titleLarge => Theme.of(this).textTheme.titleLarge;
   TextStyle? get titleMedium => Theme.of(this).textTheme.titleMedium;
   TextStyle? get titleSmall => Theme.of(this).textTheme.titleSmall;
+  TextStyle? get bodyLargeOld => Theme.of(this).textTheme.bodyLarge;
+  TextStyle? get bodyMedium => Theme.of(this).textTheme.bodyMedium;
+  TextStyle? get bodySmallOld => Theme.of(this).textTheme.bodySmall;
   TextStyle? get labelLarge => Theme.of(this).textTheme.labelLarge;
-  TextStyle? get bodySmall => Theme.of(this).textTheme.bodySmall;
-  TextStyle? get titleTextStyle => Theme.of(this).appBarTheme.titleTextStyle;
-  TextStyle? get bodyExtraSmall => bodySmall?.copyWith(fontSize: 10, height: 1.6, letterSpacing: .5);
-  TextStyle? get bodyLarge => Theme.of(this).textTheme.bodyLarge;
-  TextStyle? get dividerTextSmall =>
-      bodySmall?.copyWith(letterSpacing: 0.5, fontWeight: FontWeight.w700, fontSize: 12.0);
-  TextStyle? get dividerTextLarge =>
-      bodySmall?.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.w700, fontSize: 13.0, height: 1.23);
-
-  // Color Extensions
-  Color get primaryColor => Theme.of(this).primaryColor;
-  Color get primaryColorDark => Theme.of(this).primaryColorDark;
-  Color get primaryColorLight => Theme.of(this).primaryColorLight;
-  Color get primary => Theme.of(this).colorScheme.primary;
-  Color get onPrimary => Theme.of(this).colorScheme.onPrimary;
-  Color get secondary => Theme.of(this).colorScheme.secondary;
-  Color get onSecondary => Theme.of(this).colorScheme.onSecondary;
-  Color get cardColor => Theme.of(this).cardColor;
-  Color get error => Theme.of(this).colorScheme.error;
-  Color get onError => Theme.of(this).colorScheme.onError;
-  Color get errorContainer => Theme.of(this).colorScheme.errorContainer;
-  Color get surface => Theme.of(this).colorScheme.surface;
-  Color get onSurface => Theme.of(this).colorScheme.onSurface;
-  Color get surfaceContainer => Theme.of(this).colorScheme.surfaceContainer;
-  Color get onSecondaryContainer => Theme.of(this).colorScheme.onSecondaryContainer;
-
-  // Spacer
-  Widget spacerHeight(double percentage) {
-    final height = MediaQuery.of(this).size.height * (percentage / 100);
-    return SizedBox(height: height);
-  }
-
-  Widget spacerWidth(double percentage) {
-    final width = MediaQuery.of(this).size.width * (percentage / 100);
-    return SizedBox(width: width);
-  }
+  TextStyle? get labelMedium => Theme.of(this).textTheme.labelMedium;
+  TextStyle? get labelSmall => Theme.of(this).textTheme.labelSmall;
 }
 
-extension DateTimeExtension on DateTime {
-  String toFormattedString() {
-    return DateFormat('dd-MM-yyyy').format(this);
-  }
+// =============================================================================
+// UTILITY EXTENSIONS - Genel yardımcı metodlar
+// =============================================================================
+
+extension StringExtensions on String {
+  String get capitalize =>
+      isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
+
+  String get formatCurrency => NumberFormat.currency(
+        locale: 'tr_TR',
+        symbol: '₺',
+        decimalDigits: 2,
+      ).format(double.tryParse(this) ?? 0);
+}
+
+extension DoubleExtensions on double {
+  String get formatCurrency => NumberFormat.currency(
+        locale: 'tr_TR',
+        symbol: '₺',
+        decimalDigits: 2,
+      ).format(this);
 }

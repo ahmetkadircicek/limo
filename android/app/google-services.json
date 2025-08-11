@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "805516186655",
+    "project_id": "limo-transport-app",
+    "storage_bucket": "limo-transport-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:805516186655:android:your-android-app-id",
+        "android_client_info": {
+          "package_name": "limo.nitec.io"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "YOUR_GOOGLE_MAPS_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

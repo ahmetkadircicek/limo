@@ -1,0 +1,28 @@
+{
+  "vehicleBrands": [
+    "Ford",
+    "Mercedes",
+    "Volvo",
+    "Scania",
+    "MAN",
+    "Iveco",
+    "DAF",
+    "Renault"
+  ],
+  "vehicleTypes": [
+    "Kamyon",
+    "Tır",
+    "Kamyonet",
+    "Çekici",
+    "Minibüs",
+    "Otobüs"
+  ],
+  "colors": [
+    "Beyaz",
+    "Siyah",
+    "Gri",
+    "Kırmızı",
+    "Mavi",
+    "Yeşil"
+  ]
+}

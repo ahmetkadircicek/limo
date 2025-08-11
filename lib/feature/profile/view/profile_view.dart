@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/shared/elevated_expansion_tile.dart';
-import 'package:soforvarcom/shared/elevated_material.dart';
-import 'package:soforvarcom/shared/general_button.dart';
-import 'package:soforvarcom/shared/general_text.dart';
-import 'package:soforvarcom/shared/general_text_field.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/shared/app_components.dart';
+import 'package:provider/provider.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -34,13 +32,12 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   void initState() {
     super.initState();
-    _loadMockData();
+    _loadUserData();
   }
 
-  void _loadMockData() {
-    _nameController.text = 'John Doe';
-    _emailController.text = 'john.doe@example.com';
-    _phoneController.text = '+90 555 123 4567';
+  void _loadUserData() {
+    // User data will be loaded from UserProvider
+    // Mock data is kept as fallback for company and vehicle information
     _companyNameController.text = 'ABC Transport Company';
     _companyAddressController.text = 'Istanbul, Turkey';
     _taxNumberController.text = '1234567890';
@@ -60,6 +57,62 @@ class _ProfileViewState extends State<ProfileView> {
         'plateNumber': '34 DEF 456',
         'vehicleType': 'Van',
       },
+      {
+        'brand': 'BMW',
+        'model': 'X5',
+        'year': '2021',
+        'plateNumber': '34 GHI 789',
+        'vehicleType': 'SUV',
+      },
+      {
+        'brand': 'Audi',
+        'model': 'A6',
+        'year': '2022',
+        'plateNumber': '34 JKL 012',
+        'vehicleType': 'Sedan',
+      },
+      {
+        'brand': 'Volkswagen',
+        'model': 'Golf',
+        'year': '2020',
+        'plateNumber': '34 MNO 345',
+        'vehicleType': 'Hatchback',
+      },
+      {
+        'brand': 'Toyota',
+        'model': 'Camry',
+        'year': '2021',
+        'plateNumber': '34 PQR 678',
+        'vehicleType': 'Sedan',
+      },
+      {
+        'brand': 'Honda',
+        'model': 'CR-V',
+        'year': '2022',
+        'plateNumber': '34 STU 901',
+        'vehicleType': 'SUV',
+      },
+      {
+        'brand': 'Nissan',
+        'model': 'Leaf',
+        'year': '2023',
+        'plateNumber': '34 VWX 234',
+        'vehicleType': 'Electric',
+      },
+      {
+        'brand': 'Hyundai',
+        'model': 'Tucson',
+        'year': '2021',
+        'plateNumber': '34 YZA 567',
+        'vehicleType': 'SUV',
+      },
+      {
+        'brand': 'Kia',
+        'model': 'Sportage',
+        'year': '2022',
+        'plateNumber': '34 BCD 890',
+        'vehicleType': 'SUV',
+      },
     ]);
   }
 
@@ -76,220 +129,546 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        // Update controllers with user data if available
+        if (userProvider.isLoggedIn) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (userProvider.userDisplayName != null) {
+              _nameController.text = userProvider.userDisplayName!;
+            }
+            if (userProvider.userEmail != null) {
+              _emailController.text = userProvider.userEmail!;
+            }
+          });
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Header
+              _buildProfileHeader(context, userProvider),
+              const SizedBox(height: 24),
+
+              // User Information Section
+              _buildUserInfoSection(context),
+              const SizedBox(height: 24),
+
+              // Company Information Section
+              _buildCompanyInfoSection(context),
+              const SizedBox(height: 24),
+
+              // Vehicles Section
+              _buildVehiclesSection(context),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileHeader(BuildContext context, UserProvider userProvider) {
     return Container(
-      color: context.surfaceContainer,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: PaddingConstants.allMedium,
-          child: Form(
-            key: _formKey,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Profile Picture
+          CircleAvatar(
+            radius: 40,
+            backgroundImage:
+                userProvider.isLoggedIn && userProvider.userPhotoUrl != null
+                    ? NetworkImage(userProvider.userPhotoUrl!)
+                    : null,
+            backgroundColor: context.primary.withOpacity(0.1),
+            child: userProvider.isLoggedIn && userProvider.userPhotoUrl != null
+                ? null
+                : Icon(
+                    Icons.person,
+                    size: 40,
+                    color: context.primary,
+                  ),
+          ),
+          const SizedBox(width: 20),
+
+          // Profile Info
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
-                _buildPersonalInformation(),
-                const SizedBox(height: 16),
-                _buildCompanyInformation(),
-                const SizedBox(height: 16),
-                _buildVehicleManagement(),
-                const SizedBox(height: 16),
-                _buildChangePassword(),
-                const SizedBox(height: 24),
-                _buildActionButtons(),
-                const SizedBox(height: 16),
+                Text(
+                  userProvider.userDisplayName ?? 'Kullanıcı Adı',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  userProvider.userEmail ?? 'email@example.com',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: context.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: context.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Aktif Kullanıcı',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: context.primary,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildPersonalInformation() {
-    return ElevatedExpansionTile(
-      initiallyExpanded: true,
-      title: Row(
-        children: [
-          Icon(
-            Icons.person,
-            size: GeneralConstants.fontSizeMedium,
-            color: context.primary,
-          ),
-          const SizedBox(width: 8),
-          GeneralText(
-            text: 'Personal Information',
-            fontSize: GeneralConstants.fontSizeSmall,
-            fontWeight: GeneralConstants.fontWeightBold,
-            color: context.onSurface,
+  Widget _buildUserInfoSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      children: [
-        Padding(
-          padding: PaddingConstants.allMedium,
-          child: Column(
-            children: [
-              _buildTextField('Full Name', _nameController),
-              const SizedBox(height: 16),
-              _buildTextField('Email', _emailController,
-                  keyboardType: TextInputType.emailAddress),
-              const SizedBox(height: 16),
-              _buildTextField('Phone Number', _phoneController,
-                  keyboardType: TextInputType.phone),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompanyInformation() {
-    return ElevatedExpansionTile(
-      title: Row(
-        children: [
-          Icon(
-            Icons.business,
-            size: GeneralConstants.fontSizeMedium,
-            color: context.primary,
-          ),
-          const SizedBox(width: 8),
-          GeneralText(
-            text: 'Company Information',
-            fontSize: GeneralConstants.fontSizeSmall,
-            fontWeight: GeneralConstants.fontWeightBold,
-            color: context.onSurface,
-          ),
-        ],
-      ),
-      children: [
-        Padding(
-          padding: PaddingConstants.allMedium,
-          child: Column(
-            children: [
-              _buildTextField('Company Name', _companyNameController),
-              const SizedBox(height: 16),
-              _buildTextField('Company Address', _companyAddressController,
-                  maxLines: 2),
-              const SizedBox(height: 16),
-              _buildTextField('Tax Number', _taxNumberController),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVehicleManagement() {
-    return ElevatedExpansionTile(
-      title: Row(
-        children: [
-          Icon(
-            Icons.local_shipping,
-            size: GeneralConstants.fontSizeMedium,
-            color: context.primary,
-          ),
-          const SizedBox(width: 8),
-          GeneralText(
-            text: 'Vehicle Management',
-            fontSize: GeneralConstants.fontSizeSmall,
-            fontWeight: GeneralConstants.fontWeightBold,
-            color: context.onSurface,
-          ),
-          const Spacer(),
-          GeneralText(
-            text: '(${_vehicles.length} vehicles)',
-            fontSize: GeneralConstants.fontSizeExtraSmall,
-            color: context.secondary,
-          ),
-        ],
-      ),
-      children: [
-        Padding(
-          padding: PaddingConstants.allMedium,
-          child: Column(
-            children: [
-              // Add Vehicle Button
-              SizedBox(
-                width: double.infinity,
-                child: GeneralButton(
-                  text: 'Add New Vehicle',
-                  color: context.secondary,
-                  fontSize: GeneralConstants.fontSizeSmall,
-                  onPressed: _showAddVehicleDialog,
-                ),
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: context.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 16),
-
-              // Vehicle List
-              if (_vehicles.isNotEmpty) ...[
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _vehicles.length,
-                  itemBuilder: (context, index) {
-                    return _buildVehicleCard(_vehicles[index], index);
-                  },
-                ),
-              ] else ...[
-                GeneralText(
-                  text: 'No vehicles added yet',
-                  fontSize: GeneralConstants.fontSizeSmall,
-                  color: context.secondary,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ],
-          ),
+              child: Icon(
+                Icons.person,
+                color: context.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Kişisel Bilgiler',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
+          ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildVehicleCard(Map<String, String> vehicle, int index) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: ElevatedMaterial(
-        child: Container(
-          padding: PaddingConstants.allMedium,
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        shape: const Border(), // Üst çizgiyi kaldır
+        collapsedShape: const Border(), // Kapalı haldeki üst çizgiyi kaldır
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Consumer<UserProvider>(
+              builder: (context, userProvider, child) {
+                return Column(
                   children: [
-                    GeneralText(
-                      text:
-                          '${vehicle['brand']} ${vehicle['model']} (${vehicle['year']})',
-                      fontSize: GeneralConstants.fontSizeSmall,
-                      fontWeight: GeneralConstants.fontWeightBold,
-                      color: context.onSurface,
+                    // Display Name (Read-only from Google)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: context.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Ad Soyad',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  userProvider.userDisplayName ??
+                                      'Belirtilmemiş',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF1A1A1A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: context.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Google',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: context.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    GeneralText(
-                      text:
-                          'Plate: ${vehicle['plateNumber']} | Type: ${vehicle['vehicleType']}',
-                      fontSize: GeneralConstants.fontSizeExtraSmall,
-                      color: context.secondary,
+                    const SizedBox(height: 16),
+
+                    // Email (Read-only from Google)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.email,
+                            color: context.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'E-posta',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  userProvider.userEmail ?? 'Belirtilmemiş',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF1A1A1A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: context.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              'Google',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: context.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Phone Number (Editable)
+                    AppInput.primary(
+                      controller: _phoneController,
+                      labelText: 'Telefon',
+                      hintText: 'Telefon numaranızı girin',
+                      prefixIcon: Icons.phone,
+                      keyboardType: TextInputType.phone,
                     ),
                   ],
-                ),
-              ),
-              IconButton(
-                onPressed: () => _removeVehicle(index),
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: context.error,
-                  size: 20,
-                ),
-              ),
-            ],
+                );
+              },
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompanyInfoSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: context.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.business,
+                color: context.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Şirket Bilgileri',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
+          ],
         ),
+        shape: const Border(), // Üst çizgiyi kaldır
+        collapsedShape: const Border(), // Kapalı haldeki üst çizgiyi kaldır
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                AppInput.primary(
+                  controller: _companyNameController,
+                  labelText: 'Şirket Adı',
+                  hintText: 'Şirket adını girin',
+                  prefixIcon: Icons.business,
+                ),
+                const SizedBox(height: 16),
+                AppInput.primary(
+                  controller: _companyAddressController,
+                  labelText: 'Şirket Adresi',
+                  hintText: 'Şirket adresini girin',
+                  prefixIcon: Icons.location_on,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                AppInput.primary(
+                  controller: _taxNumberController,
+                  labelText: 'Vergi Numarası',
+                  hintText: 'Vergi numarasını girin',
+                  prefixIcon: Icons.receipt,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVehiclesSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: context.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.directions_car,
+                color: context.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Araç Yönetimi',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
+          ],
+        ),
+        shape: const Border(), // Üst çizgiyi kaldır
+        collapsedShape: const Border(), // Kapalı haldeki üst çizgiyi kaldır
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Vehicle List
+                ..._vehicles
+                    .map((vehicle) => _buildVehicleCard(context, vehicle)),
+                const SizedBox(height: 16),
+
+                // Add New Vehicle Button
+                SizedBox(
+                  width: double.infinity,
+                  child: AppButton.secondary(
+                    'Yeni Araç Ekle',
+                    onPressed: () => _showAddVehicleDialog(context),
+                    icon: Icons.add,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVehicleCard(BuildContext context, Map<String, String> vehicle) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: context.onSurface.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: context.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.directions_car,
+              color: context.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${vehicle['brand']} ${vehicle['model']} (${vehicle['year']})',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  vehicle['plateNumber'] ?? '',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: context.onSurface.withOpacity(0.6),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  vehicle['vehicleType'] ?? '',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: context.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () => _editVehicle(context, vehicle),
+            icon: Icon(
+              Icons.edit,
+              color: context.primary,
+              size: 20,
+            ),
+          ),
+          IconButton(
+            onPressed: () => _deleteVehicle(context, vehicle),
+            icon: Icon(
+              Icons.delete,
+              color: Colors.red,
+              size: 20,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildChangePassword() {
-    return ElevatedExpansionTile(
+    return ExpansionTile(
       title: Row(
         children: [
           Icon(
@@ -298,10 +677,8 @@ class _ProfileViewState extends State<ProfileView> {
             color: context.primary,
           ),
           const SizedBox(width: 8),
-          GeneralText(
-            text: 'Change Password',
-            fontSize: GeneralConstants.fontSizeSmall,
-            fontWeight: GeneralConstants.fontWeightBold,
+          AppText.body(
+            'Change Password',
             color: context.onSurface,
           ),
         ],
@@ -322,10 +699,8 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: GeneralButton(
-                  text: 'Update Password',
-                  color: context.secondary,
-                  fontSize: GeneralConstants.fontSizeSmall,
+                child: AppButton.secondary(
+                  'Update Password',
                   onPressed: _updatePassword,
                 ),
               ),
@@ -346,14 +721,12 @@ class _ProfileViewState extends State<ProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GeneralText(
-          text: label,
-          fontSize: GeneralConstants.fontSizeSmall,
-          fontWeight: GeneralConstants.fontWeightBold,
+        AppText.body(
+          label,
           color: context.onSurface,
         ),
         const SizedBox(height: 8),
-        GeneralTextField(
+        AppInput.primary(
           controller: controller,
           hintText: label,
           keyboardType: keyboardType,
@@ -369,20 +742,16 @@ class _ProfileViewState extends State<ProfileView> {
       children: [
         SizedBox(
           width: double.infinity,
-          child: GeneralButton(
-            text: 'Save Profile',
-            color: context.primary,
-            fontSize: GeneralConstants.fontSizeSmall,
+          child: AppButton.primary(
+            'Save Profile',
             onPressed: _saveProfile,
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
-          child: GeneralButton(
-            text: 'Delete Account',
-            color: context.error,
-            fontSize: GeneralConstants.fontSizeSmall,
+          child: AppButton.tertiary(
+            'Delete Account',
             onPressed: _deleteAccount,
           ),
         ),
@@ -390,106 +759,16 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  void _showAddVehicleDialog() {
-    final brandController = TextEditingController();
-    final modelController = TextEditingController();
-    final yearController = TextEditingController();
-    final plateController = TextEditingController();
-    String selectedVehicleType = 'Truck';
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Vehicle'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: brandController,
-                decoration: const InputDecoration(labelText: 'Brand'),
-              ),
-              TextField(
-                controller: modelController,
-                decoration: const InputDecoration(labelText: 'Model'),
-              ),
-              TextField(
-                controller: yearController,
-                decoration: const InputDecoration(labelText: 'Year'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: plateController,
-                decoration: const InputDecoration(labelText: 'Plate Number'),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedVehicleType,
-                decoration: const InputDecoration(labelText: 'Vehicle Type'),
-                items: ['Truck', 'Van', 'Car', 'Bus', 'Motorcycle'].map((type) {
-                  return DropdownMenuItem(value: type, child: Text(type));
-                }).toList(),
-                onChanged: (value) {
-                  selectedVehicleType = value!;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (brandController.text.isNotEmpty &&
-                  modelController.text.isNotEmpty &&
-                  yearController.text.isNotEmpty &&
-                  plateController.text.isNotEmpty) {
-                setState(() {
-                  _vehicles.add({
-                    'brand': brandController.text,
-                    'model': modelController.text,
-                    'year': yearController.text,
-                    'plateNumber': plateController.text,
-                    'vehicleType': selectedVehicleType,
-                  });
-                });
-                Navigator.of(context).pop();
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
+  void _showAddVehicleDialog(BuildContext context) {
+    // TODO: Implement add vehicle dialog
   }
 
-  void _removeVehicle(int index) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Vehicle'),
-        content: const Text('Are you sure you want to remove this vehicle?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _vehicles.removeAt(index);
-              });
-              Navigator.of(context).pop();
-            },
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
+  void _editVehicle(BuildContext context, Map<String, String> vehicle) {
+    // TODO: Implement edit vehicle
+  }
+
+  void _deleteVehicle(BuildContext context, Map<String, String> vehicle) {
+    // TODO: Implement delete vehicle
   }
 
   void _updatePassword() {

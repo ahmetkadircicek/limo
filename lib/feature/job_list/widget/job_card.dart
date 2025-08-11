@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/enums/pickup_type_enum.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/feature/job_list/model/job_model.dart';
-import 'package:soforvarcom/shared/elevated_material.dart';
-import 'package:soforvarcom/shared/general_text.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/job_list/model/job_model.dart';
+import 'package:limo/shared/app_components.dart';
 
 class JobCard extends StatelessWidget {
   final JobModel job;
@@ -22,24 +21,16 @@ class JobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: PaddingConstants.symmetricVerticalSmall / 2,
-      child: ElevatedMaterial(
-        child: Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            borderRadius: GeneralConstants.borderRadius,
-            color: index.isEven
-                ? context.secondary.withValues(alpha: 0.01)
-                : context.secondary.withValues(alpha: 0.06),
-          ),
-          height: GeneralConstants.heightMedium * 2,
-          child: Row(
-            children: [
-              Expanded(flex: 2, child: _LocationSection(job: job)),
-              Expanded(flex: 2, child: _InformationSection(job: job)),
-              Expanded(flex: 1, child: _DetailsButton(onTap: onTap)),
-            ],
-          ),
+      padding: PaddingConstants.verticalS,
+      child: AppCard.primary(
+        padding: EdgeInsets.zero, // No internal padding for row layout
+        height: GeneralConstants.heightLarge * 1.8, // Uber-style height
+        child: Row(
+          children: [
+            Expanded(flex: 3, child: _LocationSection(job: job)),
+            Expanded(flex: 3, child: _InformationSection(job: job)),
+            Expanded(flex: 2, child: _DetailsButton(onTap: onTap)),
+          ],
         ),
       ),
     );
@@ -56,31 +47,26 @@ class _LocationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: PaddingConstants.symmetricHorizontalSmall,
+      padding: PaddingConstants.horizontalL, // Uber-style padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FittedBox(
-            child: GeneralText(
-              text: job.fromProvince.toUpperCase(),
-              fontSize: GeneralConstants.fontSizeSmall,
-              fontWeight: GeneralConstants.fontWeightBold,
-              color: context.onSurface,
+          AppText.body(
+            job.fromProvince.toUpperCase(),
+            color: context.onSurface,
+          ),
+          Padding(
+            padding: PaddingConstants.verticalXs,
+            child: Icon(
+              Icons.south,
+              color: context.secondary, // Uber green
+              size: GeneralConstants.iconSizeSmall,
             ),
           ),
-          Icon(
-            Icons.arrow_downward_sharp,
-            color: context.primary,
-            size: GeneralConstants.fontSizeSmall,
-          ),
-          FittedBox(
-            child: GeneralText(
-              text: job.toProvince.toUpperCase(),
-              fontSize: GeneralConstants.fontSizeSmall,
-              fontWeight: GeneralConstants.fontWeightBold,
-              color: context.onSurface,
-            ),
+          AppText.body(
+            job.toProvince.toUpperCase(),
+            color: context.onSurface,
           ),
         ],
       ),
@@ -104,21 +90,17 @@ class _InformationSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            context.spacerHeight(0.5),
-            if (job.pickupType != null) ...[
+            if (job.jobType != null) ...[
               Row(
                 children: [
                   Icon(
                     Icons.local_shipping,
-                    color: context.onSecondaryContainer,
+                    color: context.onSecondary,
                     size: GeneralConstants.fontSizeExtraSmall,
                   ),
-                  context.spacerWidth(1),
-                  GeneralText(
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
+                  AppText.caption(
+                    _getJobTypeText(job.jobType!),
                     color: context.onSurface,
-                    fontWeight: GeneralConstants.fontWeightLight,
-                    text: _getJobTypeText(job.pickupType!),
                   ),
                 ],
               ),
@@ -128,15 +110,12 @@ class _InformationSection extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.directions_car,
-                    color: context.onSecondaryContainer,
+                    color: context.onSecondary,
                     size: GeneralConstants.fontSizeExtraSmall,
                   ),
-                  context.spacerWidth(1),
-                  GeneralText(
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
+                  AppText.caption(
+                    '${job.vehicleCount} Vehicles',
                     color: context.onSurface,
-                    fontWeight: GeneralConstants.fontWeightLight,
-                    text: '${job.vehicleCount} Vehicles',
                   ),
                 ],
               ),
@@ -146,15 +125,12 @@ class _InformationSection extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.local_offer,
-                    color: context.onSecondaryContainer,
+                    color: context.onSecondary,
                     size: GeneralConstants.fontSizeExtraSmall,
                   ),
-                  context.spacerWidth(1),
-                  GeneralText(
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
+                  AppText.caption(
+                    'QUOTE BASED',
                     color: context.onSurface,
-                    fontWeight: GeneralConstants.fontWeightLight,
-                    text: 'QUOTE BASED',
                   ),
                 ],
               ),
@@ -163,20 +139,16 @@ class _InformationSection extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.monetization_on,
-                    color: context.onSecondaryContainer,
+                    color: context.onSecondary,
                     size: GeneralConstants.fontSizeExtraSmall,
                   ),
-                  context.spacerWidth(1),
-                  GeneralText(
-                    fontSize: GeneralConstants.fontSizeExtraSmall,
+                  AppText.caption(
+                    '\$${job.price!.toStringAsFixed(0)}',
                     color: context.onSurface,
-                    fontWeight: GeneralConstants.fontWeightLight,
-                    text: '\$${job.price!.toStringAsFixed(0)}',
                   ),
                 ],
               ),
             ],
-            context.spacerHeight(0.5),
           ],
         ),
       ],
@@ -194,21 +166,29 @@ class _DetailsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: context.primary,
+      decoration: BoxDecoration(
+        color: context.primary, // Black for Uber style
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(8.0),
+          bottomRight: Radius.circular(8.0),
+        ),
+      ),
       width: double.infinity,
       height: double.infinity,
       child: TextButton(
         style: TextButton.styleFrom(
-          padding: PaddingConstants.allSmall,
+          padding: PaddingConstants.allM,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(8.0),
+              bottomRight: Radius.circular(8.0),
+            ),
+          ),
         ),
         onPressed: onTap,
-        child: FittedBox(
-          child: GeneralText(
-            text: 'DETAILS',
-            color: context.onPrimary,
-            fontWeight: GeneralConstants.fontWeightBold,
-            fontSize: GeneralConstants.fontSizeMedium,
-          ),
+        child: AppText.body(
+          'VIEW',
+          color: context.onPrimary,
         ),
       ),
     );
@@ -233,7 +213,7 @@ class _Seperator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: PaddingConstants.symmetricVerticalSmall,
-      child: context.spacerWidth(1),
+      child: const SizedBox(width: 1),
     );
   }
 }

@@ -1,0 +1,51 @@
+{
+  "vehicleTypes": [
+    "Sedan",
+    "Hatchback",
+    "SUV",
+    "Station Wagon",
+    "Coupe",
+    "Convertible",
+    "Pickup Truck",
+    "Minivan",
+    "Van",
+    "Bus",
+    "Truck",
+    "Motorcycle",
+    "Scooter"
+  ],
+  "capacityOptions": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10+"
+  ],
+  "colorOptions": [
+    "White",
+    "Black",
+    "Silver",
+    "Gray",
+    "Red",
+    "Blue",
+    "Green",
+    "Yellow",
+    "Orange",
+    "Brown",
+    "Purple",
+    "Pink",
+    "Gold",
+    "Bronze",
+    "Beige",
+    "Cream"
+  ],
+  "yearOptions": {
+    "startYear": 1990,
+    "endYear": 2025
+  }
+}

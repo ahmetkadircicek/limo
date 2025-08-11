@@ -1,0 +1,84 @@
+{
+  "userInfo": {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "phone": "+90 555 123 4567"
+  },
+  "companyInfo": {
+    "companyName": "ABC Transport Company",
+    "companyAddress": "Istanbul, Turkey",
+    "taxNumber": "1234567890"
+  },
+  "vehicles": [
+    {
+      "brand": "Mercedes",
+      "model": "Actros",
+      "year": "2020",
+      "plateNumber": "34 ABC 123",
+      "vehicleType": "Truck"
+    },
+    {
+      "brand": "Ford",
+      "model": "Transit",
+      "year": "2019",
+      "plateNumber": "34 DEF 456",
+      "vehicleType": "Van"
+    },
+    {
+      "brand": "BMW",
+      "model": "X5",
+      "year": "2021",
+      "plateNumber": "34 GHI 789",
+      "vehicleType": "SUV"
+    },
+    {
+      "brand": "Audi",
+      "model": "A6",
+      "year": "2022",
+      "plateNumber": "34 JKL 012",
+      "vehicleType": "Sedan"
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "Golf",
+      "year": "2020",
+      "plateNumber": "34 MNO 345",
+      "vehicleType": "Hatchback"
+    },
+    {
+      "brand": "Toyota",
+      "model": "Camry",
+      "year": "2021",
+      "plateNumber": "34 PQR 678",
+      "vehicleType": "Sedan"
+    },
+    {
+      "brand": "Honda",
+      "model": "CR-V",
+      "year": "2022",
+      "plateNumber": "34 STU 901",
+      "vehicleType": "SUV"
+    },
+    {
+      "brand": "Nissan",
+      "model": "Leaf",
+      "year": "2023",
+      "plateNumber": "34 VWX 234",
+      "vehicleType": "Electric"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "year": "2021",
+      "plateNumber": "34 YZA 567",
+      "vehicleType": "SUV"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "year": "2022",
+      "plateNumber": "34 BCD 890",
+      "vehicleType": "SUV"
+    }
+  ]
+}

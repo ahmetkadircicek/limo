@@ -1,4 +1,5 @@
-import 'package:soforvarcom/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/core/enums/vehicle_category_enum.dart';
+import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
 class VehicleRequirement {
   final String? specificBrand; // null = "Any brand"
@@ -10,7 +11,12 @@ class VehicleRequirement {
   final int? maximumCapacity; // null = "No max limit"
   final int? minimumYear; // null = "Any year"
   final int? maximumYear; // null = "No max year"
+  final VehicleCategory? minimumCategory; // null = "Any category"
   final bool isFlexible; // Overall flexibility flag
+  
+  // Pricing for this specific vehicle requirement
+  final double? hourlyRate;
+  final double? pricePerMile;
 
   const VehicleRequirement({
     this.specificBrand,
@@ -22,7 +28,10 @@ class VehicleRequirement {
     this.maximumCapacity,
     this.minimumYear,
     this.maximumYear,
+    this.minimumCategory,
     this.isFlexible = true,
+    this.hourlyRate,
+    this.pricePerMile,
   });
 
   /// Factory constructor for completely flexible requirements
@@ -43,6 +52,9 @@ class VehicleRequirement {
     int? maxCapacity,
     int? minYear,
     int? maxYear,
+    VehicleCategory? minCategory,
+    double? hourlyRate,
+    double? pricePerMile,
   }) {
     return VehicleRequirement(
       specificBrand: brand,
@@ -54,7 +66,10 @@ class VehicleRequirement {
       maximumCapacity: maxCapacity,
       minimumYear: minYear,
       maximumYear: maxYear,
+      minimumCategory: minCategory,
       isFlexible: false,
+      hourlyRate: hourlyRate,
+      pricePerMile: pricePerMile,
     );
   }
 
@@ -68,7 +83,8 @@ class VehicleRequirement {
         specificExteriorColor == null &&
         specificInteriorColor == null &&
         minimumCapacity == null &&
-        maximumCapacity == null) {
+        maximumCapacity == null &&
+        minimumCategory == null) {
       return true;
     }
 
@@ -120,6 +136,11 @@ class VehicleRequirement {
       return false;
     }
 
+    // Check minimum category requirement
+    if (minimumCategory != null && !vehicle.canHandleJob(minimumCategory!)) {
+      return false;
+    }
+
     return true;
   }
 
@@ -130,7 +151,8 @@ class VehicleRequirement {
         specificModel == null &&
         specificVehicleType == null &&
         specificExteriorColor == null &&
-        minimumCapacity == null) {
+        minimumCapacity == null &&
+        minimumCategory == null) {
       return "Any vehicle accepted";
     }
 
@@ -156,12 +178,30 @@ class VehicleRequirement {
         requirements.add("Min Year: $minimumYear+");
       }
     }
+    if (minimumCategory != null) {
+      requirements.add("Min Category: ${minimumCategory!.displayName}");
+    }
 
     if (requirements.isEmpty) {
       requirements.add("Flexible requirements");
     }
 
     return requirements.join(", ");
+  }
+
+  /// Get pricing summary for this vehicle requirement
+  String getPricingSummary() {
+    List<String> pricing = [];
+    
+    if (hourlyRate != null) {
+      pricing.add('\$${hourlyRate!.toStringAsFixed(2)}/hour');
+    }
+    if (pricePerMile != null) {
+      pricing.add('\$${pricePerMile!.toStringAsFixed(2)}/mile');
+    }
+    
+    if (pricing.isEmpty) return 'No pricing specified';
+    return pricing.join(', ');
   }
 
   Map<String, dynamic> toJson() {
@@ -175,7 +215,10 @@ class VehicleRequirement {
       'maximumCapacity': maximumCapacity,
       'minimumYear': minimumYear,
       'maximumYear': maximumYear,
+      'minimumCategory': minimumCategory?.id,
       'isFlexible': isFlexible,
+      'hourlyRate': hourlyRate,
+      'pricePerMile': pricePerMile,
     };
   }
 
@@ -190,7 +233,12 @@ class VehicleRequirement {
       maximumCapacity: json['maximumCapacity'],
       minimumYear: json['minimumYear'],
       maximumYear: json['maximumYear'],
+      minimumCategory: json['minimumCategory'] != null 
+          ? VehicleCategory.fromId(json['minimumCategory'])
+          : null,
       isFlexible: json['isFlexible'] ?? true,
+      hourlyRate: json['hourlyRate']?.toDouble(),
+      pricePerMile: json['pricePerMile']?.toDouble(),
     );
   }
 
@@ -207,7 +255,10 @@ class VehicleRequirement {
         other.maximumCapacity == maximumCapacity &&
         other.minimumYear == minimumYear &&
         other.maximumYear == maximumYear &&
-        other.isFlexible == isFlexible;
+        other.minimumCategory == minimumCategory &&
+        other.isFlexible == isFlexible &&
+        other.hourlyRate == hourlyRate &&
+        other.pricePerMile == pricePerMile;
   }
 
   @override
@@ -221,6 +272,9 @@ class VehicleRequirement {
         maximumCapacity.hashCode ^
         minimumYear.hashCode ^
         maximumYear.hashCode ^
-        isFlexible.hashCode;
+        minimumCategory.hashCode ^
+        isFlexible.hashCode ^
+        hourlyRate.hashCode ^
+        pricePerMile.hashCode;
   }
 }

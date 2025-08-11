@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:soforvarcom/core/constants/general_constants.dart';
-import 'package:soforvarcom/core/constants/padding_constants.dart';
-import 'package:soforvarcom/core/extensions/general_extensions.dart';
-import 'package:soforvarcom/feature/map/models/location_model.dart';
-import 'package:soforvarcom/feature/map/services/location_service.dart';
-import 'package:soforvarcom/shared/elevated_material.dart';
-import 'package:soforvarcom/shared/general_button.dart';
-import 'package:soforvarcom/shared/general_text.dart';
-import 'package:soforvarcom/shared/general_text_field.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/constants/padding_constants.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/map/models/location_model.dart';
+import 'package:limo/feature/map/services/location_service.dart';
+import 'package:limo/shared/app_components.dart';
 
 class LocationPicker extends StatefulWidget {
   final String title;
@@ -170,8 +167,7 @@ class _LocationPickerState extends State<LocationPicker> {
   void _selectSearchResult(LocationModel location) {
     setState(() {
       _selectedLocation = location;
-      _searchResults.clear();
-      _searchController.clear();
+      // Don't clear search results immediately - keep them visible
       _addMarker(location);
     });
     _animateToLocation(location);
@@ -179,6 +175,11 @@ class _LocationPickerState extends State<LocationPicker> {
 
   void _confirmSelection() {
     if (_selectedLocation != null) {
+      // Clear search results and controller when confirming
+      setState(() {
+        _searchResults.clear();
+        _searchController.clear();
+      });
       widget.onLocationSelected(_selectedLocation!);
       Navigator.of(context).pop();
     }
@@ -188,10 +189,8 @@ class _LocationPickerState extends State<LocationPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GeneralText(
-          text: widget.title,
-          fontSize: GeneralConstants.fontSizeMedium,
-          fontWeight: GeneralConstants.fontWeightMedium,
+        title: AppText.body(
+          widget.title,
         ),
         backgroundColor: context.surface,
         elevation: 0,
@@ -227,25 +226,52 @@ class _LocationPickerState extends State<LocationPicker> {
             right: 16,
             child: Column(
               children: [
-                ElevatedMaterial(
+                AppCard.primary(
                   child: Row(
                     children: [
                       Expanded(
-                        child: GeneralTextField(
-                          controller: _searchController,
-                          hintText: 'Search for a location...',
-                          prefixIcon: const Icon(Icons.search),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                                16), // Daha yuvarlak köşeler
+                            border: Border.all(
+                              color: context.onSurface.withOpacity(0.1),
+                              width: 1,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Search for a location...',
+                              hintStyle: TextStyle(
+                                color: context.onSurface.withOpacity(0.5),
+                                fontSize: 16,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: context.primary,
+                                size: 24,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: context.onSurface,
+                            ),
+                          ),
                         ),
                       ),
-                      context.spacerWidth(1),
+                      const SizedBox(width: 8),
                       SizedBox(
-                        width: 50,
-                        height: GeneralConstants.heightMedium,
+                        width: 48,
+                        height: 48,
                         child: _isLoadingCurrentLocation
                             ? Container(
                                 decoration: BoxDecoration(
                                   color: context.primary,
-                                  borderRadius: GeneralConstants.borderRadius,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Center(
                                   child: SizedBox(
@@ -258,13 +284,20 @@ class _LocationPickerState extends State<LocationPicker> {
                                   ),
                                 ),
                               )
-                            : GeneralButton(
+                            : IconButton(
                                 onPressed: _getCurrentLocation,
-                                color: context.primary,
-                                text: '',
-                                fontSize: GeneralConstants.fontSizeSmall,
-                                icon: Icon(Icons.my_location,
-                                    color: context.onPrimary, size: 20),
+                                icon: Icon(
+                                  Icons.my_location,
+                                  color: context.primary,
+                                  size: 24,
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor:
+                                      context.primary.withOpacity(0.1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
                               ),
                       ),
                     ],
@@ -275,37 +308,134 @@ class _LocationPickerState extends State<LocationPicker> {
                 if (_searchResults.isNotEmpty || _isSearching)
                   Container(
                     margin: const EdgeInsets.only(top: 8),
-                    constraints: const BoxConstraints(maxHeight: 200),
-                    child: ElevatedMaterial(
+                    constraints: const BoxConstraints(maxHeight: 350),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: GeneralConstants
+                          .borderRadius, // Daha yuvarlak köşeler
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: GeneralConstants
+                          .borderRadius, // Daha yuvarlak köşeler
                       child: _isSearching
                           ? const Padding(
                               padding: PaddingConstants.allMedium,
                               child: Center(child: CircularProgressIndicator()),
                             )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: _searchResults.length,
-                              itemBuilder: (context, index) {
-                                final location = _searchResults[index];
-                                return ListTile(
-                                  leading: Icon(Icons.location_on,
-                                      color: context.primary),
-                                  title: GeneralText(
-                                    text: location.placeName,
-                                    fontSize: GeneralConstants.fontSizeSmall,
-                                    fontWeight:
-                                        GeneralConstants.fontWeightMedium,
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.search,
+                                        size: 20,
+                                        color: context.primary,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Search Results (${_searchResults.length})',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: context.onSurface,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _searchResults.clear();
+                                            _searchController.clear();
+                                          });
+                                        },
+                                        child: Text(
+                                          'Clear',
+                                          style: TextStyle(
+                                            color: context.primary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  subtitle: GeneralText(
-                                    text: location.address,
-                                    fontSize:
-                                        GeneralConstants.fontSizeExtraSmall,
-                                    fontWeight:
-                                        GeneralConstants.fontWeightLight,
-                                  ),
-                                  onTap: () => _selectSearchResult(location),
-                                );
-                              },
+                                ),
+                                const Divider(height: 1),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _searchResults.length,
+                                  itemBuilder: (context, index) {
+                                    final location = _searchResults[index];
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                            16), // Daha yuvarlak köşeler
+                                        border: Border.all(
+                                          color: context.onSurface
+                                              .withOpacity(0.1),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        contentPadding:
+                                            const EdgeInsets.all(12),
+                                        leading: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: context.primary
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            Icons.location_on,
+                                            color: context.primary,
+                                            size: 20,
+                                          ),
+                                        ),
+                                        title: Text(
+                                          location.placeName,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: context.onSurface,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          location.address,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: context.onSurface
+                                                .withOpacity(0.7),
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        trailing: Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 16,
+                                          color: context.onSurface
+                                              .withOpacity(0.3),
+                                        ),
+                                        onTap: () =>
+                                            _selectSearchResult(location),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                     ),
                   ),
@@ -319,7 +449,7 @@ class _LocationPickerState extends State<LocationPicker> {
               bottom: 16,
               left: 16,
               right: 16,
-              child: ElevatedMaterial(
+              child: AppCard.primary(
                 child: Padding(
                   padding: PaddingConstants.allMedium,
                   child: Column(
@@ -329,34 +459,26 @@ class _LocationPickerState extends State<LocationPicker> {
                       Row(
                         children: [
                           Icon(Icons.location_on, color: context.primary),
-                          context.spacerWidth(1),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                GeneralText(
-                                  text: _selectedLocation!.placeName,
-                                  fontSize: GeneralConstants.fontSizeSmall,
-                                  fontWeight: GeneralConstants.fontWeightMedium,
+                                AppText.body(
+                                  _selectedLocation!.placeName,
                                 ),
-                                GeneralText(
-                                  text: _selectedLocation!.address,
-                                  fontSize: GeneralConstants.fontSizeExtraSmall,
-                                  fontWeight: GeneralConstants.fontWeightLight,
+                                AppText.body(
+                                  _selectedLocation!.address,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      context.spacerHeight(2),
                       SizedBox(
                         width: double.infinity,
                         height: GeneralConstants.heightMedium,
-                        child: GeneralButton(
-                          text: 'Confirm Location',
-                          fontSize: GeneralConstants.fontSizeSmall,
-                          color: context.primary,
+                        child: AppButton.primary(
+                          'Confirm Location',
                           onPressed: _confirmSelection,
                         ),
                       ),

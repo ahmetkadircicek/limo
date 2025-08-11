@@ -1,8 +1,8 @@
-import 'package:soforvarcom/core/enums/pickup_type_enum.dart';
-import 'package:soforvarcom/feature/job_list/model/coordinate_model.dart';
-import 'package:soforvarcom/feature/job_list/model/pricing_model.dart';
-import 'package:soforvarcom/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:soforvarcom/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/feature/job_list/model/coordinate_model.dart';
+import 'package:limo/feature/job_list/model/pricing_model.dart';
+import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
+import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
 class JobModel {
   final String id;
@@ -13,7 +13,6 @@ class JobModel {
   final Coordinate fromLocation;
   final Coordinate? toLocation;
   final double? price;
-  final JobType? pickupType;
   final String? companyName;
   final String? contactInfo;
   final String? description;
@@ -32,7 +31,6 @@ class JobModel {
     this.fromCity,
     this.toCity,
     this.price,
-    this.pickupType,
     this.companyName,
     this.contactInfo,
     this.description,
@@ -55,10 +53,6 @@ class JobModel {
           ? Coordinate.fromJson(json['toLocation'])
           : null,
       price: json['price']?.toDouble(),
-      pickupType: json['pickupType'] != null
-          ? JobType.values.firstWhere((e) => e.name == json['pickupType'],
-              orElse: () => JobType.pointToPoint)
-          : null,
       companyName: json['companyName'],
       contactInfo: json['contactInfo'],
       description: json['description'],
@@ -90,7 +84,6 @@ class JobModel {
       'fromLocation': fromLocation.toJson(),
       'toLocation': toLocation?.toJson(),
       'price': price,
-      'pickupType': pickupType?.name,
       'companyName': companyName,
       'contactInfo': contactInfo,
       'description': description,
