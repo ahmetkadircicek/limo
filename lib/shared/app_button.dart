@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/shared/app_text.dart';
 
 enum ButtonVariant { primary, secondary, tertiary }
 
@@ -99,14 +100,10 @@ class AppButton extends StatelessWidget {
                       color: _getForegroundColor(context),
                     )
                   : null),
-          label: Text(
+          label: AppText.body(
             text,
-            style: GoogleFonts.nunito(
-              color: _getForegroundColor(context),
-              fontWeight: FontWeight.w600,
-              fontSize: 16.0,
-              height: 1.2,
-            ),
+            color: _getForegroundColor(context),
+            fontWeight: FontWeight.w600,
             textAlign: TextAlign.center,
           ),
         ),

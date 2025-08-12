@@ -98,7 +98,7 @@ class AppText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: GoogleFonts.nunito(
+      style: GoogleFonts.montserrat(
         fontSize: fontSize ?? 16.0,
         fontWeight: fontWeight ?? FontWeight.w400,
         color: color ?? context.textPrimary, // Context'ten alınıyor

@@ -4,13 +4,15 @@ import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
 class VehicleCategoryService {
   /// Check if a vehicle can apply to a job with specific requirements
-  static bool canVehicleApplyToJob(VehicleModel vehicle, VehicleRequirement requirement) {
+  static bool canVehicleApplyToJob(
+      VehicleModel vehicle, VehicleRequirement requirement) {
     if (requirement.minimumCategory == null) return true;
     return vehicle.category.canApplyToJob(requirement.minimumCategory!);
   }
 
   /// Check if a vehicle can apply to any requirement in a job
-  static bool canVehicleApplyToJobRequirements(VehicleModel vehicle, List<VehicleRequirement> requirements) {
+  static bool canVehicleApplyToJobRequirements(
+      VehicleModel vehicle, List<VehicleRequirement> requirements) {
     for (final requirement in requirements) {
       if (canVehicleApplyToJob(vehicle, requirement)) {
         return true;
@@ -24,9 +26,10 @@ class VehicleCategoryService {
     List<VehicleModel> vehicles,
     List<VehicleRequirement> requirements,
   ) {
-    return vehicles.where((vehicle) => 
-      canVehicleApplyToJobRequirements(vehicle, requirements)
-    ).toList();
+    return vehicles
+        .where((vehicle) =>
+            canVehicleApplyToJobRequirements(vehicle, requirements))
+        .toList();
   }
 
   /// Get vehicles that cannot apply to a job with upgrade suggestions
@@ -35,25 +38,27 @@ class VehicleCategoryService {
     List<VehicleRequirement> requirements,
   ) {
     final ineligibleVehicles = <Map<String, dynamic>>[];
-    
+
     for (final vehicle in vehicles) {
       if (!canVehicleApplyToJobRequirements(vehicle, requirements)) {
         // Find the highest category requirement
         VehicleRequirement? highestRequirement;
         int? highestCategoryId;
-        
+
         for (final requirement in requirements) {
           if (requirement.minimumCategory != null) {
             final categoryId = requirement.minimumCategory!.id;
-            if (highestRequirement == null || categoryId > (highestCategoryId ?? 0)) {
+            if (highestRequirement == null ||
+                categoryId > (highestCategoryId ?? 0)) {
               highestRequirement = requirement;
               highestCategoryId = categoryId;
             }
           }
         }
-        
+
         if (highestRequirement != null) {
-          final eligibility = vehicle.getJobEligibilitySummary(highestRequirement);
+          final eligibility =
+              vehicle.getJobEligibilitySummary(highestRequirement);
           ineligibleVehicles.add({
             'vehicle': vehicle,
             'eligibility': eligibility,
@@ -62,7 +67,7 @@ class VehicleCategoryService {
         }
       }
     }
-    
+
     return ineligibleVehicles;
   }
 
@@ -92,29 +97,32 @@ class VehicleCategoryService {
     }
 
     final upgradePath = vehicle.getUpgradePath(requirement.minimumCategory!);
-    final estimatedCost = vehicle.getUpgradeCostEstimate(requirement.minimumCategory!);
-    
+    final estimatedCost =
+        vehicle.getUpgradeCostEstimate(requirement.minimumCategory!);
+
     final recommendations = <String>[];
-    
+
     if (upgradePath.isNotEmpty) {
-      recommendations.add('Araç kategorisini ${upgradePath.first.displayName} seviyesine yükseltin');
-      
+      recommendations.add(
+          'Araç kategorisini ${upgradePath.first.displayName} seviyesine yükseltin');
+
       if (upgradePath.length > 1) {
-        recommendations.add('Ardından ${upgradePath.last.displayName} seviyesine yükseltin');
+        recommendations.add(
+            'Ardından ${upgradePath.last.displayName} seviyesine yükseltin');
       }
     }
-    
+
     // Add specific recommendations based on vehicle type
-    if (vehicle.vehicleType.toLowerCase().contains('sedan') && 
+    if (vehicle.vehicleType.toLowerCase().contains('sedan') &&
         requirement.minimumCategory!.id >= 8) {
       recommendations.add('Lüks sedan segmentine geçiş yapmayı düşünün');
     }
-    
-    if (vehicle.vehicleType.toLowerCase().contains('suv') && 
+
+    if (vehicle.vehicleType.toLowerCase().contains('suv') &&
         requirement.minimumCategory!.id >= 7) {
       recommendations.add('Premium SUV segmentine geçiş yapmayı düşünün');
     }
-    
+
     if (vehicle.year < 2018 && requirement.minimumCategory!.id >= 6) {
       recommendations.add('Daha yeni model araç almayı düşünün (2018+)');
     }
@@ -134,74 +142,84 @@ class VehicleCategoryService {
   static Map<String, dynamic> validateVehicleCategory(VehicleModel vehicle) {
     // Since _determineCategory is private, we'll create a simple validation
     // based on the vehicle's current category and general rules
-    
+
     final currentCategory = vehicle.category;
     final suggestions = <String>[];
     bool isValid = true;
-    
+
     // Add suggestions based on vehicle characteristics
     if (vehicle.year < 2015 && currentCategory.id >= 6) {
       suggestions.add('Araç yaşı kategori ile uyumsuz olabilir');
       isValid = false;
     }
-    
+
     if (vehicle.capacity <= 4 && currentCategory.id >= 7) {
       suggestions.add('Kapasite kategori ile uyumsuz olabilir');
       isValid = false;
     }
-    
+
     // Brand-based validation
-    final luxuryBrands = ['Mercedes', 'BMW', 'Audi', 'Lexus', 'Porsche', 'Jaguar', 'Land Rover'];
+    final luxuryBrands = [
+      'Mercedes',
+      'BMW',
+      'Audi',
+      'Lexus',
+      'Porsche',
+      'Jaguar',
+      'Land Rover'
+    ];
     if (luxuryBrands.contains(vehicle.brand) && currentCategory.id < 7) {
       suggestions.add('Marka için daha yüksek kategori önerilir');
       isValid = false;
     }
-    
+
     final validation = {
       'isValid': isValid,
       'currentCategory': currentCategory,
       'categoryLevel': currentCategory.levelDescription,
       'suggestions': suggestions,
     };
-    
+
     if (!isValid) {
       validation['message'] = 'Kategori uyumluluğu kontrol edilmeli';
     }
-    
+
     return validation;
   }
 
   /// Get category statistics for a list of vehicles
-  static Map<String, dynamic> getCategoryStatistics(List<VehicleModel> vehicles) {
+  static Map<String, dynamic> getCategoryStatistics(
+      List<VehicleModel> vehicles) {
     final categoryCounts = <VehicleCategory, int>{};
     final totalVehicles = vehicles.length;
-    
+
     for (final vehicle in vehicles) {
-      categoryCounts[vehicle.category] = (categoryCounts[vehicle.category] ?? 0) + 1;
+      categoryCounts[vehicle.category] =
+          (categoryCounts[vehicle.category] ?? 0) + 1;
     }
-    
+
     final statistics = <String, dynamic>{
       'totalVehicles': totalVehicles,
-      'categoryDistribution': categoryCounts.map((key, value) => 
-        MapEntry(key.displayName, value)
-      ),
+      'categoryDistribution':
+          categoryCounts.map((key, value) => MapEntry(key.displayName, value)),
       'levelDistribution': <String, int>{},
       'averageCategoryId': 0.0,
     };
-    
+
     // Calculate level distribution
     final levelCounts = <String, int>{};
     int totalCategoryId = 0;
-    
+
     for (final vehicle in vehicles) {
       final level = vehicle.category.levelDescription;
       levelCounts[level] = (levelCounts[level] ?? 0) + 1;
       totalCategoryId += vehicle.category.id;
     }
-    
+
     statistics['levelDistribution'] = levelCounts;
-    statistics['averageCategoryId'] = totalVehicles > 0 ? totalCategoryId / totalVehicles : 0.0;
-    
+    statistics['averageCategoryId'] =
+        totalVehicles > 0 ? totalCategoryId / totalVehicles : 0.0;
+
     return statistics;
   }
-} 
+}

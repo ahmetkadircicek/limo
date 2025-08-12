@@ -1,14 +1,17 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/pickup_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/coordinate_model.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
+import 'package:limo/feature/listing_job/services/job_creation_service.dart';
 import 'package:limo/feature/listing_job/widgets/multiple_vehicle_requirements_form.dart';
 import 'package:limo/feature/map/models/location_model.dart';
-import 'package:limo/feature/map/widgets/location_picker.dart';
 import 'package:limo/shared/app_components.dart';
 
 class ListingJobView extends StatefulWidget {
@@ -43,11 +46,10 @@ class _ListingJobViewState extends State<ListingJobView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: context.surfaceContainer,
       body: SafeArea(
         child: Column(
           children: [
-            // Form Content
             Expanded(
               child: CustomScrollView(
                 slivers: [
@@ -55,23 +57,23 @@ class _ListingJobViewState extends State<ListingJobView> {
                     child: Form(
                       key: _formKey,
                       child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: PaddingConstants.allL,
                         child: Column(
                           children: [
                             _buildCompanySection(),
-                            const SizedBox(height: 24),
+                            SizedBox(height: PaddingConstants.spacingXl),
                             _buildJobTypeSection(),
-                            const SizedBox(height: 24),
+                            SizedBox(height: PaddingConstants.spacingXl),
                             _buildLocationSection(),
-                            const SizedBox(height: 24),
+                            SizedBox(height: PaddingConstants.spacingXl),
                             _buildVehicleSection(),
-                            const SizedBox(height: 24),
+                            SizedBox(height: PaddingConstants.spacingXl),
                             _buildDescriptionSection(),
-                            const SizedBox(height: 32),
+                            SizedBox(height: PaddingConstants.spacingXxl),
                             _buildActionButtons(),
-                            const SizedBox(
-                                height:
-                                    96), // Added 80px bottom padding for navigation bar
+                            SizedBox(
+                                height: PaddingConstants.spacingXxl +
+                                    PaddingConstants.spacingL),
                           ],
                         ),
                       ),
@@ -86,6 +88,7 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
+  // Build company information section with form inputs
   Widget _buildCompanySection() {
     return _buildSection(
       title: 'Company Information',
@@ -93,14 +96,12 @@ class _ListingJobViewState extends State<ListingJobView> {
       children: [
         AppInput.primary(
           controller: _companyNameController,
-          labelText: 'Company Name',
           hintText: 'Enter your company name',
           prefixIcon: Icons.business,
         ),
         const SizedBox(height: 16),
         AppInput.primary(
           controller: _contactInfoController,
-          labelText: 'Contact Information',
           hintText: 'Enter your phone number',
           prefixIcon: Icons.phone,
         ),
@@ -108,14 +109,14 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
+  // Build job type selection section with dropdown and info
   Widget _buildJobTypeSection() {
     return _buildSection(
-      title: 'İş Türü',
+      title: 'Job Type',
       icon: Icons.work_outline,
       children: [
         AppInput.dropdown(
-          labelText: 'İş Türü',
-          hintText: 'İş türünü seçin',
+          hintText: 'Select job type',
           dropdownItems: [
             'Point to Point',
             'Daily Rental',
@@ -125,8 +126,6 @@ class _ListingJobViewState extends State<ListingJobView> {
           onDropdownChanged: (value) {
             setState(() {
               _selectedJobType = value;
-
-              // Sadece Point to Point için varış noktası gerekli
               if (value != 'Point to Point') {
                 _toLocation = null;
               }
@@ -135,54 +134,56 @@ class _ListingJobViewState extends State<ListingJobView> {
           prefixIcon: Icons.work,
         ),
         const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF3F4F6),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: const Color(0xFFE5E7EB),
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                color: const Color(0xFF6B7280),
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  _selectedJobType == 'Point to Point'
-                      ? 'Noktadan noktaya transfer için başlangıç ve varış noktası gerekli'
-                      : 'Günlük/Saatlik kiralama için sadece başlangıç noktası gerekli',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF6B7280),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        _buildJobTypeInfoCard(),
       ],
     );
   }
 
+  // Build info card explaining job type requirements
+  Widget _buildJobTypeInfoCard() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.surfaceContainer,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: context.onSurface.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            color: context.onSurface.withValues(alpha: 0.6),
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: AppText.caption(
+              _selectedJobType == 'Point to Point'
+                  ? 'Point-to-point transfer requires both pickup and destination locations'
+                  : 'Daily/Hourly rental only requires pickup location',
+              color: context.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build location section with pickup and destination inputs
   Widget _buildLocationSection() {
     return _buildSection(
-      title: 'Lokasyon Bilgileri',
+      title: 'Location Information',
       icon: Icons.location_on_outlined,
       children: [
-        // Başlangıç Lokasyonu (Tüm iş türleri için gerekli)
         _buildLocationCard(
-          title: 'Başlangıç Lokasyonu',
+          title: 'Pickup Location',
           icon: Icons.radio_button_checked,
           color: const Color(0xFF10B981),
           location: _fromLocation,
           onTap: () => _showLocationPicker(
-            title: 'Başlangıç Lokasyonu Seçin',
+            title: 'Select Pickup Location',
             onLocationSelected: (location) {
               setState(() {
                 _fromLocation = location;
@@ -190,18 +191,15 @@ class _ListingJobViewState extends State<ListingJobView> {
             },
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Varış Lokasyonu (Sadece Point to Point için)
         if (_selectedJobType == 'Point to Point') ...[
           _buildLocationCard(
-            title: 'Varış Lokasyonu',
+            title: 'Destination Location',
             icon: Icons.location_on,
             color: const Color(0xFFEF4444),
             location: _toLocation,
             onTap: () => _showLocationPicker(
-              title: 'Varış Lokasyonu Seçin',
+              title: 'Select Destination Location',
               onLocationSelected: (location) {
                 setState(() {
                   _toLocation = location;
@@ -209,48 +207,48 @@ class _ListingJobViewState extends State<ListingJobView> {
               },
             ),
           ),
-
-          // Rota Bilgisi (Sadece her iki lokasyon da seçildiğinde)
           if (_fromLocation != null && _toLocation != null) ...[
             const SizedBox(height: 16),
             _buildRouteInfo(),
           ],
         ] else ...[
-          // Diğer iş türleri için bilgi kartı
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFEF3C7),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: const Color(0xFFF59E0B),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: const Color(0xFFF59E0B),
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '$_selectedJobType iş türü için sadece başlangıç lokasyonu yeterli. Müşteriler bu noktadan hizmet alacak.',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF92400E),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildOtherJobTypeInfoCard(),
         ],
       ],
     );
   }
 
+  // Build info card for non-point-to-point job types
+  Widget _buildOtherJobTypeInfoCard() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.surfaceContainer,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: context.onSurface.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            color: context.warning,
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: AppText.caption(
+              'For $_selectedJobType job type, only pickup location is required. Customers will receive service from this point.',
+              color: context.warning,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build vehicle requirements section
   Widget _buildVehicleSection() {
     return _buildSection(
       title: 'Vehicle Requirements',
@@ -268,6 +266,7 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
+  // Build description section with optional text input
   Widget _buildDescriptionSection() {
     return _buildSection(
       title: 'Description',
@@ -275,15 +274,14 @@ class _ListingJobViewState extends State<ListingJobView> {
       children: [
         AppInput.primary(
           controller: _descriptionController,
-          labelText: 'Description (Optional)',
           hintText: 'Additional information about the job...',
           prefixIcon: Icons.description,
-          maxLines: 4,
         ),
       ],
     );
   }
 
+  // Build reusable section container with title and icon
   Widget _buildSection({
     required String title,
     required IconData icon,
@@ -291,11 +289,11 @@ class _ListingJobViewState extends State<ListingJobView> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.surface,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -306,31 +304,7 @@ class _ListingJobViewState extends State<ListingJobView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3B82F6).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFF3B82F6),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-              ],
-            ),
+            _buildSectionHeader(title, icon),
             const SizedBox(height: 16),
             ...children,
           ],
@@ -339,6 +313,32 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
+  // Build section header with icon and title
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: context.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: context.primary,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        AppText.heading(
+          title,
+          color: context.onSurface,
+        ),
+      ],
+    );
+  }
+
+  // Build location selection card with tap functionality
   Widget _buildLocationCard({
     required String title,
     required IconData icon,
@@ -351,15 +351,15 @@ class _ListingJobViewState extends State<ListingJobView> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: context.surface,
-          borderRadius: BorderRadius.circular(16), // Daha yuvarlak köşeler
+          color: context.surfaceContainer,
+          borderRadius: GeneralConstants.borderRadius,
           border: Border.all(
             color: context.onSurface.withValues(alpha: 0.1),
             width: 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: context.onSurface.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -367,48 +367,12 @@ class _ListingJobViewState extends State<ListingJobView> {
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius:
-                    BorderRadius.circular(12), // Daha yuvarlak köşeler
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 20,
-              ),
-            ),
+            _buildLocationIcon(icon, color),
             const SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: context.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    location?.placeName ?? 'Lokasyon seçin',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: location != null
-                          ? context.onSurface
-                          : context.onSurface.withValues(alpha: 0.5),
-                      fontWeight: location != null
-                          ? FontWeight.w500
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
+              child: _buildLocationInfo(title, location),
             ),
+            const SizedBox(width: 16),
             Icon(
               Icons.chevron_right,
               color: context.onSurface.withValues(alpha: 0.5),
@@ -419,6 +383,42 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
+  // Build location icon with background
+  Widget _buildLocationIcon(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        icon,
+        color: color,
+        size: 20,
+      ),
+    );
+  }
+
+  // Build location information text
+  Widget _buildLocationInfo(String title, LocationModel? location) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText.bodySmall(
+          title,
+          color: context.onSurface,
+        ),
+        AppText.bodySmall(
+          location?.placeName ?? 'Select location',
+          color: location != null
+              ? context.onSurface
+              : context.onSurface.withValues(alpha: 0.5),
+        ),
+      ],
+    );
+  }
+
+  // Build route information display with distance and time
   Widget _buildRouteInfo() {
     if (_fromLocation == null || _toLocation == null) {
       return const SizedBox.shrink();
@@ -431,12 +431,12 @@ class _ListingJobViewState extends State<ListingJobView> {
       _toLocation!.longitude,
     );
 
-    final distanceKm = distanceMiles * 1.60934; // Convert miles to kilometers
+    final distanceKm = distanceMiles * 1.60934;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: context.primary.withValues(alpha: 0.1),
+        color: context.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: context.primary.withValues(alpha: 0.2),
@@ -444,7 +444,7 @@ class _ListingJobViewState extends State<ListingJobView> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: context.onSurface.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -453,224 +453,209 @@ class _ListingJobViewState extends State<ListingJobView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.route,
-                color: context.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Rota Bilgileri',
-                style: TextStyle(
-                  color: context.primary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
+          _buildRouteHeader(),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: context.primary.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Mesafe',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.onSurface.withValues(alpha: 0.6),
-                        ),
-                      ),
-                      Text(
-                        '${distanceKm.toStringAsFixed(1)} km',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: context.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: context.primary.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Tahmini Süre',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.onSurface.withValues(alpha: 0.6),
-                        ),
-                      ),
-                      Text(
-                        '${(distanceKm / 80).ceil()} saat',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: context.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _buildRouteMetrics(distanceKm),
           const SizedBox(height: 8),
-          Text(
-            '${_fromLocation!.placeName} → ${_toLocation!.placeName}',
-            style: TextStyle(
-              fontSize: 14,
-              color: context.onSurface.withValues(alpha: 0.8),
-              fontWeight: FontWeight.w500,
-            ),
+          _buildRouteSummary(),
+        ],
+      ),
+    );
+  }
+
+  // Build route header with icon and title
+  Widget _buildRouteHeader() {
+    return Row(
+      children: [
+        Icon(
+          Icons.route,
+          color: context.primary,
+          size: 20,
+        ),
+        const SizedBox(width: 12),
+        AppText.body(
+          'Route Information',
+          color: context.primary,
+        ),
+      ],
+    );
+  }
+
+  // Build route metrics (distance and time)
+  Widget _buildRouteMetrics(double distanceKm) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildMetricCard(
+              'Distance', '${distanceKm.toStringAsFixed(1)} km'),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildMetricCard(
+              'Estimated Time', '${(distanceKm / 80).ceil()} hours'),
+        ),
+      ],
+    );
+  }
+
+  // Build individual metric card
+  Widget _buildMetricCard(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: context.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: context.onSurface.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        children: [
+          AppText.caption(
+            label,
+            color: context.onSurface.withValues(alpha: 0.6),
+          ),
+          AppText.body(
+            value,
+            color: context.primary,
           ),
         ],
       ),
     );
   }
 
+  // Build route summary text
+  Widget _buildRouteSummary() {
+    return AppText.bodySmall(
+      '${_fromLocation!.placeName} → ${_toLocation!.placeName}',
+      color: context.onSurface.withValues(alpha: 0.8),
+    );
+  }
+
+  // Build action buttons section
   Widget _buildActionButtons() {
     return Column(
       children: [
-        // Create Job Button
-        SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed: _createJob,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A1A1A),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'İş İlanı Oluştur',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Clear Button
-        SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: OutlinedButton(
-            onPressed: _clearForm,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF6B7280),
-              side: const BorderSide(color: Color(0xFFE5E7EB)),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'Temizle',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
+        _buildCreateJobButton(),
+        _buildClearButton(),
       ],
     );
   }
 
+  // Build create job button
+  Widget _buildCreateJobButton() {
+    return AppButton.primary(
+      'Create Job Post',
+      onPressed: () async {
+        await _createJob();
+      },
+      width: double.infinity,
+      height: 52,
+    );
+  }
+
+  // Build clear form button
+  Widget _buildClearButton() {
+    return AppButton.tertiary(
+      'Clear',
+      onPressed: _clearForm,
+      width: double.infinity,
+      height: 52,
+    );
+  }
+
+  // Show location picker modal
   void _showLocationPicker({
     required String title,
     required Function(LocationModel) onLocationSelected,
   }) {
-    // Show location picker directly (map page)
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LocationPicker(
-          title: title,
-          onLocationSelected: onLocationSelected,
-        ),
-      ),
-    );
+    debugPrint("Navigation to Location Picker from Listing Job");
+    context.push('/location-picker', extra: onLocationSelected);
   }
 
-  void _createJob() {
-    // Validation
+  // Create job with validation and service call
+  Future<void> _createJob() async {
+    if (!_validateForm()) return;
+
+    final job = _buildJobModel();
+    if (job == null) return;
+
+    try {
+      _showLoadingDialog();
+      final response = await JobCreationService.createJob(job);
+      context.pop();
+
+      if (response['success'] == true) {
+        JobCreationService.logDebugInfo(job);
+        _showSuccessSnackbar('Job posted successfully!');
+        if (context.mounted) {
+          context.pop();
+        }
+      } else {
+        _showErrorSnackbar(
+            'Error creating job: ${response['error']['message']}');
+      }
+    } catch (error) {
+      context.pop();
+      _showErrorSnackbar('An unexpected error occurred: $error');
+    }
+  }
+
+  // Validate form inputs
+  bool _validateForm() {
     if (_companyNameController.text.trim().isEmpty) {
       _showErrorSnackbar('Please enter company name');
-      return;
+      return false;
     }
 
     if (_contactInfoController.text.trim().isEmpty) {
       _showErrorSnackbar('Please enter contact information');
-      return;
+      return false;
     }
 
     if (_fromLocation == null) {
       _showErrorSnackbar('Please select pickup location');
-      return;
+      return false;
     }
 
     if (_selectedJobType == 'Point to Point' && _toLocation == null) {
       _showErrorSnackbar('Please select destination location');
-      return;
+      return false;
     }
 
-    // Validate vehicle requirements
     if (_vehicleRequirements.isEmpty) {
       _showErrorSnackbar('Please add at least one vehicle requirement');
-      return;
+      return false;
     }
 
-    // Validate that specific requirements have category and pricing
+    if (!_validateVehicleRequirements()) return false;
+
+    return true;
+  }
+
+  // Validate vehicle requirements
+  bool _validateVehicleRequirements() {
     for (int i = 0; i < _vehicleRequirements.length; i++) {
       final requirement = _vehicleRequirements[i];
       if (!requirement.isFlexible) {
         if (requirement.minimumCategory == null) {
           _showErrorSnackbar(
               'Please select minimum category for vehicle requirement ${i + 1}');
-          return;
+          return false;
         }
         if (requirement.hourlyRate == null &&
             requirement.pricePerMile == null) {
           _showErrorSnackbar(
               'Please set at least one price for vehicle requirement ${i + 1}');
-          return;
+          return false;
         }
       }
     }
+    return true;
+  }
 
-    // Create job
+  // Build job model from form data
+  JobModel? _buildJobModel() {
     JobType? jobType;
     if (_selectedJobType != null) {
       switch (_selectedJobType!) {
@@ -698,7 +683,7 @@ class _ListingJobViewState extends State<ListingJobView> {
           )
         : null;
 
-    final job = JobModel(
+    return JobModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       fromProvince: _fromLocation!.placeName.toUpperCase(),
       toProvince: _toLocation?.placeName.toUpperCase() ?? '',
@@ -714,16 +699,9 @@ class _ListingJobViewState extends State<ListingJobView> {
           : null,
       vehicleRequirements: _vehicleRequirements,
     );
-
-    // TODO: Save job to database
-    debugPrint('Job created: ${job.id}');
-    debugPrint('Company: ${job.companyName}');
-    debugPrint('From: ${job.fromProvince} To: ${job.toProvince}');
-
-    _showSuccessSnackbar('İş ilanı başarıyla oluşturuldu!');
-    Navigator.pop(context);
   }
 
+  // Clear form and reset all values
   void _clearForm() {
     setState(() {
       _companyNameController.clear();
@@ -735,27 +713,71 @@ class _ListingJobViewState extends State<ListingJobView> {
       _vehicleRequirements = [];
     });
 
-    _showSuccessSnackbar('Form başarıyla temizlendi!');
+    _showSuccessSnackbar('Form cleared successfully!');
   }
 
+  // Show error snackbar with red background
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFFEF4444),
+        content: AppText.body(message),
+        backgroundColor: context.error,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }
 
+  // Show success snackbar with green background
   void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF10B981),
+        content: AppText.body(message),
+        backgroundColor: context.success,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }
 
+  // Show loading dialog during operations
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              AppText.body('Creating job...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Calculate distance between two coordinates using Haversine formula
   double _calculateDistanceInMiles(
       double lat1, double lon1, double lat2, double lon2) {
     const double earthRadiusKm = 6371.0;
@@ -776,6 +798,7 @@ class _ListingJobViewState extends State<ListingJobView> {
     return distanceKm * kmToMiles;
   }
 
+  // Convert degrees to radians for distance calculation
   double _toRadians(double degrees) {
     return degrees * (math.pi / 180);
   }

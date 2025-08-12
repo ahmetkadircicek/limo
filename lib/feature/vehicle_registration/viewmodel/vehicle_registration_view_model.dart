@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/enums/field_error_enum.dart';
 import 'package:limo/core/enums/success_message_enum.dart';
+import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/shared/app_components.dart';
 
 import '../model/vehicle_model.dart';
@@ -11,12 +12,19 @@ class VehicleRegistrationViewModel with ChangeNotifier {
   late TextEditingController brandController;
   late TextEditingController modelController;
 
+  // Vehicle being edited (if any)
+  VehicleModel? vehicleToEdit;
+
   // Dropdown values
   String? selectedYear;
   String? selectedCapacity;
   String? selectedVehicleType;
-  String? selectedInteriorColor;
-  String? selectedExteriorColor;
+  String? selectedBrand;
+  String? selectedCategory;
+
+  // Controllers for new fields
+  late TextEditingController yearController;
+  late TextEditingController capacityController;
 
   // Predefined options
   static const List<String> vehicleTypes = [
@@ -48,23 +56,44 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     '10+',
   ];
 
-  static const List<String> colorOptions = [
-    'White',
-    'Black',
-    'Silver',
-    'Gray',
-    'Red',
-    'Blue',
-    'Green',
-    'Yellow',
-    'Orange',
-    'Brown',
-    'Purple',
-    'Pink',
-    'Gold',
-    'Bronze',
-    'Beige',
-    'Cream',
+  static const List<String> brandOptions = [
+    'Ford',
+    'Mercedes',
+    'Volvo',
+    'Scania',
+    'MAN',
+    'Iveco',
+    'DAF',
+    'Renault',
+    'BMW',
+    'Audi',
+    'Toyota',
+    'Honda',
+    'Nissan',
+    'Chevrolet',
+    'Hyundai',
+    'Kia',
+    'Volkswagen',
+    'Peugeot',
+    'Citroën',
+    'Fiat',
+  ];
+
+  static const List<String> categoryOptions = [
+    'standardSedan',
+    'premiumSedan',
+    'luxurySedan',
+    'standardSuv',
+    'premiumSuv',
+    'luxurySuv',
+    'standardVan',
+    'premiumVan',
+    'standardTruck',
+    'premiumTruck',
+    'economySedan',
+    'economySuv',
+    'economyHatchback',
+    'utilityVehicle',
   ];
 
   // Generate years from 1990 to current year + 1
@@ -81,6 +110,8 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     licencePlateController = TextEditingController();
     brandController = TextEditingController();
     modelController = TextEditingController();
+    yearController = TextEditingController();
+    capacityController = TextEditingController();
   }
 
   // Update dropdown selections
@@ -99,13 +130,19 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateInteriorColor(String? color) {
-    selectedInteriorColor = color;
+  // New setter methods
+  void setVehicleType(String? vehicleType) {
+    selectedVehicleType = vehicleType;
     notifyListeners();
   }
 
-  void updateExteriorColor(String? color) {
-    selectedExteriorColor = color;
+  void setBrand(String? brand) {
+    selectedBrand = brand;
+    notifyListeners();
+  }
+
+  void setCategory(String? category) {
+    selectedCategory = category;
     notifyListeners();
   }
 
@@ -145,6 +182,29 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     return null;
   }
 
+  // Validation methods
+  String? validateYear(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a year';
+    }
+    final year = int.tryParse(value);
+    if (year == null || year < 1900 || year > DateTime.now().year + 1) {
+      return 'Please enter a valid year';
+    }
+    return null;
+  }
+
+  String? validateCapacity(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter capacity';
+    }
+    final capacity = int.tryParse(value);
+    if (capacity == null || capacity < 1 || capacity > 50) {
+      return 'Please enter a valid capacity (1-50)';
+    }
+    return null;
+  }
+
   /// Registers the vehicle with professional dialog validation
   Future<bool> registerVehicle(BuildContext context) async {
     // Get values
@@ -171,10 +231,11 @@ class VehicleRegistrationViewModel with ChangeNotifier {
       validationError = FieldError.emptyCapacity;
     } else if (selectedVehicleType == null) {
       validationError = FieldError.emptyVehicleType;
-    } else if (selectedInteriorColor == null) {
-      validationError = FieldError.emptyInteriorColor;
-    } else if (selectedExteriorColor == null) {
-      validationError = FieldError.emptyExteriorColor;
+    } else if (selectedBrand == null) {
+      validationError = FieldError.emptyBrand;
+    } else if (selectedCategory == null) {
+      validationError =
+          FieldError.emptyVehicleType; // Using existing error for now
     }
 
     if (validationError != null) {
@@ -186,13 +247,17 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     // Create vehicle model
     final vehicle = VehicleModel(
       licencePlate: licencePlate,
-      brand: brand,
+      brand: selectedBrand!,
       model: model,
       year: int.parse(selectedYear!),
       capacity: selectedCapacity! == '10+' ? 10 : int.parse(selectedCapacity!),
       vehicleType: selectedVehicleType!,
-      interiorColor: selectedInteriorColor!,
-      exteriorColor: selectedExteriorColor!,
+      interiorColor: 'N/A',
+      exteriorColor: 'N/A',
+      category: VehicleCategory.values.firstWhere(
+        (cat) => cat.name == selectedCategory,
+        orElse: () => VehicleCategory.standardSedan,
+      ),
     );
 
     // Debug print vehicle data
@@ -203,8 +268,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     debugPrint('Year: ${vehicle.year}');
     debugPrint('Capacity: ${vehicle.capacity}');
     debugPrint('Vehicle Type: ${vehicle.vehicleType}');
-    debugPrint('Interior Color: ${vehicle.interiorColor}');
-    debugPrint('Exterior Color: ${vehicle.exteriorColor}');
+    debugPrint('Category: ${vehicle.category.displayName}');
 
     // TODO: Implement actual vehicle registration logic here
     // await registerVehicleToServer(context, vehicle);
@@ -223,6 +287,8 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     licencePlateController.dispose();
     brandController.dispose();
     modelController.dispose();
+    yearController.dispose();
+    capacityController.dispose();
     super.dispose();
   }
 }

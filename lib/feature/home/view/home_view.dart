@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:go_router/go_router.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/core/services/google_auth_service.dart';
+import 'package:limo/feature/company_registration/view/company_registration_view.dart';
 import 'package:limo/feature/home/viewmodel/home_view_model.dart';
+import 'package:limo/feature/home/widgets/bottom_navigation_bar.dart';
 import 'package:limo/feature/job_list/view/job_list_view.dart';
 import 'package:limo/feature/job_tracking/view/job_tracking_view.dart';
 import 'package:limo/feature/listing_job/view/listing_job_view.dart';
 import 'package:limo/feature/profile/view/profile_view.dart';
+import 'package:limo/feature/vehicle_registration/view/vehicle_management_view.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:limo/shared/app_drawer.dart';
 import 'package:provider/provider.dart';
 
+/// Main home view that displays jobs, posting, tracking, and profile sections
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -24,6 +27,7 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _initializeUserProvider();
+    _handleInitialPageNavigation();
   }
 
   /// Initialize UserProvider with current user data if available
@@ -43,217 +47,126 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  /// Handle initial page navigation based on query parameters
+  void _handleInitialPageNavigation() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // For now, we'll handle this through the ViewModel
+      // In the future, this can be enhanced with URL parameter handling
+      debugPrint("Initial page navigation setup complete");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => HomeViewModel(),
-      child: Consumer<HomeViewModel>(
-        builder: (context, homePageViewModel, child) {
-          return Scaffold(
-            key: homePageViewModel.scaffoldKey,
-            drawer: AppDrawer(
-              onProfileTap: () {
-                homePageViewModel.onItemTapped(3); // Navigate to profile page
-                Navigator.pop(context); // Close drawer
-              },
-              onSettingsTap: () {
-                // TODO: Navigate to settings
-                Navigator.pop(context);
-              },
-              onLogoutTap: () async {
-                // Handle logout
-                final userProvider =
-                    Provider.of<UserProvider>(context, listen: false);
-
-                // Clear user data
-                userProvider.clearUser();
-
-                // Sign out from Google
-                await GoogleAuthService.signOut();
-
-                // Navigate to login
-                if (mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/login',
-                    (route) => false,
-                  );
-                }
-
-                Navigator.pop(context); // Close drawer
-              },
-              onJobHistoryTap: () {
-                // TODO: Navigate to job history
-                Navigator.pop(context);
-              },
-              onVehicleManagementTap: () {
-                // TODO: Navigate to vehicle management
-                Navigator.pop(context);
-              },
-            ),
-            appBar: AppTopBar(
-              onMenuTap: () {
-                homePageViewModel.scaffoldKey.currentState?.openDrawer();
-              },
-            ),
-            // Use a Stack to extend the navigation bar below the page content
-            body: LayoutBuilder(
-              builder: (context, constraints) {
-                return Stack(
-                  children: [
-                    Positioned.fill(
-                      child: _buildBody(homePageViewModel),
-                    ),
-                    // BottomNavigationBar'ı overflow hatalarına karşı SingleChildScrollView ile sarmalıyoruz
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth,
-                        ),
-                        child: _buildBottomNavigationBar(
-                            context, homePageViewModel),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            // Remove the default bottomNavigationBar property
-          );
-        },
-      ),
+    return Consumer<HomeViewModel>(
+      builder: (context, homePageViewModel, child) {
+        return Scaffold(
+          key: homePageViewModel.scaffoldKey,
+          drawer: _buildAppDrawer(homePageViewModel),
+          appBar: _buildAppBar(homePageViewModel),
+          body: _buildScaffoldBody(homePageViewModel),
+        );
+      },
     );
   }
 
-  Widget _buildBody(HomeViewModel homePageViewModel) {
-    return SafeArea(
-      // SafeArea ile üst ve alt çakışmaları önle
-      top: false, // AppBar zaten var
-      left: false,
-      right: false,
-      bottom: false,
-      child: PageView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: homePageViewModel.pageController,
-        onPageChanged: homePageViewModel.onPageChanged,
-        children: [
-          const JobListView(), // Jobs
-          const ListingJobView(), // Post job
-          const JobTrackingView(), // Job tracking
-          const ProfileView(), // Profile
-        ],
-      ),
+  /// Build the app drawer with navigation options
+  Widget _buildAppDrawer(HomeViewModel homePageViewModel) {
+    return AppDrawer(
+      onProfileTap: () {
+        context.pop(); // Close drawer
+        debugPrint("Navigation to Profile from Home Drawer");
+        homePageViewModel.navigateToProfile();
+      },
+      onLogoutTap: () async {
+        await _handleLogout();
+        context.pop(); // Close drawer
+      },
+      onVehicleManagementTap: () {
+        context.pop(); // Close drawer
+        debugPrint("Navigation to Vehicle Management from Home Drawer");
+        homePageViewModel.navigateToVehicleManagement();
+      },
+      onCompanyManagementTap: () {
+        context.pop(); // Close drawer
+        debugPrint("Navigation to Company Registration from Home Drawer");
+        homePageViewModel.navigateToCompanyRegistration();
+      },
     );
   }
 
-  Widget _buildBottomNavigationBar(
-      BuildContext context, HomeViewModel viewModel) {
-    // Uber-style bottom navigation
-    return SafeArea(
-      top: false,
-      left: false,
-      right: false,
-      child: Container(
-        height: 72, // Increased height for better touch
-        margin: PaddingConstants.allM,
-        decoration: BoxDecoration(
-          color: context.primary, // Black like Uber
-          borderRadius: BorderRadius.circular(24), // More rounded
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
+  /// Build the app bar with menu button
+  PreferredSizeWidget _buildAppBar(HomeViewModel homePageViewModel) {
+    return AppTopBar(
+      onMenuTap: () {
+        homePageViewModel.scaffoldKey.currentState?.openDrawer();
+      },
+    );
+  }
+
+  /// Build the main scaffold body with page content and navigation
+  Widget _buildScaffoldBody(HomeViewModel homePageViewModel) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
           children: [
-            Expanded(
-              child: _CustomNavBarItem(
-                icon: Icons.work_outline,
-                text: 'JOBS',
-                index: 0,
-                selectedIndex: viewModel.selectedIndex,
-                onTap: viewModel.onItemTapped,
-              ),
+            Positioned.fill(
+              child: _buildPageContent(homePageViewModel),
             ),
-            Expanded(
-              child: _CustomNavBarItem(
-                icon: Icons.add_circle_outline,
-                text: 'POST',
-                index: 1,
-                selectedIndex: viewModel.selectedIndex,
-                isHighlighted: true,
-                onTap: viewModel.onItemTapped,
-              ),
-            ),
-            Expanded(
-              child: _CustomNavBarItem(
-                icon: Icons.location_on_outlined,
-                text: 'TRACK',
-                index: 2,
-                selectedIndex: viewModel.selectedIndex,
-                onTap: viewModel.onItemTapped,
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: constraints.maxWidth,
+                ),
+                child: HomeBottomNavigationBar(
+                  viewModel: homePageViewModel,
+                  constraints: constraints,
+                ),
               ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
-}
 
-class _CustomNavBarItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final int index;
-  final int selectedIndex;
-  final Function(int) onTap;
-  final bool isHighlighted;
+  /// Build the main page content with PageView
+  Widget _buildPageContent(HomeViewModel homePageViewModel) {
+    return PageView(
+      physics: const NeverScrollableScrollPhysics(),
+      controller: homePageViewModel.pageController,
+      onPageChanged: homePageViewModel.onPageChanged,
+      children: [
+        JobListView(
+          onRefresh: () => homePageViewModel.onJobCreated(),
+        ), // Jobs - Index 0
+        const ListingJobView(), // Post job - Index 1
+        const JobTrackingView(), // Job tracking - Index 2
+        const VehicleManagementView(), // Vehicle Management - Index 3
+        const CompanyRegistrationView(), // Company Registration - Index 4
 
-  const _CustomNavBarItem({
-    required this.icon,
-    required this.text,
-    required this.index,
-    required this.selectedIndex,
-    required this.onTap,
-    this.isHighlighted = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    bool isSelected = index == selectedIndex;
-    final Color iconColor = isSelected
-        ? context.secondary // Uber green for selected
-        : context.surface
-            .withValues(alpha: 0.6); // White with opacity for unselected
-
-    // Text'in taşmasını önlemek için Flexible ve overflow ayarı ekliyoruz
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: iconColor,
-            size: 24,
-          ),
-          Text(
-            text,
-            style: TextStyle(
-              color: iconColor,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        const ProfileView(), // Profile - Index 5
+      ],
     );
+  }
+
+  /// Handle user logout and navigation to login
+  Future<void> _handleLogout() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Clear user data
+    userProvider.clearUser();
+
+    // Sign out from Google
+    await GoogleAuthService.signOut();
+
+    // Navigate to login
+    if (mounted) {
+      debugPrint("Navigation to Login from Home (Logout)");
+      context.go('/login');
+    }
   }
 }

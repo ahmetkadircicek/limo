@@ -138,26 +138,26 @@ class VehicleRequirement {
     final parts = <String>[];
 
     if (specificBrand != null) {
-      parts.add('Marka: $specificBrand');
+      parts.add('Brand: $specificBrand');
     }
     if (specificModel != null) {
       parts.add('Model: $specificModel');
     }
     if (minimumCategory != null) {
-      parts.add('Kategori: ${minimumCategory!.displayName}');
+      parts.add('Category: ${minimumCategory!.displayName}');
     }
     if (minimumCapacity != null) {
-      parts.add('Kapasite: $minimumCapacity+ kişi');
+      parts.add('Capacity: $minimumCapacity+ people');
     }
     if (minimumYear != null) {
-      parts.add('Yıl: $minimumYear+');
+      parts.add('Year: $minimumYear+');
     }
     if (specificVehicleType != null) {
-      parts.add('Tip: $specificVehicleType');
+      parts.add('Type: $specificVehicleType');
     }
 
     if (parts.isEmpty) {
-      return 'Herhangi bir araç';
+      return 'Any vehicle';
     }
 
     return parts.join(', ');
@@ -205,9 +205,12 @@ class VehicleRequirement {
       id: json['id'] ?? '',
       specificBrand: json['specificBrand'],
       specificModel: json['specificModel'],
-      specificVehicleType: json['specificVehicleType'],
-      specificExteriorColor: json['specificExteriorColor'],
-      specificInteriorColor: json['specificInteriorColor'],
+      specificVehicleType:
+          _migrateVehicleTypeFromJson(json['specificVehicleType']),
+      specificExteriorColor:
+          _migrateColorFromJson(json['specificExteriorColor']),
+      specificInteriorColor:
+          _migrateColorFromJson(json['specificInteriorColor']),
       minimumCapacity: json['minimumCapacity'],
       maximumCapacity: json['maximumCapacity'],
       minimumYear: json['minimumYear'],
@@ -223,6 +226,54 @@ class VehicleRequirement {
       hourlyRate: json['hourlyRate']?.toDouble(),
       pricePerMile: json['pricePerMile']?.toDouble(),
     );
+  }
+
+  /// Migrate old Turkish vehicle types to new English ones when loading from JSON
+  static String? _migrateVehicleTypeFromJson(String? oldType) {
+    if (oldType == null) return null;
+
+    // Map old Turkish values to new English ones
+    switch (oldType) {
+      case 'Kamyon':
+        return 'Truck';
+      case 'Tır':
+        return 'Semi-Truck';
+      case 'Kamyonet':
+        return 'Pickup Truck';
+      case 'Çekici':
+        return 'Tractor';
+      case 'Minibüs':
+        return 'Minibus';
+      case 'Otobüs':
+        return 'Bus';
+      default:
+        // If it's already in English or unknown, return as is
+        return oldType;
+    }
+  }
+
+  /// Migrate old Turkish colors to new English ones when loading from JSON
+  static String? _migrateColorFromJson(String? oldColor) {
+    if (oldColor == null) return null;
+
+    // Map old Turkish values to new English ones
+    switch (oldColor) {
+      case 'Beyaz':
+        return 'White';
+      case 'Siyah':
+        return 'Black';
+      case 'Gri':
+        return 'Gray';
+      case 'Kırmızı':
+        return 'Red';
+      case 'Mavi':
+        return 'Blue';
+      case 'Yeşil':
+        return 'Green';
+      default:
+        // If it's already in English or unknown, return as is
+        return oldColor;
+    }
   }
 
   @override

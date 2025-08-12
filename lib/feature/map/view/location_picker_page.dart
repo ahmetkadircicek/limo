@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/feature/map/models/location_model.dart';
 import 'package:limo/feature/map/widgets/location_field.dart';
+import 'package:limo/shared/app_button.dart';
+import 'package:limo/shared/app_text.dart';
 
 class LocationPickerPage extends StatelessWidget {
   final String title;
@@ -19,7 +22,7 @@ class LocationPickerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: AppText.heading(title),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
@@ -70,21 +73,14 @@ class LocationPickerPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          AppText.heading(
                             title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A1A1A),
-                            ),
+                            color: const Color(0xFF1A1A1A),
                           ),
                           const SizedBox(height: 4),
-                          Text(
+                          AppText.bodySmall(
                             'Lokasyon seçimi yapın',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
+                            color: Colors.grey[600],
                           ),
                         ],
                       ),
@@ -100,7 +96,8 @@ class LocationPickerPage extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20), // Daha yuvarlak köşeler
+                    borderRadius:
+                        BorderRadius.circular(20), // Daha yuvarlak köşeler
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.04),
@@ -116,7 +113,7 @@ class LocationPickerPage extends StatelessWidget {
                     selectedLocation: selectedLocation,
                     onLocationSelected: (location) {
                       onLocationSelected(location);
-                      Navigator.pop(context);
+                      context.pop();
                     },
                   ),
                 ),
@@ -128,48 +125,21 @@ class LocationPickerPage extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF6B7280),
-                        side: const BorderSide(color: Color(0xFF6B7280)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'İptal',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                    child: AppButton.secondary(
+                      'İptal',
+                      onPressed: () => context.pop(),
+                      height: 52,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: ElevatedButton(
+                    child: AppButton.primary(
+                      'Konum Seç',
                       onPressed: () {
                         // This will be handled by the LocationField widget
                         // when a location is selected
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Konum Seç',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      height: 52,
                     ),
                   ),
                 ],

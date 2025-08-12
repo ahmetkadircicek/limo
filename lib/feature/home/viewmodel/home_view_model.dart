@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// ViewModel for managing home page state and navigation
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel();
 
@@ -12,23 +13,57 @@ class HomeViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
 
+  // Additional pages from drawer
+  final int _vehicleManagementIndex = 3;
+  final int _companyRegistrationIndex = 4;
+  final int _profileIndex = 5;
+
+  int get vehicleManagementIndex => _vehicleManagementIndex;
+  int get companyRegistrationIndex => _companyRegistrationIndex;
+  int get profileIndex => _profileIndex;
+
+  /// Handle navigation item tap and update selected index
   void onItemTapped(int index) {
     _selectedIndex = index;
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.ease,
-    );
+    _pageController.jumpToPage(index);
     notifyListeners();
   }
 
+  /// Navigate to vehicle management page
+  void navigateToVehicleManagement() {
+    _selectedIndex = _vehicleManagementIndex;
+    _pageController.jumpToPage(_vehicleManagementIndex);
+    notifyListeners();
+  }
+
+  /// Navigate to company registration page
+  void navigateToCompanyRegistration() {
+    _selectedIndex = _companyRegistrationIndex;
+    _pageController.jumpToPage(_companyRegistrationIndex);
+    notifyListeners();
+  }
+
+  /// Navigate to profile page
+  void navigateToProfile() {
+    _selectedIndex = _profileIndex;
+    _pageController.jumpToPage(_profileIndex);
+    notifyListeners();
+  }
+
+  /// Handle page change from PageView
   void onPageChanged(int index) {
     _selectedIndex = index;
     notifyListeners();
   }
 
+  /// Open the end drawer if available
   void openEndDrawer() {
     _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  /// Notify that a job was created and refresh the job list
+  void onJobCreated() {
+    notifyListeners();
   }
 
   @override

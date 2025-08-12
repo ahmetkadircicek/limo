@@ -3,60 +3,60 @@ import 'package:limo/core/constants/vehicle_category_colors.dart';
 
 enum VehicleCategory {
   // Ultra Premium/Luxury Vehicles (ID: 10)
-  ultraLuxury(10, 'Ultra Lüks', 'En üst düzey lüks araçlar',
+  ultraLuxury(10, 'Ultra Luxury', 'Top-tier luxury vehicles',
       VehicleCategoryColors.ultraLuxury, Icons.diamond, 'Ultra Premium'),
 
   // Premium Luxury Vehicles (ID: 9)
-  luxurySedan(9, 'Lüks Sedan', 'Premium lüks sedan araçlar',
-      VehicleCategoryColors.luxury, Icons.star, 'Lüks'),
-  luxurySuv(9, 'Lüks SUV', 'Premium lüks SUV araçlar',
-      VehicleCategoryColors.luxury, Icons.terrain, 'Lüks'),
+  luxurySedan(9, 'Luxury Sedan', 'Premium luxury sedan vehicles',
+      VehicleCategoryColors.luxury, Icons.star, 'Luxury'),
+  luxurySuv(9, 'Luxury SUV', 'Premium luxury SUV vehicles',
+      VehicleCategoryColors.luxury, Icons.terrain, 'Luxury'),
 
   // High-End Premium Vehicles (ID: 8)
-  premiumSedan(8, 'Premium Sedan', 'Yüksek kaliteli sedan araçlar',
+  premiumSedan(8, 'Premium Sedan', 'High-quality sedan vehicles',
       VehicleCategoryColors.premium, Icons.directions_car, 'Premium'),
-  premiumSuv(8, 'Premium SUV', 'Yüksek kaliteli SUV araçlar',
+  premiumSuv(8, 'Premium SUV', 'High-quality SUV vehicles',
       VehicleCategoryColors.premium, Icons.airport_shuttle, 'Premium'),
 
   // Mid-Range Premium Vehicles (ID: 7)
-  executiveSedan(7, 'Executive Sedan', 'İş dünyasına yönelik sedan araçlar',
+  executiveSedan(7, 'Executive Sedan', 'Business-oriented sedan vehicles',
       VehicleCategoryColors.executive, Icons.business, 'Executive'),
-  executiveSuv(7, 'Executive SUV', 'İş dünyasına yönelik SUV araçlar',
+  executiveSuv(7, 'Executive SUV', 'Business-oriented SUV vehicles',
       VehicleCategoryColors.executive, Icons.work, 'Executive'),
 
   // Standard Mid-Range Vehicles (ID: 6)
-  standardSedan(6, 'Standart Sedan', 'Orta segment sedan araçlar',
-      VehicleCategoryColors.standard, Icons.directions_car, 'Standart'),
-  standardSuv(6, 'Standart SUV', 'Orta segment SUV araçlar',
-      VehicleCategoryColors.standard, Icons.airport_shuttle, 'Standart'),
+  standardSedan(6, 'Standard Sedan', 'Mid-range sedan vehicles',
+      VehicleCategoryColors.standard, Icons.directions_car, 'Standard'),
+  standardSuv(6, 'Standard SUV', 'Mid-range SUV vehicles',
+      VehicleCategoryColors.standard, Icons.airport_shuttle, 'Standard'),
 
   // Economy Mid-Range Vehicles (ID: 5)
-  economySedan(5, 'Ekonomik Sedan', 'Ekonomik sedan araçlar',
-      VehicleCategoryColors.economy, Icons.directions_car, 'Ekonomik'),
-  economySuv(5, 'Ekonomik SUV', 'Ekonomik SUV araçlar',
-      VehicleCategoryColors.economy, Icons.airport_shuttle, 'Ekonomik'),
+  economySedan(5, 'Economy Sedan', 'Economy sedan vehicles',
+      VehicleCategoryColors.economy, Icons.directions_car, 'Economy'),
+  economySuv(5, 'Economy SUV', 'Economy SUV vehicles',
+      VehicleCategoryColors.economy, Icons.airport_shuttle, 'Economy'),
 
   // Compact Economy Vehicles (ID: 4)
-  compactSedan(4, 'Kompakt Sedan', 'Kompakt sedan araçlar', Color(0xFFE2E8F0),
-      Icons.directions_car, 'Kompakt'),
-  compactSuv(4, 'Kompakt SUV', 'Kompakt SUV araçlar',
-      VehicleCategoryColors.compact, Icons.airport_shuttle, 'Kompakt'),
+  compactSedan(4, 'Compact Sedan', 'Compact sedan vehicles', Color(0xFFE2E8F0),
+      Icons.directions_car, 'Compact'),
+  compactSuv(4, 'Compact SUV', 'Compact SUV vehicles',
+      VehicleCategoryColors.compact, Icons.airport_shuttle, 'Compact'),
 
   // Small Economy Vehicles (ID: 3)
-  economyHatchback(3, 'Ekonomik Hatchback', 'Ekonomik hatchback araçlar',
-      VehicleCategoryColors.small, Icons.directions_car, 'Küçük'),
-  compactHatchback(3, 'Kompakt Hatchback', 'Kompakt hatchback araçlar',
-      VehicleCategoryColors.small, Icons.directions_car, 'Küçük'),
+  economyHatchback(3, 'Economy Hatchback', 'Economy hatchback vehicles',
+      VehicleCategoryColors.small, Icons.directions_car, 'Small'),
+  compactHatchback(3, 'Compact Hatchback', 'Compact hatchback vehicles',
+      VehicleCategoryColors.small, Icons.directions_car, 'Small'),
 
   // Micro Vehicles (ID: 2)
-  microCar(2, 'Mikro Araç', 'Mikro araçlar', VehicleCategoryColors.micro,
-      Icons.directions_car, 'Mikro'),
-  cityCar(2, 'Şehir Arabası', 'Şehir içi kullanım araçları',
-      VehicleCategoryColors.micro, Icons.location_city, 'Şehir'),
+  microCar(2, 'Micro Car', 'Micro vehicles', VehicleCategoryColors.micro,
+      Icons.directions_car, 'Micro'),
+  cityCar(2, 'City Car', 'Urban use vehicles', VehicleCategoryColors.micro,
+      Icons.location_city, 'City'),
 
   // Utility/Basic Vehicles (ID: 1)
-  utilityVehicle(1, 'Kullanım Aracı', 'Temel kullanım araçları',
-      VehicleCategoryColors.utility, Icons.local_shipping, 'Temel');
+  utilityVehicle(1, 'Utility Vehicle', 'Basic utility vehicles',
+      VehicleCategoryColors.utility, Icons.local_shipping, 'Basic');
 
   const VehicleCategory(this.id, this.displayName, this.description, this.color,
       this.icon, this.levelName);
@@ -143,16 +143,16 @@ enum VehicleCategory {
 
   /// Get category level description
   String get levelDescription {
-    if (id >= 10) return 'Ultra Premium Seviye';
-    if (id >= 9) return 'Lüks Seviye';
-    if (id >= 8) return 'Premium Seviye';
-    if (id >= 7) return 'Executive Seviye';
-    if (id >= 6) return 'Standart Seviye';
-    if (id >= 5) return 'Ekonomik Seviye';
-    if (id >= 4) return 'Kompakt Seviye';
-    if (id >= 3) return 'Küçük Seviye';
-    if (id >= 2) return 'Mikro Seviye';
-    return 'Temel Seviye';
+    if (id >= 10) return 'Ultra Premium Level';
+    if (id >= 9) return 'Luxury Level';
+    if (id >= 8) return 'Premium Level';
+    if (id >= 7) return 'Executive Level';
+    if (id >= 6) return 'Standard Level';
+    if (id >= 5) return 'Economy Level';
+    if (id >= 4) return 'Compact Level';
+    if (id >= 3) return 'Small Level';
+    if (id >= 2) return 'Micro Level';
+    return 'Basic Level';
   }
 
   /// Get category tier (1-5 stars)
@@ -172,24 +172,53 @@ enum VehicleCategory {
       case 4:
         return 'PREMIUM';
       case 3:
-        return 'STANDART';
+        return 'STANDARD';
       case 2:
-        return 'EKONOMIK';
+        return 'ECONOMY';
       case 1:
-        return 'TEMEL';
+        return 'BASIC';
       default:
-        return 'STANDART';
+        return 'STANDARD';
     }
   }
 
   /// Get category color with opacity
-  Color get colorWithOpacity => color.withOpacity(0.8);
+  Color get colorWithOpacity => color.withValues(alpha: 0.8);
 
   /// Get category light color
-  Color get lightColor => color.withOpacity(0.1);
+  Color get lightColor => color.withValues(alpha: 0.1);
 
   /// Get category border color
-  Color get borderColor => color.withOpacity(0.3);
+  Color get borderColor => color.withValues(alpha: 0.3);
+
+  /// Get primary color for this category
+  Color get primaryColor => VehicleCategoryColors.getPrimaryColor(id);
+
+  /// Get light color for this category
+  Color get lightColorV2 => VehicleCategoryColors.getLightColor(id);
+
+  /// Get accent color for this category
+  Color get accentColor => VehicleCategoryColors.getAccentColor(id);
+
+  /// Get background color for this category (very low opacity)
+  Color get backgroundColor => VehicleCategoryColors.getBackgroundColor(id);
+
+  /// Get medium background color for this category (medium opacity)
+  Color get mediumBackgroundColor =>
+      VehicleCategoryColors.getMediumBackgroundColor(id);
+
+  /// Get strong background color for this category (high opacity)
+  Color get strongBackgroundColor =>
+      VehicleCategoryColors.getStrongBackgroundColor(id);
+
+  /// Get border color for this category
+  Color get borderColorV2 => VehicleCategoryColors.getBorderColor(id);
+
+  /// Get text color for this category (ensuring good contrast)
+  Color get textColor => VehicleCategoryColors.getTextColor(id);
+
+  /// Get gradient colors for this category
+  List<Color> get gradientColors => VehicleCategoryColors.getGradient(id);
 
   /// Get upgrade cost estimate (placeholder for future implementation)
   double? getUpgradeCostEstimate() {

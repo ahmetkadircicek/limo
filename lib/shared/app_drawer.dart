@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/shared/app_text.dart';
 import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   final VoidCallback? onProfileTap;
-  final VoidCallback? onSettingsTap;
   final VoidCallback? onLogoutTap;
-  final VoidCallback? onJobHistoryTap;
   final VoidCallback? onVehicleManagementTap;
-
+  final VoidCallback? onCompanyManagementTap;
   const AppDrawer({
     super.key,
     this.onProfileTap,
-    this.onSettingsTap,
     this.onLogoutTap,
-    this.onJobHistoryTap,
     this.onVehicleManagementTap,
+    this.onCompanyManagementTap,
   });
 
   @override
@@ -35,18 +34,9 @@ class AppDrawer extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: [
                   _buildDrawerItem(
-                    icon: Icons.work_outline,
-                    title: 'İşlerim',
-                    isSelected: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    context: context,
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.history,
-                    title: 'İş Geçmişi',
-                    onTap: onJobHistoryTap,
+                    icon: Icons.person_outline,
+                    title: 'Profil',
+                    onTap: onProfileTap,
                     context: context,
                   ),
                   _buildDrawerItem(
@@ -56,15 +46,9 @@ class AppDrawer extends StatelessWidget {
                     context: context,
                   ),
                   _buildDrawerItem(
-                    icon: Icons.person_outline,
-                    title: 'Profil',
-                    onTap: onProfileTap,
-                    context: context,
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.settings_outlined,
-                    title: 'Ayarlar',
-                    onTap: onSettingsTap,
+                    icon: Icons.business,
+                    title: 'Şirket Yönetimi',
+                    onTap: onCompanyManagementTap,
                     context: context,
                   ),
                 ],
@@ -88,7 +72,7 @@ class AppDrawer extends StatelessWidget {
             color: Colors.white,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -131,13 +115,9 @@ class AppDrawer extends StatelessWidget {
               const SizedBox(height: 20),
 
               // User name
-              Text(
+              AppText.heading(
                 userProvider.userDisplayName ?? 'Kullanıcı',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
+                color: Colors.black,
               ),
 
               const SizedBox(height: 8),
@@ -146,18 +126,9 @@ class AppDrawer extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  AppText.caption(
                     userProvider.userEmail ?? 'email@example.com',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                          fontSize: 13,
-                        ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.keyboard_arrow_down,
                     color: Colors.grey[600],
-                    size: 16,
                   ),
                 ],
               ),
@@ -172,22 +143,22 @@ class AppDrawer extends StatelessWidget {
     required IconData icon,
     required String title,
     required VoidCallback? onTap,
-    bool isSelected = false,
     required BuildContext context,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       child: ListTile(
+        tileColor: context.surfaceContainer,
         leading: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
             color: Colors.black,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
           child: Icon(
             icon,
@@ -195,18 +166,14 @@ class AppDrawer extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        title: Text(
+        title: AppText.body(
           title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 15,
-            color: Colors.black,
-          ),
+          color: Colors.black,
         ),
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         ),
       ),
     );
@@ -219,18 +186,19 @@ class AppDrawer extends StatelessWidget {
         color: Colors.white,
         border: Border(
           top: BorderSide(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
       ),
       child: ListTile(
+        tileColor: context.surfaceContainer,
         leading: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
             color: Colors.black,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
           child: Icon(
             Icons.logout,
@@ -238,18 +206,14 @@ class AppDrawer extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        title: Text(
+        title: AppText.body(
           'Çıkış Yap',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 15,
-            color: context.error,
-          ),
+          color: context.error,
         ),
         onTap: onLogoutTap,
         contentPadding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         ),
       ),
     );

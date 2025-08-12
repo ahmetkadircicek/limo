@@ -1,32 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/pickup_type_enum.dart';
-import 'package:limo/feature/job_list/model/coordinate_model.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
-import 'package:limo/feature/job_list/view/job_details_page.dart';
 import 'package:limo/shared/app_input.dart';
+import 'package:limo/shared/app_text.dart';
 
+/// Job list view displaying available jobs with search and filtering capabilities
 class JobListView extends StatefulWidget {
-  const JobListView({super.key});
+  final VoidCallback? onRefresh;
+
+  const JobListView({super.key, this.onRefresh});
 
   @override
   State<JobListView> createState() => _JobListViewState();
 }
 
-class _JobListViewState extends State<JobListView> {
+class _JobListViewState extends State<JobListView> with WidgetsBindingObserver {
   List<JobModel> _jobs = [];
   List<JobModel> _filteredJobs = [];
   final TextEditingController _searchController = TextEditingController();
   final String _selectedJobType = 'All';
-  final String _selectedPriceRange = 'All';
 
   @override
   void initState() {
     super.initState();
-    _loadMockJobs();
-    _filteredJobs = List.from(_jobs);
+    WidgetsBinding.instance.addObserver(this);
+    _initializeJobList();
     _searchController.addListener(_filterJobs);
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Refresh jobs when app becomes visible
+    if (state == AppLifecycleState.resumed) {
+      _refreshJobList();
+    }
+  }
+
+  /// Initialize the job list (currently empty - mock data removed)
+  void _initializeJobList() {
+    setState(() {
+      _jobs = [];
+      _filteredJobs = [];
+    });
+  }
+
+  /// Filter jobs based on search query and job type
   void _filterJobs() {
     final query = _searchController.text.toLowerCase();
 
@@ -42,242 +71,172 @@ class _JobListViewState extends State<JobListView> {
       final matchesJobType = _selectedJobType == 'All' ||
           job.jobType.toString().split('.').last == _selectedJobType;
 
-      final matchesPriceRange = _selectedPriceRange == 'All' ||
-          _matchesPriceRange(job.price, _selectedPriceRange);
-
-      return matchesSearch && matchesJobType && matchesPriceRange;
+      return matchesSearch && matchesJobType;
     }).toList();
 
     setState(() {});
   }
 
-  bool _matchesPriceRange(double? price, String range) {
-    if (price == null) return false;
+  /// Manually refresh the job list
+  Future<void> _refreshJobList() async {
+    // Mock data loading removed - implement real API call here
+    setState(() {
+      _jobs = [];
+      _filteredJobs = [];
+    });
 
-    switch (range) {
-      case 'Under 1000':
-        return price < 1000;
-      case '1000-2000':
-        return price >= 1000 && price <= 2000;
-      case '2000-3000':
-        return price > 2000 && price <= 3000;
-      case 'Over 3000':
-        return price > 3000;
-      default:
-        return true;
-    }
-  }
-
-  void _loadMockJobs() {
-    _jobs = [
-      JobModel(
-        id: '1',
-        fromProvince: 'CALIFORNIA',
-        toProvince: 'NEW YORK',
-        fromLocation: Coordinate(latitude: 34.0522, longitude: -118.2437),
-        toLocation: Coordinate(latitude: 40.7128, longitude: -74.0060),
-        fromCity: 'Los Angeles',
-        toCity: 'Manhattan',
-        price: 2500,
-        jobType: JobType.pointToPoint,
-        companyName: 'California Express',
-        contactInfo: '+1 213 555 0123',
-        description: 'Urgent cargo transport service from LA to NYC',
-        vehicleCount: 2,
-      ),
-      JobModel(
-        id: '2',
-        fromProvince: 'TEXAS',
-        toProvince: 'FLORIDA',
-        fromLocation: Coordinate(latitude: 29.7604, longitude: -95.3698),
-        toLocation: Coordinate(latitude: 25.7617, longitude: -80.1918),
-        fromCity: 'Houston',
-        toCity: 'Miami',
-        price: 1800,
-        jobType: JobType.pointToPoint,
-        companyName: 'Southern Logistics',
-        contactInfo: '+1 713 555 0456',
-        description: 'Electronics and textile product transport',
-        vehicleCount: 1,
-      ),
-      JobModel(
-        id: '3',
-        fromProvince: 'ILLINOIS',
-        toProvince: 'ARIZONA',
-        fromLocation: Coordinate(latitude: 41.8781, longitude: -87.6298),
-        toLocation: Coordinate(latitude: 33.4484, longitude: -112.0740),
-        fromCity: 'Chicago',
-        toCity: 'Phoenix',
-        price: 2200,
-        jobType: JobType.pointToPoint,
-        companyName: 'Midwest Transport',
-        contactInfo: '+1 312 555 0789',
-        description: 'By offer - contact for details',
-        vehicleCount: 3,
-      ),
-      JobModel(
-        id: '4',
-        fromProvince: 'WASHINGTON',
-        toProvince: 'OREGON',
-        fromLocation: Coordinate(latitude: 47.6062, longitude: -122.3321),
-        toLocation: Coordinate(latitude: 45.5152, longitude: -122.6784),
-        fromCity: 'Seattle',
-        toCity: 'Portland',
-        price: 3200,
-        jobType: JobType.fullDay,
-        companyName: 'Pacific Northwest Logistics',
-        contactInfo: '+1 206 555 0123',
-        description: 'Daily shuttle service between major cities',
-        vehicleCount: 1,
-      ),
-      JobModel(
-        id: '5',
-        fromProvince: 'MASSACHUSETTS',
-        toProvince: 'VIRGINIA',
-        fromLocation: Coordinate(latitude: 42.3601, longitude: -71.0589),
-        toLocation: Coordinate(latitude: 38.9072, longitude: -77.0369),
-        fromCity: 'Boston',
-        toCity: 'Washington DC',
-        price: 2800,
-        jobType: JobType.hourly,
-        companyName: 'East Coast Express',
-        contactInfo: '+1 617 555 0456',
-        description: 'Hourly rental service for government contracts',
-        vehicleCount: 2,
-      ),
-      JobModel(
-        id: '6',
-        fromProvince: 'COLORADO',
-        toProvince: 'UTAH',
-        fromLocation: Coordinate(latitude: 39.7392, longitude: -104.9903),
-        toLocation: Coordinate(latitude: 40.7608, longitude: -111.8910),
-        fromCity: 'Denver',
-        toCity: 'Salt Lake City',
-        price: 2100,
-        jobType: JobType.pointToPoint,
-        companyName: 'Rocky Mountain Transport',
-        contactInfo: '+1 303 555 0123',
-        description: 'Safe delivery through mountain passes',
-        vehicleCount: 1,
-      ),
-    ];
+    // Notify parent that jobs have been refreshed
+    widget.onRefresh?.call();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF8F9FA), // Uber-style light background
-      child: CustomScrollView(
-        slivers: [
-          // Modern header with search and filters
-          SliverToBoxAdapter(
-            child: _buildHeaderCard(context),
-          ),
-          // Job cards list
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0,
-                88.0), // Added 80px bottom padding for navigation bar
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final job = _filteredJobs[index];
-                  return _buildModernJobCard(context, job, index);
-                },
-                childCount: _filteredJobs.length,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title and filter button
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Available Jobs',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF1A1A1A),
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${_jobs.length} jobs found',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFF6B7280),
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Filter button
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.tune,
-                    color: Color(0xFF374151),
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Search bar (AppInput ile değiştirildi)
-            AppInput.primary(
-              controller: _searchController,
-              hintText: 'Search city, route or company...',
-              prefixIcon: Icons.search,
-            ),
+      color: context.surfaceContainer,
+      child: RefreshIndicator(
+        onRefresh: _refreshJobList,
+        child: CustomScrollView(
+          slivers: [
+            _buildHeaderSection(),
+            _buildJobListSection(),
           ],
         ),
       ),
     );
   }
 
+  /// Build the header section with search and filters
+  Widget _buildHeaderSection() {
+    return SliverToBoxAdapter(
+      child: _buildHeaderCard(context),
+    );
+  }
+
+  /// Build the job list section
+  Widget _buildJobListSection() {
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(
+        PaddingConstants.spacingL,
+        PaddingConstants.spacingS,
+        PaddingConstants.spacingL,
+        PaddingConstants.spacingXxl +
+            PaddingConstants.spacingL, // 88px for navigation bar
+      ),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final job = _filteredJobs[index];
+            return _buildModernJobCard(context, job, index);
+          },
+          childCount: _filteredJobs.length,
+        ),
+      ),
+    );
+  }
+
+  /// Build the header card with title and search
+  Widget _buildHeaderCard(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(
+        PaddingConstants.spacingL,
+        PaddingConstants.spacingL,
+        PaddingConstants.spacingL,
+        0,
+      ),
+      decoration: _buildHeaderCardDecoration(context),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          PaddingConstants.spacingL,
+          PaddingConstants.spacingL,
+          PaddingConstants.spacingL,
+          PaddingConstants.spacingXl,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeaderTitleSection(context),
+            const SizedBox(height: 16),
+            _buildSearchBar(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build the header card decoration
+  BoxDecoration _buildHeaderCardDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: context.surface,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: context.onSurface.withValues(alpha: 0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    );
+  }
+
+  /// Build the header title section
+  Widget _buildHeaderTitleSection(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildTitleAndCount(context),
+        ),
+        _buildFilterButton(context),
+      ],
+    );
+  }
+
+  /// Build the title and job count
+  Widget _buildTitleAndCount(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText.heading(
+          'Available Jobs',
+          color: context.onSurface,
+        ),
+        SizedBox(height: PaddingConstants.spacingXs),
+        AppText.bodySmall(
+          '${_jobs.length} jobs found',
+          color: context.onSurface.withValues(alpha: 0.6),
+        ),
+      ],
+    );
+  }
+
+  /// Build the filter button
+  Widget _buildFilterButton(BuildContext context) {
+    return Container(
+      padding: PaddingConstants.allM,
+      decoration: BoxDecoration(
+        color: context.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        Icons.tune,
+        color: context.onSurface.withValues(alpha: 0.7),
+      ),
+    );
+  }
+
+  /// Build the search bar
+  Widget _buildSearchBar() {
+    return AppInput.primary(
+      controller: _searchController,
+      hintText: 'Search city, route or company...',
+      prefixIcon: Icons.search,
+    );
+  }
+
+  /// Build the modern job card
   Widget _buildModernJobCard(BuildContext context, JobModel job, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: _buildJobCardDecoration(),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -288,176 +247,11 @@ class _JobListViewState extends State<JobListView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Company name and job type
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        job.companyName ?? 'Company Name',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1A1A1A),
-                        ),
-                      ),
-                    ),
-                    _buildJobTypeChip(job.jobType),
-                  ],
-                ),
+                _buildJobCardHeader(context, job),
                 const SizedBox(height: 12),
-
-                // Route with modern design
-                Row(
-                  children: [
-                    // From location
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF10B981),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  job.fromProvince?.toUpperCase() ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF374151),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text(
-                              job.fromCity ?? '',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF9CA3AF),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Arrow
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      child: const Icon(
-                        Icons.arrow_forward,
-                        color: Color(0xFF9CA3AF),
-                        size: 16,
-                      ),
-                    ),
-
-                    // To location
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFEF4444),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  job.toProvince?.toUpperCase() ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF374151),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text(
-                              job.toCity ?? '',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF9CA3AF),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
+                _buildRouteSection(context, job),
                 const SizedBox(height: 16),
-
-                // Bottom info row
-                Row(
-                  children: [
-                    // Vehicle count
-                    if (job.vehicleCount != null) ...[
-                      _buildInfoChip(
-                        Icons.local_shipping_outlined,
-                        '${job.vehicleCount} vehicles',
-                        const Color(0xFF3B82F6),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-
-                    // Price or quote
-                    if (job.price != null) ...[
-                      _buildInfoChip(
-                        Icons.attach_money,
-                        '₺${job.price!.toStringAsFixed(0)}',
-                        const Color(0xFF10B981),
-                      ),
-                    ] else ...[
-                      _buildInfoChip(
-                        Icons.request_quote_outlined,
-                        'Get Quote',
-                        const Color(0xFF8B5CF6),
-                      ),
-                    ],
-
-                    const Spacer(),
-
-                    // View details button
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'Details',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                _buildJobCardFooter(context, job),
               ],
             ),
           ),
@@ -466,49 +260,189 @@ class _JobListViewState extends State<JobListView> {
     );
   }
 
-  Widget _buildJobTypeChip(JobType? jobType) {
-    if (jobType == null) return const SizedBox();
-
-    String text;
-    Color color;
-
-    switch (jobType) {
-      case JobType.pointToPoint:
-        text = 'Point-to-Point';
-        color = const Color(0xFF3B82F6);
-        break;
-      case JobType.fullDay:
-        text = 'Full Day';
-        color = const Color(0xFF10B981);
-        break;
-      case JobType.hourly:
-        text = 'Hourly';
-        color = const Color(0xFFF59E0B);
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
+  /// Build the job card decoration
+  BoxDecoration _buildJobCardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
         ),
+      ],
+    );
+  }
+
+  /// Build the job card header with company name and job type
+  Widget _buildJobCardHeader(BuildContext context, JobModel job) {
+    return Row(
+      children: [
+        Expanded(
+          child: AppText.body(
+            job.companyName ?? 'Company Name',
+            color: const Color(0xFF1A1A1A),
+          ),
+        ),
+        _buildJobTypeChip(job.jobType),
+      ],
+    );
+  }
+
+  /// Build the route section showing from/to locations
+  Widget _buildRouteSection(BuildContext context, JobModel job) {
+    return Row(
+      children: [
+        Expanded(child: _buildFromLocation(context, job)),
+        _buildRouteArrow(),
+        Expanded(child: _buildToLocation(context, job)),
+      ],
+    );
+  }
+
+  /// Build the from location section
+  Widget _buildFromLocation(BuildContext context, JobModel job) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildLocationDot(const Color(0xFF10B981)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AppText.bodySmall(
+                job.fromProvince?.toUpperCase() ?? '',
+                color: const Color(0xFF374151),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: AppText.caption(
+            job.fromCity ?? '',
+            color: const Color(0xFF9CA3AF),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build the route arrow
+  Widget _buildRouteArrow() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      child: const Icon(
+        Icons.arrow_forward,
+        color: Color(0xFF9CA3AF),
+        size: 16,
       ),
     );
   }
 
+  /// Build the to location section
+  Widget _buildToLocation(BuildContext context, JobModel job) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildLocationDot(const Color(0xFFEF4444)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AppText.bodySmall(
+                job.toProvince?.toUpperCase() ?? '',
+                color: const Color(0xFF374151),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: AppText.caption(
+            job.toCity ?? '',
+            color: const Color(0xFF9CA3AF),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build a location dot indicator
+  Widget _buildLocationDot(Color color) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
+  /// Build the job card footer with vehicle count and action buttons
+  Widget _buildJobCardFooter(BuildContext context, JobModel job) {
+    return Row(
+      children: [
+        if (job.vehicleCount != null) ...[
+          _buildInfoChip(
+            Icons.local_shipping_outlined,
+            '${job.vehicleCount} vehicles',
+            const Color(0xFF3B82F6),
+          ),
+          const SizedBox(width: 8),
+        ],
+        _buildInfoChip(
+          Icons.request_quote_outlined,
+          'Get Quote',
+          const Color(0xFF8B5CF6),
+        ),
+        const Spacer(),
+        _buildDetailsButton(),
+      ],
+    );
+  }
+
+  /// Build the job type chip
+  Widget _buildJobTypeChip(JobType? jobType) {
+    if (jobType == null) return const SizedBox();
+
+    final chipData = _getJobTypeChipData(jobType);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: chipData.color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: AppText.caption(
+        chipData.text,
+        color: chipData.color,
+      ),
+    );
+  }
+
+  /// Get job type chip data
+  _JobTypeChipData _getJobTypeChipData(JobType jobType) {
+    switch (jobType) {
+      case JobType.pointToPoint:
+        return _JobTypeChipData('Point-to-Point', const Color(0xFF3B82F6));
+      case JobType.fullDay:
+        return _JobTypeChipData('Full Day', const Color(0xFF10B981));
+      case JobType.hourly:
+        return _JobTypeChipData('Hourly', const Color(0xFFF59E0B));
+    }
+  }
+
+  /// Build an info chip with icon and text
   Widget _buildInfoChip(IconData icon, String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -520,26 +454,41 @@ class _JobListViewState extends State<JobListView> {
             color: color,
           ),
           const SizedBox(width: 4),
-          Text(
+          AppText.caption(
             text,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            color: color,
           ),
         ],
       ),
     );
   }
 
-  void _navigateToJobDetails(JobModel job) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          body: JobDetailsPage(job: job),
-        ),
+  /// Build the details button
+  Widget _buildDetailsButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: AppText.caption(
+        'Details',
+        color: Colors.white,
       ),
     );
   }
+
+  /// Navigate to job details page
+  void _navigateToJobDetails(JobModel job) {
+    debugPrint("Navigation to Job Details from Job List");
+    context.push('/job-details', extra: job);
+  }
+}
+
+/// Helper class for job type chip data
+class _JobTypeChipData {
+  final String text;
+  final Color color;
+
+  _JobTypeChipData(this.text, this.color);
 }

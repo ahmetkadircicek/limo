@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/map/models/location_model.dart';
-import 'package:limo/feature/map/widgets/location_picker.dart';
-import 'package:limo/shared/app_components.dart';
+import 'package:limo/shared/app_card.dart';
+import 'package:limo/shared/app_text.dart';
 
 class LocationField extends StatelessWidget {
   final String? hintText;
@@ -29,20 +30,13 @@ class LocationField extends StatelessWidget {
   void _openLocationPicker(BuildContext context) {
     if (!enabled) return;
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LocationPicker(
-          title: pickerTitle,
-          initialLocation: selectedLocation,
-          onLocationSelected: onLocationSelected,
-        ),
-      ),
-    );
+    debugPrint("Navigation to Location Picker from Location Field");
+    context.push('/location-picker', extra: onLocationSelected);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppCard.primary(
+    return AppCard.secondary(
       child: FormField<LocationModel>(
         validator: (_) => validator?.call(selectedLocation),
         builder: (field) {
@@ -50,8 +44,7 @@ class LocationField extends StatelessWidget {
             children: [
               InkWell(
                 onTap: enabled ? () => _openLocationPicker(context) : null,
-                borderRadius:
-                    BorderRadius.circular(16), // Daha yuvarlak köşeler
+                borderRadius: GeneralConstants.borderRadius,
                 child: Container(
                   width: double.infinity,
                   height: GeneralConstants.inputHeight,
@@ -63,8 +56,8 @@ class LocationField extends StatelessWidget {
                       color: field.hasError
                           ? context.error
                           : enabled
-                              ? context.secondary.withOpacity(0.3)
-                              : context.secondary.withOpacity(0.1),
+                              ? context.secondary.withValues(alpha: 0.3)
+                              : context.secondary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Row(
@@ -85,41 +78,30 @@ class LocationField extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
+                                  AppText.body(
                                     selectedLocation!.placeName,
-                                    style: TextStyle(
-                                      fontWeight:
-                                          GeneralConstants.fontWeightSubtitle,
-                                      color: enabled
-                                          ? context.onSurface
-                                          : context.secondary.withOpacity(0.5),
-                                    ),
+                                    fontWeight:
+                                        GeneralConstants.fontWeightSubtitle,
+                                    color: enabled
+                                        ? context.onSurface
+                                        : context.secondary.withOpacity(0.5),
                                   ),
                                   if (selectedLocation!.address.isNotEmpty)
-                                    Text(
+                                    AppText.caption(
                                       selectedLocation!.address,
-                                      style: TextStyle(
-                                        fontSize:
-                                            GeneralConstants.fontSizeCaption,
-                                        fontWeight:
-                                            GeneralConstants.fontWeightCaption,
-                                        color: enabled
-                                            ? context.secondary
-                                            : context.secondary
-                                                .withOpacity(0.5),
-                                      ),
+                                      color: enabled
+                                          ? context.secondary
+                                          : context.secondary.withOpacity(0.5),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                 ],
                               )
-                            : Text(
+                            : AppText.body(
                                 hintText ?? 'Select location',
-                                style: TextStyle(
-                                  color: enabled
-                                      ? context.secondary.withOpacity(0.7)
-                                      : context.secondary.withOpacity(0.5),
-                                ),
+                                color: enabled
+                                    ? context.secondary.withOpacity(0.7)
+                                    : context.secondary.withOpacity(0.5),
                               ),
                       ),
                       Icon(
@@ -138,11 +120,9 @@ class LocationField extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 4, left: 12),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
+                    child: AppText.caption(
                       field.errorText!,
-                      style: TextStyle(
-                        color: context.error,
-                      ),
+                      color: context.error,
                     ),
                   ),
                 ),

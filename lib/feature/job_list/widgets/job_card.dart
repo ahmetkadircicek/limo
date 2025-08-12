@@ -6,6 +6,7 @@ import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/shared/app_components.dart';
 
+/// Job card widget displaying job information in a card format
 class JobCard extends StatelessWidget {
   final JobModel job;
   final VoidCallback onTap;
@@ -27,25 +28,17 @@ class JobCard extends StatelessWidget {
         height: GeneralConstants.heightLarge * 1.8, // Uber-style height
         child: Row(
           children: [
-            Expanded(flex: 3, child: _LocationSection(job: job)),
-            Expanded(flex: 3, child: _InformationSection(job: job)),
-            Expanded(flex: 2, child: _DetailsButton(onTap: onTap)),
+            Expanded(flex: 3, child: _buildLocationSection(context)),
+            Expanded(flex: 3, child: _buildInformationSection(context)),
+            Expanded(flex: 2, child: _buildDetailsButton(context)),
           ],
         ),
       ),
     );
   }
-}
 
-class _LocationSection extends StatelessWidget {
-  const _LocationSection({
-    required this.job,
-  });
-
-  final JobModel job;
-
-  @override
-  Widget build(BuildContext context) {
+  /// Build the location section showing from/to provinces
+  Widget _buildLocationSection(BuildContext context) {
     return Padding(
       padding: PaddingConstants.horizontalL, // Uber-style padding
       child: Column(
@@ -72,99 +65,103 @@ class _LocationSection extends StatelessWidget {
       ),
     );
   }
-}
 
-class _InformationSection extends StatelessWidget {
-  const _InformationSection({
-    required this.job,
-  });
-
-  final JobModel job;
-
-  @override
-  Widget build(BuildContext context) {
+  /// Build the information section showing job details
+  Widget _buildInformationSection(BuildContext context) {
     return Row(
       children: [
-        const _Seperator(),
+        _buildSeparator(),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (job.jobType != null) ...[
-              Row(
-                children: [
-                  Icon(
-                    Icons.local_shipping,
-                    color: context.onSecondary,
-                    size: GeneralConstants.fontSizeExtraSmall,
-                  ),
-                  AppText.caption(
-                    _getJobTypeText(job.jobType!),
-                    color: context.onSurface,
-                  ),
-                ],
-              ),
+              _buildJobTypeRow(context),
             ],
             if (job.vehicleCount != null) ...[
-              Row(
-                children: [
-                  Icon(
-                    Icons.directions_car,
-                    color: context.onSecondary,
-                    size: GeneralConstants.fontSizeExtraSmall,
-                  ),
-                  AppText.caption(
-                    '${job.vehicleCount} Vehicles',
-                    color: context.onSurface,
-                  ),
-                ],
-              ),
+              _buildVehicleCountRow(context),
             ],
             if (job.price == null) ...[
-              Row(
-                children: [
-                  Icon(
-                    Icons.local_offer,
-                    color: context.onSecondary,
-                    size: GeneralConstants.fontSizeExtraSmall,
-                  ),
-                  AppText.caption(
-                    'QUOTE BASED',
-                    color: context.onSurface,
-                  ),
-                ],
-              ),
+              _buildQuoteBasedRow(context),
             ] else ...[
-              Row(
-                children: [
-                  Icon(
-                    Icons.monetization_on,
-                    color: context.onSecondary,
-                    size: GeneralConstants.fontSizeExtraSmall,
-                  ),
-                  AppText.caption(
-                    '\$${job.price!.toStringAsFixed(0)}',
-                    color: context.onSurface,
-                  ),
-                ],
-              ),
+              _buildPriceRow(context),
             ],
           ],
         ),
       ],
     );
   }
-}
 
-class _DetailsButton extends StatelessWidget {
-  const _DetailsButton({
-    required this.onTap,
-  });
+  /// Build the job type row with icon and text
+  Widget _buildJobTypeRow(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.local_shipping,
+          color: context.onSecondary,
+          size: GeneralConstants.fontSizeExtraSmall,
+        ),
+        AppText.caption(
+          _getJobTypeText(job.jobType!),
+          color: context.onSurface,
+        ),
+      ],
+    );
+  }
 
-  final VoidCallback onTap;
+  /// Build the vehicle count row with icon and text
+  Widget _buildVehicleCountRow(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.directions_car,
+          color: context.onSecondary,
+          size: GeneralConstants.fontSizeExtraSmall,
+        ),
+        AppText.caption(
+          '${job.vehicleCount} Vehicles',
+          color: context.onSurface,
+        ),
+      ],
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
+  /// Build the quote based row when price is not available
+  Widget _buildQuoteBasedRow(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.local_offer,
+          color: context.onSecondary,
+          size: GeneralConstants.fontSizeExtraSmall,
+        ),
+        AppText.caption(
+          'QUOTE BASED',
+          color: context.onSurface,
+        ),
+      ],
+    );
+  }
+
+  /// Build the price row when price is available
+  Widget _buildPriceRow(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.monetization_on,
+          color: context.onSecondary,
+          size: GeneralConstants.fontSizeExtraSmall,
+        ),
+        AppText.caption(
+          '\$${job.price!.toStringAsFixed(0)}',
+          color: context.onSurface,
+        ),
+      ],
+    );
+  }
+
+  /// Build the details button for viewing job details
+  Widget _buildDetailsButton(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: context.primary, // Black for Uber style
@@ -193,27 +190,24 @@ class _DetailsButton extends StatelessWidget {
       ),
     );
   }
-}
 
-String _getJobTypeText(JobType jobType) {
-  switch (jobType) {
-    case JobType.pointToPoint:
-      return 'POINT TO POINT';
-    case JobType.fullDay:
-      return 'FULL DAY';
-    case JobType.hourly:
-      return 'HOURLY';
-  }
-}
-
-class _Seperator extends StatelessWidget {
-  const _Seperator();
-
-  @override
-  Widget build(BuildContext context) {
+  /// Build the separator line between sections
+  Widget _buildSeparator() {
     return Padding(
       padding: PaddingConstants.symmetricVerticalSmall,
       child: const SizedBox(width: 1),
     );
+  }
+
+  /// Get the display text for job type enum
+  String _getJobTypeText(JobType jobType) {
+    switch (jobType) {
+      case JobType.pointToPoint:
+        return 'POINT TO POINT';
+      case JobType.fullDay:
+        return 'FULL DAY';
+      case JobType.hourly:
+        return 'HOURLY';
+    }
   }
 }

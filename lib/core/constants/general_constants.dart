@@ -19,7 +19,8 @@ class GeneralConstants {
       BorderRadius.circular(DesignTokens.radiusSmall); // 4.0
   static final borderRadiusLarge =
       BorderRadius.circular(DesignTokens.radiusLarge); // 16.0
-  static const borderRadiusValue = DesignTokens.radiusMedium; // 8.0
+  static final borderRadiusRound =
+      BorderRadius.circular(DesignTokens.radiusRound); // 9999.0
 
   // Typography Sizes - Professional Design Language
   static const fontSizeCaption = 12.0; // caption

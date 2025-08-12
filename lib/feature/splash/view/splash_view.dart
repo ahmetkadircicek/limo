@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/feature/home/view/home_view.dart';
-import 'package:limo/feature/login/view/login_view.dart';
 import 'package:limo/feature/splash/viewmodel/splash_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -13,8 +12,6 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
-  late SplashViewModel _viewModel;
-
   @override
   void initState() {
     super.initState();
@@ -22,79 +19,76 @@ class _SplashViewState extends State<SplashView> {
   }
 
   void _initializeViewModel() {
-    _viewModel = SplashViewModel();
-
-    _viewModel.initialize().then((isUserSignedIn) {
-      _handleNavigation(isUserSignedIn);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = Provider.of<SplashViewModel>(context, listen: false);
+      viewModel.initialize().then((isUserSignedIn) {
+        _handleNavigation(isUserSignedIn);
+      });
     });
   }
 
   void _handleNavigation(bool isUserSignedIn) async {
     if (!mounted) return;
 
-    final destination = isUserSignedIn ? const HomeView() : const LoginView();
-
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => destination,
-        ),
-      );
+      if (isUserSignedIn) {
+        debugPrint("Navigation to Home from Splash");
+        context.go('/home');
+      } else {
+        debugPrint("Navigation to Login from Splash");
+        context.go('/login');
+      }
     }
   }
 
   @override
   void dispose() {
-    _viewModel.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _viewModel,
-      child: Consumer<SplashViewModel>(
-        builder: (context, viewModel, child) {
-          return Scaffold(
-            backgroundColor: Colors.black,
-            body: SafeArea(
-              child: Center(
-                child: Column(
-                  children: [
-                    Spacer(),
-                    ColorFiltered(
-                      colorFilter: ColorFilter.mode(
-                        context.onPrimary,
-                        BlendMode.srcIn,
-                      ),
-                      child: Image.asset(
-                        'assets/png/image/image_logo.png',
-                        width: context.width * 0.7,
-                        fit: BoxFit.contain,
-                      ),
+    return Consumer<SplashViewModel>(
+      builder: (context, viewModel, child) {
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: SafeArea(
+            child: Center(
+              child: Column(
+                children: [
+                  Spacer(),
+                  ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      context.onPrimary,
+                      BlendMode.srcIn,
                     ),
-                    Spacer(),
-                    if (viewModel.isLoading)
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          valueColor: AlwaysStoppedAnimation(context.onPrimary),
-                        ),
-                      )
-                    else
-                      const SizedBox(
-                        width: 24,
-                        height: 24,
+                    child: Image.asset(
+                      'assets/png/image/image_logo.png',
+                      width: context.width * 0.7,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Spacer(),
+                  if (viewModel.isLoading)
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation(context.onPrimary),
                       ),
-                  ],
-                ),
+                    )
+                  else
+                    const SizedBox(
+                      width: 24,
+                      height: 24,
+                    ),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

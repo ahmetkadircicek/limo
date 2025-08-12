@@ -55,9 +55,16 @@ extension AppDialogExtension on BuildContext {
         content: AppText.body(message, color: Colors.white),
         backgroundColor: const Color(0xFF00B14F),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
         ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }
@@ -68,9 +75,16 @@ extension AppDialogExtension on BuildContext {
         content: AppText.body(message, color: Colors.white),
         backgroundColor: const Color(0xFFD72638),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
         ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }
@@ -129,11 +143,17 @@ extension SnackbarExtension on BuildContext {
   void showErrorSnackbar(String message) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: AppText.body(message),
         backgroundColor: const Color(0xFFEF4444), // semantic.danger
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }
@@ -141,11 +161,17 @@ extension SnackbarExtension on BuildContext {
   void showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: AppText.body(message),
         backgroundColor: const Color(0xFF16A34A), // semantic.success
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }

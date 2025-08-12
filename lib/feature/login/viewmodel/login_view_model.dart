@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:limo/core/init/navigation/navigation_service.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/core/services/google_auth_service.dart';
-import 'package:limo/feature/home/view/home_view.dart';
 import 'package:limo/shared/app_components.dart';
+import 'package:limo/shared/app_text.dart';
 import 'package:provider/provider.dart';
 
 /// OAuth-focused Login ViewModel
@@ -28,17 +29,12 @@ class LoginViewModel extends ChangeNotifier {
 
     try {
       final user = await GoogleAuthService.signIn();
-
       if (user != null) {
-        // Get comprehensive user profile data and log it
-        await GoogleAuthService.getComprehensiveUserProfile();
-
         // Create user model and set it in provider
         final userModel = await GoogleAuthService.getUserModel();
         if (userModel != null) {
           // Set user in provider (this will be accessed from main.dart)
-          final context =
-              NavigationService.instance.navigatorKey.currentContext;
+          final context = NavigationService.instance.navigatorKey.currentContext;
           if (context != null) {
             Provider.of<UserProvider>(context, listen: false)
                 .setUser(userModel);
@@ -111,9 +107,20 @@ class LoginViewModel extends ChangeNotifier {
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Başarıyla giriş yapıldı! Hoş geldiniz.'),
+      SnackBar(
+        content: const AppText.body('Başarıyla giriş yapıldı! Hoş geldiniz.'),
         backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
 
@@ -140,13 +147,9 @@ class LoginViewModel extends ChangeNotifier {
     // Add small delay for better UX
     await Future.delayed(const Duration(milliseconds: 500));
 
-    // Navigate and remove all previous routes
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => const HomeView(),
-      ),
-      (route) => false,
-    );
+    // Navigate to home using go_router
+    debugPrint("Navigation to Home from Login");
+    context.go('/home');
   }
 
   /// Loading state setters

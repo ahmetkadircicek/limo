@@ -107,7 +107,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText.subtitle(
+                    AppText.heading(
                       'İş #${1000 + index}',
                     ),
                     Container(
@@ -152,7 +152,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText.subtitle(
+                    AppText.heading(
                       'İş #${900 + index}',
                     ),
                     Container(
@@ -197,7 +197,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText.subtitle(
+                    AppText.heading(
                       'Teklif #${200 + index}',
                     ),
                     Container(

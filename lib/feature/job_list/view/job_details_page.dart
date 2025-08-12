@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/general_constants.dart';
+import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/pickup_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/core/services/job_application_service.dart';
-import 'package:limo/core/services/json_data_service.dart';
-import 'package:limo/feature/job_list/model/job_application_model.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
-import 'package:provider/provider.dart';
+import 'package:limo/shared/app_button.dart';
+import 'package:limo/shared/app_text.dart';
 
 class JobDetailsPage extends StatefulWidget {
   final JobModel job;
@@ -20,39 +18,44 @@ class JobDetailsPage extends StatefulWidget {
 }
 
 class _JobDetailsPageState extends State<JobDetailsPage> {
-  final Map<String, VehicleModel?> _selectedVehicles = {};
-  final Map<String, bool> _isApplying = {};
-  final Map<String, JobApplication?> _userApplications = {};
-  List<VehicleModel> _availableVehicles = [];
-
   @override
   void initState() {
     super.initState();
-    _loadAvailableVehicles();
   }
 
-  Future<void> _loadAvailableVehicles() async {
-    try {
-      final vehicleData = await JsonDataService.loadVehicleData();
-      if (vehicleData.containsKey('availableVehicles')) {
-        final vehiclesList = vehicleData['availableVehicles'] as List<dynamic>;
-        final parsedVehicles = vehiclesList
-            .map((vehicleJson) {
-              try {
-                return VehicleModel.fromJson(vehicleJson);
-              } catch (e) {
-                return null;
-              }
-            })
-            .where((vehicle) => vehicle != null)
-            .cast<VehicleModel>()
-            .toList();
-
-        setState(() {
-          _availableVehicles = parsedVehicles;
-        });
-      }
-    } catch (e) {}
+  // Compact info row to match the vehicle card's typography/spacing
+  Widget _buildInfoRowCompact({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: context.onSurface.withValues(alpha: 0.7),
+        ),
+        SizedBox(width: PaddingConstants.spacingS),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppText.caption(
+                label,
+                color: context.onSurface.withValues(alpha: 0.5),
+              ),
+              AppText.bodySmall(
+                value,
+                color: context.onSurface,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -67,7 +70,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('İş Detayları'),
+        title: const AppText.heading('Job Details'),
         backgroundColor: context.surface,
         foregroundColor: context.onSurface,
         elevation: 0,
@@ -105,17 +108,17 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: GeneralConstants.borderRadius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.surface,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: PaddingConstants.allM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -124,8 +127,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: context.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: context.primary.withValues(alpha: 0.1),
+                    borderRadius: GeneralConstants.borderRadius,
                   ),
                   child: Icon(
                     Icons.business,
@@ -134,28 +137,24 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Şirket Bilgileri',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: context.onSurface,
-                  ),
+                AppText.heading(
+                  'Company Information',
+                  color: context.onSurface,
                 ),
               ],
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
               icon: Icons.business,
-              label: 'Şirket Adı',
-              value: widget.job.companyName ?? 'Belirtilmemiş',
+              label: 'Company Name',
+              value: widget.job.companyName ?? 'Not specified',
               color: context.primary,
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
               icon: Icons.phone,
-              label: 'İletişim',
-              value: widget.job.contactInfo ?? 'Belirtilmemiş',
+              label: 'Contact',
+              value: widget.job.contactInfo ?? 'Not specified',
               color: context.primary,
             ),
           ],
@@ -171,14 +170,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.surface,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: PaddingConstants.allM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -187,7 +186,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3B82F6).withOpacity(0.1),
+                    color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -197,20 +196,16 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Rota Bilgileri',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: context.onSurface,
-                  ),
+                AppText.heading(
+                  'Route Information',
+                  color: context.onSurface,
                 ),
               ],
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
               icon: Icons.location_on,
-              label: 'Başlangıç',
+              label: 'Departure',
               value: '${widget.job.fromCity ?? ''}, ${widget.job.fromProvince}',
               color: const Color(0xFF3B82F6),
             ),
@@ -218,7 +213,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             if (widget.job.toCity != null || widget.job.toProvince!.isNotEmpty)
               _buildInfoRow(
                 icon: Icons.location_on_outlined,
-                label: 'Varış',
+                label: 'Destination',
                 value: '${widget.job.toCity ?? ''}, ${widget.job.toProvince}',
                 color: const Color(0xFF3B82F6),
               ),
@@ -235,14 +230,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.surface,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: PaddingConstants.allM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -251,7 +246,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -261,40 +256,27 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'İş Bilgileri',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: context.onSurface,
-                  ),
+                AppText.heading(
+                  'Job Information',
+                  color: context.onSurface,
                 ),
               ],
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
               icon: Icons.category,
-              label: 'İş Türü',
+              label: 'Job Type',
               value: _getJobTypeDisplayText(widget.job.jobType),
               color: const Color(0xFF8B5CF6),
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
               icon: Icons.local_shipping,
-              label: 'Araç Sayısı',
+              label: 'Vehicle Count',
               value:
                   '${widget.job.vehicleCount ?? widget.job.vehicleRequirements.length}',
               color: const Color(0xFF8B5CF6),
             ),
-            if (widget.job.price != null) ...[
-              const SizedBox(height: 16),
-              _buildInfoRow(
-                icon: Icons.attach_money,
-                label: 'Fiyat',
-                value: '₺${widget.job.price!.toStringAsFixed(2)}',
-                color: const Color(0xFF8B5CF6),
-              ),
-            ],
           ],
         ),
       ),
@@ -304,18 +286,18 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   Widget _buildDescriptionCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.surface,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: PaddingConstants.allM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -324,7 +306,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6B7280).withOpacity(0.1),
+                    color: const Color(0xFF6B7280).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -334,24 +316,16 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
-                  'Açıklama',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
-                  ),
+                AppText.heading(
+                  'Description',
+                  color: const Color(0xFF1A1A1A),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Text(
+            AppText.body(
               widget.job.description ?? '',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF374151),
-                height: 1.5,
-              ),
+              color: const Color(0xFF374151),
             ),
           ],
         ),
@@ -366,14 +340,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: PaddingConstants.allM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -382,22 +356,31 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: context.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.local_shipping,
-                    color: Color(0xFF10B981),
+                    color: context.primary,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Araç Gereksinimleri ve Başvuru',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: context.onSurface,
+                AppText.heading(
+                  'Vehicle Requirements',
+                  color: context.onSurface,
+                ),
+                Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: context.secondary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: AppText.caption(
+                    '${widget.job.vehicleRequirements.length} requirements',
+                    color: context.secondary,
                   ),
                 ),
               ],
@@ -405,393 +388,338 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             const SizedBox(height: 20),
             if (widget.job.vehicleRequirements.isNotEmpty) ...[
               ...widget.job.vehicleRequirements.map((requirement) {
-                return _buildRequirementSection(requirement, context);
+                return _buildRequirementCard(requirement, context);
               }),
             ] else ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  color: context.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: context.primary.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: Colors.blue,
+                      color: context.primary,
                       size: 20,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        'Bu iş için özel araç gereksinimi bulunmuyor. Tüm araç kategorileri kabul ediliyor.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blue.withOpacity(0.8),
+                      child: AppText.bodySmall(
+                        'No special vehicle requirements for this job. All vehicle categories are accepted.',
+                        color: context.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequirementCard(
+      VehicleRequirement requirement, BuildContext context) {
+    return _FramedContainer(
+      margin: EdgeInsets.only(bottom: PaddingConstants.spacingM),
+      borderColor: requirement.isFlexible
+          ? context.primary.withValues(alpha: 0.2)
+          : (requirement.minimumCategory?.borderColor.withValues(alpha: 0.2) ??
+              context.primary.withValues(alpha: 0.2)),
+      boxShadow: [
+        BoxShadow(
+          color: context.onSurface.withValues(alpha: 0.03),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+      ],
+      child: Padding(
+        padding: PaddingConstants.allL,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row with category badge and action buttons
+            Row(
+              children: [
+                // Category badge
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal:
+                        PaddingConstants.spacingS + PaddingConstants.spacingXs,
+                    vertical: PaddingConstants.spacingXs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: requirement.isFlexible
+                        ? context.primary.withValues(alpha: 0.1)
+                        : (requirement.minimumCategory?.backgroundColor ??
+                            context.primary.withValues(alpha: 0.1)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: requirement.isFlexible
+                          ? context.primary
+                          : (requirement.minimumCategory?.borderColor ??
+                              context.primary),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        requirement.isFlexible
+                            ? Icons.check_circle_outline
+                            : requirement.minimumCategory?.icon ??
+                                Icons.directions_car,
+                        size: 30,
+                        color: requirement.isFlexible
+                            ? context.primary
+                            : (requirement.minimumCategory?.primaryColor ??
+                                context.primary),
+                      ),
+                      SizedBox(width: PaddingConstants.spacingS),
+                      AppText.caption(
+                        requirement.isFlexible
+                            ? 'Flexible'
+                            : requirement.minimumCategory?.badgeText ??
+                                'Vehicle',
+                        color: requirement.isFlexible
+                            ? context.primary
+                            : (requirement.minimumCategory?.primaryColor ??
+                                context.primary),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                // Action button styled identically to vehicle card action button
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _showApplyMessage(context),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: PaddingConstants.spacingM,
+                            vertical: PaddingConstants.spacingS,
+                          ),
+                          decoration: BoxDecoration(
+                            color: context.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: context.primary.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: AppText.caption(
+                            'Apply',
+                            color: context.primary,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+              ],
+            ),
 
-  Widget _buildRequirementSection(
-      VehicleRequirement requirement, BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.onSurface.withOpacity(0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: context.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+            SizedBox(height: PaddingConstants.spacingL),
+
+            // Vehicle information grid
+            Row(
+              children: [
+                // Left column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (requirement.specificBrand != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.branding_watermark,
+                          label: 'Brand',
+                          value: requirement.specificBrand!,
+                          color: context.onSurface,
+                        ),
+                      if (requirement.specificBrand != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.specificModel != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.directions_car,
+                          label: 'Model',
+                          value: requirement.specificModel!,
+                          color: context.onSurface,
+                        ),
+                      if (requirement.specificModel != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      _buildInfoRowCompact(
+                        icon: Icons.category,
+                        label: 'Vehicle Type',
+                        value: requirement.isFlexible
+                            ? 'Any Vehicle'
+                            : (requirement.specificVehicleType ??
+                                requirement.getDescription()),
+                        color: context.primary,
+                      ),
+                      SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.specificExteriorColor != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.format_color_fill,
+                          label: 'Exterior Color',
+                          value: requirement.specificExteriorColor!,
+                          color: context.onSurface,
+                        ),
+                      if (requirement.specificExteriorColor != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.specificInteriorColor != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.format_color_text,
+                          label: 'Interior Color',
+                          value: requirement.specificInteriorColor!,
+                          color: context.onSurface,
+                        ),
+                      if (requirement.specificInteriorColor != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.minimumCategory != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.layers,
+                          label: 'Min Category',
+                          value: requirement.minimumCategory!.displayName,
+                          color: requirement.minimumCategory!.primaryColor,
+                        ),
+                    ],
+                  ),
                 ),
-                child: Icon(
-                  Icons.assignment,
-                  color: context.primary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Gereksinim ${requirement.id}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+
+                // Right column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (requirement.minimumCapacity != null ||
+                          requirement.maximumCapacity != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.people_outline,
+                          label: 'Capacity',
+                          value: _getCapacityDisplayValue(requirement),
+                          color: context.primary,
+                        ),
+                      if (requirement.minimumCapacity != null ||
+                          requirement.maximumCapacity != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.minimumYear != null ||
+                          requirement.maximumYear != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.calendar_today,
+                          label: 'Year',
+                          value: _getYearDisplayValue(requirement),
+                          color: context.onSurface,
+                        ),
+                      if (requirement.minimumYear != null ||
+                          requirement.maximumYear != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.hourlyRate != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.access_time,
+                          label: 'Hourly Rate',
+                          value: '\$${requirement.hourlyRate}/hr',
+                          color: const Color(0xFF10B981),
+                        ),
+                      if (requirement.hourlyRate != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      if (requirement.pricePerMile != null)
+                        _buildInfoRowCompact(
+                          icon: Icons.route,
+                          label: 'Price per Mile',
+                          value: '\$${requirement.pricePerMile}/mile',
+                          color: const Color(0xFF10B981),
+                        ),
+                      if (requirement.pricePerMile != null)
+                        SizedBox(height: PaddingConstants.spacingM),
+                      _buildInfoRowCompact(
+                        icon: Icons.check_circle_outline,
+                        label: 'Flexible',
+                        value: requirement.isFlexible ? 'Yes' : 'No',
                         color: context.onSurface,
                       ),
-                    ),
-                    Text(
-                      requirement.getDescription(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: context.onSurface.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (requirement.isFlexible)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Esnek',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF10B981),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (requirement.hourlyRate != null ||
-              requirement.pricePerMile != null) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFFF59E0B).withOpacity(0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.attach_money,
-                    color: const Color(0xFFF59E0B),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      requirement.getPricingSummary(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFFF59E0B),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          _buildVehicleSelectionForRequirement(requirement, context),
-          const SizedBox(height: 20),
-          _buildApplyButton(requirement, context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVehicleSelectionForRequirement(
-      VehicleRequirement requirement, BuildContext context) {
-    final eligibleVehicles = _availableVehicles.where((vehicle) {
-      return requirement.matchesVehicle(vehicle);
-    }).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.directions_car,
-              color: context.primary,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Araç Seçimi',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: context.onSurface,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: eligibleVehicles.isNotEmpty
-                    ? context.primary.withOpacity(0.1)
-                    : context.error.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                eligibleVehicles.isNotEmpty
-                    ? '${eligibleVehicles.length} uygun araç'
-                    : 'Uygun araç yok',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: eligibleVehicles.isNotEmpty
-                      ? context.primary
-                      : context.error,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        if (eligibleVehicles.isEmpty) ...[
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: context.error.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: context.error.withOpacity(0.2),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  color: context.error,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Bu gereksinim için uygun araç bulunmuyor. Araç kategorinizi yükseltmeyi düşünebilirsiniz.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: context.error.withOpacity(0.8),
-                    ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 16),
-        ],
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: context.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: context.onSurface.withOpacity(0.1),
-            ),
-          ),
-          child: Column(
-            children: [
-              Text(
-                eligibleVehicles.isNotEmpty
-                    ? 'Bu gereksinim için uygun araçlarınız:'
-                    : 'Mevcut araçlarınız (gereksinimlerle uyumsuz):',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.onSurface.withOpacity(0.7),
-                ),
+
+            if (requirement.notes != null && requirement.notes!.isNotEmpty) ...[
+              SizedBox(height: PaddingConstants.spacingM),
+              _buildInfoRowCompact(
+                icon: Icons.notes,
+                label: 'Notes',
+                value: requirement.notes!,
+                color: context.onSurface,
               ),
-              const SizedBox(height: 16),
-              ..._availableVehicles.map((vehicle) {
-                final isEligible = eligibleVehicles.contains(vehicle);
-                final isSelected =
-                    _selectedVehicles[requirement.id]?.licencePlate ==
-                        vehicle.licencePlate;
-                return ListTile(
-                  title: Text('${vehicle.brand} ${vehicle.model}'),
-                  subtitle: Text(
-                      '${vehicle.year} • ${vehicle.capacity} kişi • ${vehicle.licencePlate}'),
-                  trailing: isSelected
-                      ? Icon(Icons.check_circle, color: context.primary)
-                      : null,
-                  onTap: isEligible
-                      ? () {
-                          setState(() {
-                            _selectedVehicles[requirement.id] = vehicle;
-                          });
-                        }
-                      : null,
-                  enabled: isEligible,
-                );
-              }),
             ],
-          ),
+          ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildApplyButton(
-      VehicleRequirement requirement, BuildContext context) {
-    final selectedVehicle = _selectedVehicles[requirement.id];
-    final isApplying = _isApplying[requirement.id] ?? false;
-    final isVehicleEligible =
-        selectedVehicle != null && requirement.matchesVehicle(selectedVehicle);
-    final canApply =
-        selectedVehicle != null && isVehicleEligible && !isApplying;
-
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canApply
-            ? () => _applyToRequirement(requirement, selectedVehicle)
-            : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor:
-              canApply ? context.primary : context.onSurface.withOpacity(0.1),
-          foregroundColor:
-              canApply ? Colors.white : context.onSurface.withOpacity(0.3),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: isApplying
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Text(
-                selectedVehicle == null
-                    ? 'Önce Araç Seçin'
-                    : !isVehicleEligible
-                        ? 'Seçilen Araç Uygun Değil'
-                        : 'Bu Gereksinim İçin Başvuru Yap',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
       ),
     );
   }
 
-  Future<void> _applyToRequirement(
-      VehicleRequirement requirement, VehicleModel vehicle) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (!userProvider.isLoggedIn) {
-      _showErrorSnackbar('Başvuru yapmak için giriş yapmalısınız');
-      return;
-    }
-
-    setState(() {
-      _isApplying[requirement.id] = true;
-    });
-
-    try {
-      final result = await JobApplicationService.instance.submitApplication(
-        jobId: widget.job.id,
-        vehicleRequirementId: requirement.id,
-        driverId: userProvider.currentUser!.id,
-        driverName: userProvider.currentUser!.displayName,
-        driverEmail: userProvider.currentUser!.email,
-        driverPhone: '',
-        vehicle: vehicle,
-        notes: 'Otomatik başvuru',
-      );
-
-      if (result.success) {
-        setState(() {
-          _userApplications[requirement.id] = result.application;
-        });
-        _showSuccessSnackbar('Başvuru başarıyla gönderildi!');
+  // Helper method to get capacity display value
+  String _getCapacityDisplayValue(VehicleRequirement requirement) {
+    if (requirement.minimumCapacity != null &&
+        requirement.maximumCapacity != null) {
+      if (requirement.minimumCapacity == requirement.maximumCapacity) {
+        return '${requirement.minimumCapacity} people';
       } else {
-        _showErrorSnackbar(result.message);
+        return '${requirement.minimumCapacity}-${requirement.maximumCapacity} people';
       }
-    } catch (e) {
-      _showErrorSnackbar('Başvuru gönderilirken hata oluştu: $e');
-    } finally {
-      setState(() {
-        _isApplying[requirement.id] = false;
-      });
+    } else if (requirement.minimumCapacity != null) {
+      return '${requirement.minimumCapacity}+ people';
+    } else if (requirement.maximumCapacity != null) {
+      return 'Up to ${requirement.maximumCapacity} people';
     }
+    return 'Any capacity';
   }
 
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      ),
-    );
+  // Helper method to get year display value
+  String _getYearDisplayValue(VehicleRequirement requirement) {
+    if (requirement.minimumYear != null && requirement.maximumYear != null) {
+      if (requirement.minimumYear == requirement.maximumYear) {
+        return requirement.minimumYear.toString();
+      } else {
+        return '${requirement.minimumYear}-${requirement.maximumYear}';
+      }
+    } else if (requirement.minimumYear != null) {
+      return '${requirement.minimumYear}+';
+    } else if (requirement.maximumYear != null) {
+      return 'Up to ${requirement.maximumYear}';
+    }
+    return 'Any year';
   }
 
-  void _showErrorSnackbar(String message) {
+  void _showApplyMessage(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+        content: const AppText.body('Başvuru özelliği yakında eklenecek'),
+        backgroundColor: context.primary,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 8,
+        dismissDirection: DismissDirection.up,
       ),
     );
   }
@@ -827,22 +755,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              AppText.caption(
                 label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.onSurface.withOpacity(0.5),
-                  fontWeight: FontWeight.w500,
-                ),
+                color: context.onSurface.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 2),
-              Text(
+              AppText.body(
                 value,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: context.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
+                color: context.onSurface,
               ),
             ],
           ),
@@ -856,52 +776,103 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
       children: [
         SizedBox(
           width: double.infinity,
-          child: OutlinedButton.icon(
+          child: AppButton.secondary(
+            'Contact',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('İletişim bilgileri gösterilecek'),
+                SnackBar(
+                  content: const AppText.body(
+                      'Contact information will be displayed'),
                   backgroundColor: Colors.blue,
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(
+                    top: 16,
+                    left: 16,
+                    right: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 8,
+                  dismissDirection: DismissDirection.up,
                 ),
               );
             },
-            icon: const Icon(Icons.phone, size: 20),
-            label: const Text('İletişim'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF3B82F6),
-              side: const BorderSide(color: Color(0xFF3B82F6)),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            icon: Icons.phone,
+            width: double.infinity,
+            height: 52,
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
-          child: OutlinedButton.icon(
+          child: AppButton.secondary(
+            'Share',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Paylaşım seçenekleri gösterilecek'),
+                SnackBar(
+                  content:
+                      const AppText.body('Sharing options will be displayed'),
                   backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(
+                    top: 16,
+                    left: 16,
+                    right: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 8,
+                  dismissDirection: DismissDirection.up,
                 ),
               );
             },
-            icon: const Icon(Icons.share, size: 20),
-            label: const Text('Paylaş'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF10B981),
-              side: const BorderSide(color: Color(0xFF10B981)),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            icon: Icons.share,
+            width: double.infinity,
+            height: 52,
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Universal frame widget for all cards/sections
+class _FramedContainer extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? margin;
+  final Color? borderColor;
+  final List<BoxShadow>? boxShadow;
+
+  const _FramedContainer({
+    required this.child,
+    this.margin,
+    this.borderColor,
+    this.boxShadow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      decoration: BoxDecoration(
+        color: context.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: borderColor ?? context.onSurface.withValues(alpha: 0.1),
+          width: 1.0,
+        ),
+        boxShadow: boxShadow ??
+            [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+      ),
+      child: child,
     );
   }
 }
