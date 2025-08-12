@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../viewmodel/company_registration_view_model.dart';
 
+/// Main view for company registration and management with edit mode support
 class CompanyRegistrationView extends StatelessWidget {
   const CompanyRegistrationView({super.key});
 
@@ -17,26 +18,20 @@ class CompanyRegistrationView extends StatelessWidget {
         return Scaffold(
           backgroundColor: context.surfaceContainer,
           body: SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: PaddingConstants.allL,
-                    child: Column(
-                      children: [
-                        _buildHeader(context),
-                        SizedBox(height: PaddingConstants.spacingXl),
-                        _buildCompanyInfoSection(context, viewModel),
-                        SizedBox(height: PaddingConstants.spacingXl),
-                        _buildContactSection(context, viewModel),
-                        SizedBox(height: PaddingConstants.spacingXxl),
-                        _buildActionButtons(context, viewModel),
-                        SizedBox(height: PaddingConstants.spacingXxl),
-                      ],
-                    ),
-                  ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: PaddingConstants.allL,
+                child: Column(
+                  spacing: PaddingConstants.spacingM,
+                  children: [
+                    _buildHeader(context, viewModel),
+                    _buildCompanyInfoSection(context, viewModel),
+                    _buildContactSection(context, viewModel),
+                    _buildActionButtons(context, viewModel),
+                    SizedBox(height: PaddingConstants.spacingXxl),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
@@ -44,8 +39,9 @@ class CompanyRegistrationView extends StatelessWidget {
     );
   }
 
-  /// Build the page header with title and description
-  Widget _buildHeader(BuildContext context) {
+  /// Build the page header with title, description and edit button
+  Widget _buildHeader(
+      BuildContext context, CompanyRegistrationViewModel viewModel) {
     return Container(
       width: double.infinity,
       padding: PaddingConstants.allL,
@@ -63,7 +59,7 @@ class CompanyRegistrationView extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: PaddingConstants.allL,
             decoration: BoxDecoration(
               color: context.primary.withValues(alpha: 0.1),
               borderRadius: GeneralConstants.borderRadius,
@@ -79,11 +75,10 @@ class CompanyRegistrationView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText.heading(
+                AppText.body(
                   'Company Management',
                   color: context.onSurface,
                 ),
-                SizedBox(height: PaddingConstants.spacingS),
                 AppText.bodySmall(
                   'Update and manage your company information',
                   color: context.onSurface.withValues(alpha: 0.7),
@@ -96,7 +91,7 @@ class CompanyRegistrationView extends StatelessWidget {
     );
   }
 
-  /// Build company information section
+  /// Build company information section with edit mode support
   Widget _buildCompanyInfoSection(
       BuildContext context, CompanyRegistrationViewModel viewModel) {
     return _buildSection(
@@ -105,30 +100,30 @@ class CompanyRegistrationView extends StatelessWidget {
       icon: Icons.business_outlined,
       children: [
         AppInput.primary(
-          labelText: 'Company Name',
           hintText: 'Enter your company name',
           controller: viewModel.companyNameController,
           prefixIcon: Icons.business_outlined,
+          enabled: viewModel.isEditMode,
         ),
         SizedBox(height: PaddingConstants.spacingM),
         AppInput.primary(
-          labelText: 'Company Type',
           hintText: 'Enter your company type (e.g., Limited Company)',
           controller: viewModel.companyTypeController,
           prefixIcon: Icons.category_outlined,
+          enabled: viewModel.isEditMode,
         ),
         SizedBox(height: PaddingConstants.spacingM),
         AppInput.primary(
-          labelText: 'Company Description',
           hintText: 'Enter a brief description about your company',
           controller: viewModel.descriptionController,
           prefixIcon: Icons.description_outlined,
+          enabled: viewModel.isEditMode,
         ),
       ],
     );
   }
 
-  /// Build contact information section
+  /// Build contact information section with edit mode support
   Widget _buildContactSection(
       BuildContext context, CompanyRegistrationViewModel viewModel) {
     return _buildSection(
@@ -137,70 +132,85 @@ class CompanyRegistrationView extends StatelessWidget {
       icon: Icons.contact_phone_outlined,
       children: [
         AppInput.primary(
-          labelText: 'Address',
           hintText: 'Enter your company address',
           controller: viewModel.addressController,
           prefixIcon: Icons.location_on_outlined,
+          enabled: viewModel.isEditMode,
         ),
         SizedBox(height: PaddingConstants.spacingM),
         AppInput.primary(
-          labelText: 'Phone',
           hintText: 'Enter your company phone number',
           controller: viewModel.phoneController,
           keyboardType: TextInputType.phone,
           prefixIcon: Icons.phone_outlined,
+          enabled: viewModel.isEditMode,
         ),
         SizedBox(height: PaddingConstants.spacingM),
         AppInput.primary(
-          labelText: 'Email',
           hintText: 'Enter your company email address',
           controller: viewModel.emailController,
           keyboardType: TextInputType.emailAddress,
           prefixIcon: Icons.email_outlined,
+          enabled: viewModel.isEditMode,
         ),
         SizedBox(height: PaddingConstants.spacingM),
         AppInput.primary(
-          labelText: 'Website',
           hintText: 'Enter your company website (optional)',
           controller: viewModel.websiteController,
           keyboardType: TextInputType.url,
           prefixIcon: Icons.language_outlined,
+          enabled: viewModel.isEditMode,
         ),
       ],
     );
   }
 
-  /// Build action buttons section
+  /// Build action buttons section with edit mode support
   Widget _buildActionButtons(
       BuildContext context, CompanyRegistrationViewModel viewModel) {
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: AppButton.primary(
-            'Save Company Information',
-            isLoading: viewModel.isLoading,
-            onPressed: viewModel.isLoading
-                ? null
-                : () async {
-                    await viewModel.registerCompany(context);
-                  },
+    if (viewModel.isEditMode) {
+      // Edit mode: Show Cancel and Update buttons
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  'Cancel',
+                  onPressed:
+                      viewModel.isLoading ? null : viewModel.toggleEditMode,
+                ),
+              ),
+              SizedBox(width: PaddingConstants.spacingM),
+              Expanded(
+                child: AppButton.primary(
+                  'Save Changes',
+                  isLoading: viewModel.isLoading,
+                  onPressed: viewModel.isLoading || !viewModel.hasChanges
+                      ? null
+                      : () async {
+                          final success =
+                              await viewModel.updateCompany(context);
+                          if (success) {
+                            // Success - edit mode will be disabled automatically
+                          }
+                        },
+                ),
+              ),
+            ],
           ),
+        ],
+      );
+    } else {
+      // Normal mode: Show only Edit button
+      return SizedBox(
+        width: double.infinity,
+        child: AppButton.primary(
+          'Edit Company Information',
+          onPressed: viewModel.isLoading ? null : viewModel.toggleEditMode,
         ),
-        SizedBox(height: PaddingConstants.spacingM),
-        SizedBox(
-          width: double.infinity,
-          child: AppButton.secondary(
-            'Clear Form',
-            onPressed: viewModel.isLoading
-                ? null
-                : () {
-                    viewModel.clearForm();
-                  },
-          ),
-        ),
-      ],
-    );
+      );
+    }
   }
 
   /// Build reusable section container

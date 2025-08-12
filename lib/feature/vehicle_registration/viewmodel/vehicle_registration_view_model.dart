@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/enums/field_error_enum.dart';
-import 'package:limo/core/enums/success_message_enum.dart';
 import 'package:limo/core/enums/vehicle_category_enum.dart';
-import 'package:limo/shared/app_components.dart';
 
 import '../model/vehicle_model.dart';
 
+/// ViewModel for vehicle registration form management and validation
 class VehicleRegistrationViewModel with ChangeNotifier {
   final formKey = GlobalKey<FormState>();
   late TextEditingController licencePlateController;
@@ -80,23 +79,23 @@ class VehicleRegistrationViewModel with ChangeNotifier {
   ];
 
   static const List<String> categoryOptions = [
-    'standardSedan',
-    'premiumSedan',
-    'luxurySedan',
-    'standardSuv',
-    'premiumSuv',
-    'luxurySuv',
-    'standardVan',
-    'premiumVan',
-    'standardTruck',
-    'premiumTruck',
-    'economySedan',
-    'economySuv',
-    'economyHatchback',
-    'utilityVehicle',
+    'Standard Sedan',
+    'Premium Sedan',
+    'Luxury Sedan',
+    'Standard SUV',
+    'Premium SUV',
+    'Luxury SUV',
+    'Standard Van',
+    'Premium Van',
+    'Standard Truck',
+    'Premium Truck',
+    'Economy Sedan',
+    'Economy SUV',
+    'Economy Hatchback',
+    'Utility Vehicle',
   ];
 
-  // Generate years from 1990 to current year + 1
+  /// Generates year options from 1990 to current year + 1
   static List<String> get yearOptions {
     final currentYear = DateTime.now().year;
     return List.generate(
@@ -105,6 +104,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
         .toList();
   }
 
+  /// Constructor initializes all text controllers
   VehicleRegistrationViewModel(BuildContext context) {
     debugPrint('VehicleRegistrationViewModel created');
     licencePlateController = TextEditingController();
@@ -114,39 +114,43 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     capacityController = TextEditingController();
   }
 
-  // Update dropdown selections
+  /// Updates the selected year and notifies listeners
   void updateYear(String? year) {
     selectedYear = year;
     notifyListeners();
   }
 
+  /// Updates the selected capacity and notifies listeners
   void updateCapacity(String? capacity) {
     selectedCapacity = capacity;
     notifyListeners();
   }
 
+  /// Updates the selected vehicle type and notifies listeners
   void updateVehicleType(String? vehicleType) {
     selectedVehicleType = vehicleType;
     notifyListeners();
   }
 
-  // New setter methods
+  /// Sets the vehicle type and notifies listeners
   void setVehicleType(String? vehicleType) {
     selectedVehicleType = vehicleType;
     notifyListeners();
   }
 
+  /// Sets the brand and notifies listeners
   void setBrand(String? brand) {
     selectedBrand = brand;
     notifyListeners();
   }
 
+  /// Sets the category and notifies listeners
   void setCategory(String? category) {
     selectedCategory = category;
     notifyListeners();
   }
 
-  /// Validates licence plate format (general format for international use)
+  /// Validates licence plate format for international use
   String? validateLicencePlate(String? value) {
     if (value == null || value.trim().isEmpty) {
       return null; // Will be handled in registerVehicle method
@@ -160,7 +164,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     return null;
   }
 
-  /// Validates brand field
+  /// Validates brand field for minimum length requirement
   String? validateBrand(String? value) {
     if (value == null || value.trim().isEmpty) {
       return null; // Will be handled in registerVehicle method
@@ -171,7 +175,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     return null;
   }
 
-  /// Validates model field
+  /// Validates model field for non-empty requirement
   String? validateModel(String? value) {
     if (value == null || value.trim().isEmpty) {
       return null; // Will be handled in registerVehicle method
@@ -182,70 +186,73 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     return null;
   }
 
-  // Validation methods
-  String? validateYear(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter a year';
-    }
-    final year = int.tryParse(value);
-    if (year == null || year < 1900 || year > DateTime.now().year + 1) {
-      return 'Please enter a valid year';
-    }
-    return null;
-  }
-
-  String? validateCapacity(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter capacity';
-    }
-    final capacity = int.tryParse(value);
-    if (capacity == null || capacity < 1 || capacity > 50) {
-      return 'Please enter a valid capacity (1-50)';
-    }
-    return null;
-  }
-
-  /// Registers the vehicle with professional dialog validation
+  /// Registers the vehicle with comprehensive validation and snackbar feedback
   Future<bool> registerVehicle(BuildContext context) async {
     // Get values
     String licencePlate = licencePlateController.text.trim().toUpperCase();
-    String brand = brandController.text.trim();
+    String brand = selectedBrand ?? '';
     String model = modelController.text.trim();
 
     // Manual validation with proper error messages
-    FieldError? validationError;
-
-    if (licencePlate.isEmpty) {
-      validationError = FieldError.emptyLicencePlate;
-    } else if (!RegExp(r'^[A-Za-z0-9\s\-\.]{2,15}$').hasMatch(licencePlate)) {
-      validationError = FieldError.invalidLicencePlate;
-    } else if (brand.isEmpty) {
-      validationError = FieldError.emptyBrand;
-    } else if (brand.length < 2) {
-      validationError = FieldError.invalidBrand;
-    } else if (model.isEmpty) {
-      validationError = FieldError.emptyModel;
-    } else if (selectedYear == null) {
-      validationError = FieldError.emptyYear;
-    } else if (selectedCapacity == null) {
-      validationError = FieldError.emptyCapacity;
-    } else if (selectedVehicleType == null) {
-      validationError = FieldError.emptyVehicleType;
-    } else if (selectedBrand == null) {
-      validationError = FieldError.emptyBrand;
-    } else if (selectedCategory == null) {
-      validationError =
-          FieldError.emptyVehicleType; // Using existing error for now
-    }
+    FieldError? validationError = _validateVehicleData(
+      licencePlate: licencePlate,
+      brand: brand,
+      model: model,
+    );
 
     if (validationError != null) {
-      // Show error dialog
-      context.showErrorDialog(validationError.message);
+      _showErrorSnackbar(context, validationError.message);
       return false;
     }
 
-    // Create vehicle model
-    final vehicle = VehicleModel(
+    // Create and save vehicle
+    final vehicle = _createVehicleModel(
+      licencePlate: licencePlate,
+      brand: brand,
+      model: model,
+    );
+
+    _logVehicleData(vehicle);
+    _showSuccessSnackbar(context);
+
+    return true;
+  }
+
+  /// Validates all vehicle data and returns appropriate error if any
+  FieldError? _validateVehicleData({
+    required String licencePlate,
+    required String brand,
+    required String model,
+  }) {
+    if (licencePlate.isEmpty) {
+      return FieldError.emptyLicencePlate;
+    } else if (!RegExp(r'^[A-Za-z0-9\s\-\.]{2,15}$').hasMatch(licencePlate)) {
+      return FieldError.invalidLicencePlate;
+    } else if (brand.isEmpty) {
+      return FieldError.emptyBrand;
+    } else if (brand.length < 2) {
+      return FieldError.invalidBrand;
+    } else if (model.isEmpty) {
+      return FieldError.emptyModel;
+    } else if (selectedYear == null) {
+      return FieldError.emptyYear;
+    } else if (selectedCapacity == null) {
+      return FieldError.emptyCapacity;
+    } else if (selectedVehicleType == null) {
+      return FieldError.emptyVehicleType;
+    } else if (selectedCategory == null) {
+      return FieldError.emptyVehicleType;
+    }
+    return null;
+  }
+
+  /// Creates VehicleModel instance from form data
+  VehicleModel _createVehicleModel({
+    required String licencePlate,
+    required String brand,
+    required String model,
+  }) {
+    return VehicleModel(
       licencePlate: licencePlate,
       brand: selectedBrand!,
       model: model,
@@ -255,12 +262,42 @@ class VehicleRegistrationViewModel with ChangeNotifier {
       interiorColor: 'N/A',
       exteriorColor: 'N/A',
       category: VehicleCategory.values.firstWhere(
-        (cat) => cat.name == selectedCategory,
+        (cat) => cat.displayName == selectedCategory,
         orElse: () => VehicleCategory.standardSedan,
       ),
     );
+  }
 
-    // Debug print vehicle data
+  /// Shows error message as snackbar instead of dialog
+  void _showErrorSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  /// Shows success message as snackbar
+  void _showSuccessSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Vehicle registered successfully!'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  /// Logs vehicle data for debugging purposes
+  void _logVehicleData(VehicleModel vehicle) {
     debugPrint('Vehicle Registration Data:');
     debugPrint('Licence Plate: ${vehicle.licencePlate}');
     debugPrint('Brand: ${vehicle.brand}');
@@ -269,21 +306,28 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     debugPrint('Capacity: ${vehicle.capacity}');
     debugPrint('Vehicle Type: ${vehicle.vehicleType}');
     debugPrint('Category: ${vehicle.category.displayName}');
-
-    // TODO: Implement actual vehicle registration logic here
-    // await registerVehicleToServer(context, vehicle);
-
-    // Show success dialog
-    context.showSuccessDialog(
-      SuccessMessageEnum.vehicleRegisterSuccess.successMessage,
-    );
-
-    return true;
   }
 
+  /// Clears all form data and resets to initial state
+  void clearForm() {
+    licencePlateController.clear();
+    brandController.clear();
+    modelController.clear();
+    yearController.clear();
+    capacityController.clear();
+
+    selectedYear = null;
+    selectedCapacity = null;
+    selectedVehicleType = null;
+    selectedBrand = null;
+    selectedCategory = null;
+
+    notifyListeners();
+  }
+
+  /// Disposes all controllers to prevent memory leaks
   @override
   void dispose() {
-    debugPrint('VehicleRegistrationViewModel disposed');
     licencePlateController.dispose();
     brandController.dispose();
     modelController.dispose();

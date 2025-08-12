@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/design_tokens.dart';
+import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/shared/app_text.dart';
 import 'package:provider/provider.dart';
 
+/// Main drawer widget for the application navigation
 class AppDrawer extends StatelessWidget {
   final VoidCallback? onProfileTap;
   final VoidCallback? onLogoutTap;
   final VoidCallback? onVehicleManagementTap;
   final VoidCallback? onCompanyManagementTap;
+
   const AppDrawer({
     super.key,
     this.onProfileTap,
@@ -22,116 +24,42 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            // Header with user info
-            _buildHeader(context),
-
-            // Navigation items
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildDrawerItem(
-                    icon: Icons.person_outline,
-                    title: 'Profil',
-                    onTap: onProfileTap,
-                    context: context,
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.local_shipping_outlined,
-                    title: 'Araç Yönetimi',
-                    onTap: onVehicleManagementTap,
-                    context: context,
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.business,
-                    title: 'Şirket Yönetimi',
-                    onTap: onCompanyManagementTap,
-                    context: context,
-                  ),
-                ],
-              ),
-            ),
-
-            // Logout section
-            _buildLogoutSection(context),
-          ],
+        color: context.surface,
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              _buildNavigationSection(context),
+              _buildLogoutSection(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  /// Builds the user profile header section with avatar and user info
   Widget _buildHeader(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         return Container(
-          padding: const EdgeInsets.fromLTRB(24, 60, 24, 32),
+          padding: context.paddingXl,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.surface,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.withValues(alpha: 0.1),
+                color: context.onSurface.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
           ),
           child: Column(
             children: [
-              // User avatar
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: userProvider.isLoggedIn &&
-                          userProvider.userPhotoUrl != null
-                      ? Colors.transparent
-                      : context.primary,
-                ),
-                child:
-                    userProvider.isLoggedIn && userProvider.userPhotoUrl != null
-                        ? ClipOval(
-                            child: Image.network(
-                              userProvider.userPhotoUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.person,
-                                  size: 36,
-                                  color: Colors.white,
-                                );
-                              },
-                            ),
-                          )
-                        : Icon(
-                            Icons.person,
-                            size: 36,
-                            color: Colors.white,
-                          ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // User name
-              AppText.heading(
-                userProvider.userDisplayName ?? 'Kullanıcı',
-                color: Colors.black,
-              ),
-
-              const SizedBox(height: 8),
-
-              // User email with dropdown indicator
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppText.caption(
-                    userProvider.userEmail ?? 'email@example.com',
-                    color: Colors.grey[600],
-                  ),
-                ],
-              ),
+              _buildUserAvatar(context, userProvider),
+              SizedBox(height: context.spacingS),
+              _buildUserName(context, userProvider),
+              SizedBox(height: context.spacingXs),
+              _buildUserEmail(context, userProvider),
             ],
           ),
         );
@@ -139,6 +67,88 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
+  /// Builds the user avatar with fallback icon
+  Widget _buildUserAvatar(BuildContext context, UserProvider userProvider) {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: userProvider.isLoggedIn && userProvider.userPhotoUrl != null
+            ? Colors.transparent
+            : context.primary,
+      ),
+      child: userProvider.isLoggedIn && userProvider.userPhotoUrl != null
+          ? ClipOval(
+              child: Image.network(
+                userProvider.userPhotoUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.person,
+                    size: 36,
+                    color: context.onPrimary,
+                  );
+                },
+              ),
+            )
+          : Icon(
+              Icons.person,
+              size: 36,
+              color: context.onPrimary,
+            ),
+    );
+  }
+
+  /// Builds the user display name text
+  Widget _buildUserName(BuildContext context, UserProvider userProvider) {
+    return AppText.heading(
+      userProvider.userDisplayName ?? 'Kullanıcı',
+      color: context.onSurface,
+    );
+  }
+
+  /// Builds the user email text
+  Widget _buildUserEmail(BuildContext context, UserProvider userProvider) {
+    return AppText.caption(
+      userProvider.userEmail ?? 'email@example.com',
+      color: context.textSecondary,
+    );
+  }
+
+  /// Builds the main navigation section with menu items
+  Widget _buildNavigationSection(BuildContext context) {
+    return Expanded(
+      child: Container(
+        color: context.surfaceContainer,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            _buildDrawerItem(
+              icon: Icons.person_outline,
+              title: 'Profil',
+              onTap: onProfileTap,
+              context: context,
+            ),
+            _buildDrawerItem(
+              icon: Icons.local_shipping_outlined,
+              title: 'Araç Yönetimi',
+              onTap: onVehicleManagementTap,
+              context: context,
+            ),
+            _buildDrawerItem(
+              icon: Icons.business,
+              title: 'Şirket Yönetimi',
+              onTap: onCompanyManagementTap,
+              context: context,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds individual navigation menu items
   Widget _buildDrawerItem({
     required IconData icon,
     required String title,
@@ -146,66 +156,61 @@ class AppDrawer extends StatelessWidget {
     required BuildContext context,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      margin: PaddingConstants.horizontalS,
       decoration: BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderRadius: context.radiusMedium,
       ),
       child: ListTile(
         tileColor: context.surfaceContainer,
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: Colors.white,
-          ),
-        ),
+        leading: _buildItemIcon(icon, context),
         title: AppText.body(
           title,
-          color: Colors.black,
+          color: context.onSurface,
         ),
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        contentPadding: EdgeInsets.symmetric(
+            horizontal: context.spacingL, vertical: context.spacingS),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          borderRadius: context.radiusMedium,
         ),
       ),
     );
   }
 
+  /// Builds the icon container for navigation items
+  Widget _buildItemIcon(IconData icon, BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: context.onSurface,
+        borderRadius: context.radiusMedium,
+      ),
+      child: Icon(
+        icon,
+        size: 20,
+        color: context.surface,
+      ),
+    );
+  }
+
+  /// Builds the logout section at the bottom of the drawer
   Widget _buildLogoutSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: context.horizontalXl + context.verticalS,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surface,
         border: Border(
           top: BorderSide(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: context.onSurface.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
       ),
       child: ListTile(
         tileColor: context.surfaceContainer,
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-          ),
-          child: Icon(
-            Icons.logout,
-            size: 20,
-            color: Colors.white,
-          ),
-        ),
+        leading: _buildItemIcon(Icons.logout, context),
         title: AppText.body(
           'Çıkış Yap',
           color: context.error,
@@ -213,7 +218,7 @@ class AppDrawer extends StatelessWidget {
         onTap: onLogoutTap,
         contentPadding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          borderRadius: context.radiusMedium,
         ),
       ),
     );

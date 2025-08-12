@@ -35,9 +35,10 @@ class _LocationPickerState extends State<LocationPicker> {
   bool _isLoadingCurrentLocation = false;
   Timer? _debounceTimer;
 
+  // Cupertino, California, USA: 37.322998, -122.032182
   static const CameraPosition _defaultPosition = CameraPosition(
-    target: LatLng(39.9334, 32.8597), // Ankara, Turkey
-    zoom: 10,
+    target: LatLng(37.322998, -122.032182), // Cupertino, CA, USA
+    zoom: 12, // Reasonable city-level zoom
   );
 
   final Set<Marker> _markers = {};
@@ -46,33 +47,44 @@ class _LocationPickerState extends State<LocationPicker> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
-    _initializeUserLocation();
+    _initializeStoredLocation();
   }
 
-  // Initialize user location on app start
-  Future<void> _initializeUserLocation() async {
+  // Initialize with stored location instead of automatically getting current location
+  Future<void> _initializeStoredLocation() async {
     try {
-      final currentLocation = await LocationService.getCurrentLocation();
-
-      if (currentLocation != null) {
+      // First check if an initial location was passed to the widget
+      if (widget.initialLocation != null) {
         setState(() {
-          _selectedLocation = currentLocation;
+          _selectedLocation = widget.initialLocation;
         });
-        _addMarker(currentLocation);
-        _animateToLocation(currentLocation);
-        await _saveLastLocation(currentLocation);
+        _addMarker(widget.initialLocation!);
+        _animateToLocation(widget.initialLocation!);
+        developer.log(
+            '📍 Using initial location from widget: ${widget.initialLocation!.placeName}',
+            name: _tag);
+        return;
+      }
+
+      // If no initial location, try to get the last saved location
+      final lastLocation = await _getLastLocation();
+
+      if (lastLocation != null) {
+        setState(() {
+          _selectedLocation = lastLocation;
+        });
+        _addMarker(lastLocation);
+        _animateToLocation(lastLocation);
+        developer.log('📍 Using stored location: ${lastLocation.placeName}',
+            name: _tag);
       } else {
-        final lastLocation = await _getLastLocation();
-        if (lastLocation != null) {
-          setState(() {
-            _selectedLocation = lastLocation;
-          });
-          _addMarker(lastLocation);
-          _animateToLocation(lastLocation);
-        }
+        // If no stored location, use the default position but don't set it as selected
+        developer.log(
+            '📍 No stored location found, using default position (Cupertino, CA, USA)',
+            name: _tag);
       }
     } catch (e) {
-      developer.log('💥 Failed to initialize user location: $e', name: _tag);
+      developer.log('💥 Failed to initialize stored location: $e', name: _tag);
     }
   }
 
@@ -81,6 +93,11 @@ class _LocationPickerState extends State<LocationPicker> {
     _mapController?.dispose();
     _searchController.dispose();
     _debounceTimer?.cancel();
+
+    // Clear any remaining state
+    _searchResults.clear();
+    _markers.clear();
+
     super.dispose();
   }
 
@@ -184,7 +201,7 @@ class _LocationPickerState extends State<LocationPicker> {
     );
   }
 
-  // Get current location from device
+  // Get current location from device without automatically saving
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoadingCurrentLocation = true;
@@ -194,7 +211,10 @@ class _LocationPickerState extends State<LocationPicker> {
       final location = await LocationService.getCurrentLocation();
       if (location != null) {
         _selectLocation(location);
-        await _saveLastLocation(location);
+        // Don't automatically save current location as the default
+        // Only save when user explicitly confirms selection
+        developer.log('📍 Current location obtained: ${location.placeName}',
+            name: _tag);
       }
     } catch (e) {
       developer.log('💥 Failed to get current location: $e', name: _tag);
@@ -205,16 +225,37 @@ class _LocationPickerState extends State<LocationPicker> {
     }
   }
 
-  // Confirm location selection and navigate back
-  void _confirmSelection() {
-    if (_selectedLocation != null) {
-      widget.onLocationSelected(_selectedLocation!);
-      _resetMapState();
-      Navigator.of(context).pop();
+  // Manually save current location as default (user-initiated action)
+  Future<void> _saveCurrentLocationAsDefault() async {
+    try {
+      final location = await LocationService.getCurrentLocation();
+      if (location != null) {
+        await _saveLastLocation(location);
+        _selectLocation(location);
+        developer.log(
+            '📍 Current location saved as default: ${location.placeName}',
+            name: _tag);
+      }
+    } catch (e) {
+      developer.log('💥 Failed to save current location as default: $e',
+          name: _tag);
     }
   }
 
-  // Reset map state to initial values
+  // Confirm location selection and navigate back
+  void _confirmSelection() async {
+    if (_selectedLocation != null) {
+      // Save the location when user confirms selection
+      await _saveLastLocation(_selectedLocation!);
+      widget.onLocationSelected(_selectedLocation!);
+      // Reset map state before navigating back
+      _resetMapState();
+      // Use Navigator.pop() to return to the parent page
+      Navigator.of(context).pop(_selectedLocation!);
+    }
+  }
+
+  // Reset map state to initial values (without clearing stored location)
   void _resetMapState() {
     setState(() {
       _selectedLocation = null;
@@ -224,23 +265,52 @@ class _LocationPickerState extends State<LocationPicker> {
     });
   }
 
-  // Save last known location in memory
-  static LocationModel? _lastSavedLocation;
-
+  // Save last known location in persistent storage
   Future<void> _saveLastLocation(LocationModel location) async {
-    _lastSavedLocation = location;
-    developer.log('📍 Last location saved: ${location.placeName}', name: _tag);
+    final success = await LocationService.saveLocationToStorage(location);
+    if (success) {
+      developer.log(
+          '📍 Last location saved to persistent storage: ${location.placeName}',
+          name: _tag);
+    } else {
+      developer.log('❌ Failed to save location to persistent storage',
+          name: _tag);
+    }
   }
 
   Future<LocationModel?> _getLastLocation() async {
-    if (_lastSavedLocation != null) {
-      developer.log(
-          '📍 Saved last location found: ${_lastSavedLocation!.placeName}',
+    final location = await LocationService.getLocationFromStorage();
+    if (location != null) {
+      developer.log('📍 Stored location found: ${location.placeName}',
           name: _tag);
-      return _lastSavedLocation;
+      return location;
     }
-    developer.log('📍 No saved last location found', name: _tag);
+    developer.log('📍 No stored location found', name: _tag);
     return null;
+  }
+
+  // Manually clear stored location
+  Future<void> _clearStoredLocation() async {
+    try {
+      await LocationService.clearLocationFromStorage();
+      setState(() {
+        _selectedLocation = null;
+        _markers.clear();
+      });
+      developer.log('🗑️ Stored location cleared manually', name: _tag);
+
+      // Show a snackbar to inform the user
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Stored location cleared'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      developer.log('💥 Failed to clear stored location: $e', name: _tag);
+    }
   }
 
   @override
@@ -274,7 +344,11 @@ class _LocationPickerState extends State<LocationPicker> {
           Icons.arrow_back_ios_rounded,
           size: 20,
         ),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () {
+          // Reset map state before going back
+          _resetMapState();
+          Navigator.of(context).pop();
+        },
         style: IconButton.styleFrom(
           backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(
@@ -282,20 +356,49 @@ class _LocationPickerState extends State<LocationPicker> {
           ),
         ),
       ),
+      actions: [
+        if (_selectedLocation != null)
+          IconButton(
+            icon: const Icon(
+              Icons.clear,
+              size: 20,
+            ),
+            onPressed: _clearStoredLocation,
+            tooltip: 'Clear stored location',
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
   // Build the Google Maps widget
   Widget _buildGoogleMap() {
+    final initialPosition = _selectedLocation != null
+        ? CameraPosition(
+            target: LatLng(
+                _selectedLocation!.latitude, _selectedLocation!.longitude),
+            zoom: 15,
+          )
+        : _defaultPosition;
+
+    // Log which position is being used
+    if (_selectedLocation != null) {
+      developer.log(
+          '🗺️ Using stored location for map: ${_selectedLocation!.placeName}',
+          name: _tag);
+    } else {
+      developer.log('🗺️ Using default position for map (Cupertino, CA, USA)',
+          name: _tag);
+    }
+
     return GoogleMap(
       onMapCreated: _onMapCreated,
-      initialCameraPosition: _selectedLocation != null
-          ? CameraPosition(
-              target: LatLng(
-                  _selectedLocation!.latitude, _selectedLocation!.longitude),
-              zoom: 15,
-            )
-          : _defaultPosition,
+      initialCameraPosition: initialPosition,
       markers: _markers,
       onTap: _onMapTap,
       myLocationEnabled: true,
@@ -409,19 +512,32 @@ class _LocationPickerState extends State<LocationPicker> {
 
   // Build current location button
   Widget _buildCurrentLocationButton() {
-    return IconButton(
-      onPressed: _getCurrentLocation,
-      icon: Icon(
-        Icons.my_location_rounded,
-        color: Theme.of(context).colorScheme.primary,
-        size: 22,
-      ),
-      style: IconButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+    return Tooltip(
+      message: 'Tap to get current location\nLong press to save as default',
+      child: GestureDetector(
+        onTap: _getCurrentLocation,
+        onLongPress: _saveCurrentLocationAsDefault,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: IconButton(
+            onPressed: null, // Disabled since we're using GestureDetector
+            icon: Icon(
+              Icons.my_location_rounded,
+              color: Theme.of(context).colorScheme.primary,
+              size: 22,
+            ),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+          ),
         ),
-        padding: EdgeInsets.zero,
       ),
     );
   }

@@ -27,11 +27,21 @@ class LocationField extends StatelessWidget {
     required this.pickerTitle,
   });
 
-  void _openLocationPicker(BuildContext context) {
+  void _openLocationPicker(BuildContext context) async {
     if (!enabled) return;
 
     debugPrint("Navigation to Location Picker from Location Field");
-    context.push('/location-picker', extra: onLocationSelected);
+
+    // Navigate to location picker and get the result
+    final result = await context.push(
+      '/location-picker',
+      extra: {'title': pickerTitle},
+    );
+
+    // Handle the result
+    if (result != null && result is LocationModel) {
+      onLocationSelected(result);
+    }
   }
 
   @override

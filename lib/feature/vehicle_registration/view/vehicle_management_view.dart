@@ -142,16 +142,15 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                     Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.all(PaddingConstants.spacingS),
+                          padding: PaddingConstants.allL,
                           decoration: BoxDecoration(
                             color: context.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(
-                                DesignTokens.radiusMedium),
+                            borderRadius: GeneralConstants.borderRadius,
                           ),
                           child: Icon(
                             Icons.directions_car,
-                            size: 24,
                             color: context.primary,
+                            size: 32,
                           ),
                         ),
                         SizedBox(width: PaddingConstants.spacingM),

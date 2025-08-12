@@ -437,9 +437,9 @@ class _ListingJobViewState extends State<ListingJobView> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: GeneralConstants.borderRadius,
         border: Border.all(
-          color: context.primary.withValues(alpha: 0.2),
+          color: context.onSurface.withValues(alpha: 0.1),
           width: 1.0,
         ),
         boxShadow: [
@@ -501,10 +501,10 @@ class _ListingJobViewState extends State<ListingJobView> {
   // Build individual metric card
   Widget _buildMetricCard(String label, String value) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: PaddingConstants.allS,
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: GeneralConstants.borderRadius,
         border: Border.all(
           color: context.onSurface.withValues(alpha: 0.1),
         ),
@@ -524,11 +524,46 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
-  // Build route summary text
+  // Build route summary text with icon inside a nice container
   Widget _buildRouteSummary() {
-    return AppText.bodySmall(
-      '${_fromLocation!.placeName} → ${_toLocation!.placeName}',
-      color: context.onSurface.withValues(alpha: 0.8),
+    final from = _fromLocation?.placeName.trim();
+    final to = _toLocation?.placeName.trim();
+
+    String summary;
+    if ((from?.isNotEmpty ?? false) && (to?.isNotEmpty ?? false)) {
+      summary = '$from → $to';
+    } else if (from?.isNotEmpty ?? false) {
+      summary = from!;
+    } else if (to?.isNotEmpty ?? false) {
+      summary = to!;
+    } else {
+      summary = 'Route not specified';
+    }
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: context.primary.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            Icons.location_on,
+            size: 16,
+            color: context.primary.withOpacity(0.8),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: AppText.bodySmall(
+            summary,
+            color: context.onSurface.withValues(alpha: 0.8),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 
@@ -568,9 +603,19 @@ class _ListingJobViewState extends State<ListingJobView> {
   void _showLocationPicker({
     required String title,
     required Function(LocationModel) onLocationSelected,
-  }) {
+  }) async {
     debugPrint("Navigation to Location Picker from Listing Job");
-    context.push('/location-picker', extra: onLocationSelected);
+
+    // Navigate to location picker and get the result
+    final result = await context.push(
+      '/location-picker',
+      extra: {'title': title},
+    );
+
+    // Handle the result
+    if (result != null && result is LocationModel) {
+      onLocationSelected(result);
+    }
   }
 
   // Create job with validation and service call
@@ -583,20 +628,20 @@ class _ListingJobViewState extends State<ListingJobView> {
     try {
       _showLoadingDialog();
       final response = await JobCreationService.createJob(job);
-      context.pop();
+      Navigator.of(context).pop();
 
       if (response['success'] == true) {
         JobCreationService.logDebugInfo(job);
         _showSuccessSnackbar('Job posted successfully!');
         if (context.mounted) {
-          context.pop();
+          Navigator.of(context).pop();
         }
       } else {
         _showErrorSnackbar(
             'Error creating job: ${response['error']['message']}');
       }
     } catch (error) {
-      context.pop();
+      Navigator.of(context).pop();
       _showErrorSnackbar('An unexpected error occurred: $error');
     }
   }

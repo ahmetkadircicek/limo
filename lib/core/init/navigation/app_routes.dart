@@ -157,11 +157,21 @@ class AppRoutes {
         name: 'location-picker',
         builder: (context, state) {
           debugPrint("Navigation to Location Picker");
-          final title = state.uri.queryParameters['title'] ?? 'Select Location';
-          final onLocationSelected = state.extra as dynamic Function(dynamic)?;
+          
+          // Get title from extra
+          String title = 'Select Location';
+          if (state.extra is Map<String, dynamic>) {
+            final args = state.extra as Map<String, dynamic>;
+            title = args['title'] ?? 'Select Location';
+          }
+          
+          // Create LocationPickerPage that will return the selected location
           return LocationPickerPage(
             title: title,
-            onLocationSelected: onLocationSelected ?? (location) {},
+            onLocationSelected: (location) {
+              // Navigate back with the selected location
+              Navigator.of(context).pop(location);
+            },
           );
         },
       ),

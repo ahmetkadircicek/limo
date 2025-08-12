@@ -33,6 +33,7 @@ dependencies:
   geolocator: ^13.0.1 # Provides geolocation functionalities (get current location, etc.)
   geocoding: ^3.0.0 # Converts addresses to coordinates and vice versa (geocoding/reverse geocoding)
   path_provider: ^2.1.4 # Provides access to system directories for file operations
+  shared_preferences: ^2.2.2 # Provides persistent storage for app data
 
   # --- Networking ---
   http: ^1.2.2 # Simplifies making HTTP requests (REST API calls, etc.)

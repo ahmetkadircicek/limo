@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 import 'package:limo/shared/app_components.dart';
@@ -7,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../viewmodel/vehicle_registration_view_model.dart';
 
+/// Main view for vehicle registration form with comprehensive input fields
 final class VehicleRegistrationView extends StatelessWidget {
   final VehicleModel? vehicleToEdit;
 
@@ -21,12 +21,12 @@ final class VehicleRegistrationView extends StatelessWidget {
   }
 }
 
-// Builds the full screen content
+/// Builds the complete screen content with form and sections
 Widget _buildFullScreenContent() {
   return Consumer<VehicleRegistrationViewModel>(
     builder: (context, viewModel, child) {
       return Padding(
-        padding: PaddingConstants.horizontalL,
+        padding: context.horizontalL,
         child: Form(
           key: viewModel.formKey,
           child: Column(
@@ -35,11 +35,13 @@ Widget _buildFullScreenContent() {
                 child: SingleChildScrollView(
                   child: SafeArea(
                     child: Column(
-                      spacing: PaddingConstants.spacingL,
                       children: [
-                        _buildVehicleInfoSection(viewModel),
-                        _buildVehicleSpecsSection(viewModel),
-                        _buildCategorySection(viewModel),
+                        _buildVehicleInfoSection(viewModel, context),
+                        SizedBox(height: context.spacingL),
+                        _buildVehicleSpecsSection(viewModel, context),
+                        SizedBox(height: context.spacingL),
+                        _buildCategorySection(viewModel, context),
+                        SizedBox(height: context.spacingL),
                         _buildActionButtons(context, viewModel),
                       ],
                     ),
@@ -54,8 +56,9 @@ Widget _buildFullScreenContent() {
   );
 }
 
-// Builds the vehicle information section
-Widget _buildVehicleInfoSection(VehicleRegistrationViewModel viewModel) {
+/// Builds the vehicle information section with license plate, brand, and model
+Widget _buildVehicleInfoSection(
+    VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
     title: 'Vehicle Information',
     icon: Icons.directions_car,
@@ -66,7 +69,7 @@ Widget _buildVehicleInfoSection(VehicleRegistrationViewModel viewModel) {
         prefixIcon: Icons.confirmation_number,
         validator: viewModel.validateLicencePlate,
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.spacingL),
       AppInput.dropdown(
         hintText: 'Select vehicle brand',
         dropdownItems: VehicleRegistrationViewModel.brandOptions,
@@ -76,7 +79,7 @@ Widget _buildVehicleInfoSection(VehicleRegistrationViewModel viewModel) {
         },
         prefixIcon: Icons.branding_watermark,
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.spacingL),
       AppInput.primary(
         controller: viewModel.modelController,
         hintText: 'Enter vehicle model',
@@ -87,8 +90,9 @@ Widget _buildVehicleInfoSection(VehicleRegistrationViewModel viewModel) {
   );
 }
 
-// Builds the vehicle specifications section
-Widget _buildVehicleSpecsSection(VehicleRegistrationViewModel viewModel) {
+/// Builds the vehicle specifications section with type, year, and capacity
+Widget _buildVehicleSpecsSection(
+    VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
     title: 'Vehicle Specifications',
     icon: Icons.settings,
@@ -98,32 +102,37 @@ Widget _buildVehicleSpecsSection(VehicleRegistrationViewModel viewModel) {
         dropdownItems: VehicleRegistrationViewModel.vehicleTypes,
         dropdownValue: viewModel.selectedVehicleType,
         onDropdownChanged: (value) {
-          viewModel.setVehicleType(value);
+          viewModel.updateVehicleType(value);
         },
         prefixIcon: Icons.local_shipping,
       ),
-      const SizedBox(height: 16),
-      AppInput.primary(
-        controller: viewModel.yearController,
-        hintText: 'Enter year',
+      SizedBox(height: context.spacingL),
+      AppInput.dropdown(
+        hintText: 'Select year',
+        dropdownItems: VehicleRegistrationViewModel.yearOptions,
+        dropdownValue: viewModel.selectedYear,
+        onDropdownChanged: (value) {
+          viewModel.updateYear(value);
+        },
         prefixIcon: Icons.calendar_today,
-        keyboardType: TextInputType.number,
-        validator: viewModel.validateYear,
       ),
-      const SizedBox(height: 16),
-      AppInput.primary(
-        controller: viewModel.capacityController,
-        hintText: 'Number of people',
+      SizedBox(height: context.spacingL),
+      AppInput.dropdown(
+        hintText: 'Select capacity',
+        dropdownItems: VehicleRegistrationViewModel.capacityOptions,
+        dropdownValue: viewModel.selectedCapacity,
+        onDropdownChanged: (value) {
+          viewModel.updateCapacity(value);
+        },
         prefixIcon: Icons.people,
-        keyboardType: TextInputType.number,
-        validator: viewModel.validateCapacity,
       ),
     ],
   );
 }
 
-// Builds the vehicle category section (most important)
-Widget _buildCategorySection(VehicleRegistrationViewModel viewModel) {
+/// Builds the vehicle category section for classification
+Widget _buildCategorySection(
+    VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
     title: 'Vehicle Category',
     icon: Icons.star,
@@ -141,7 +150,42 @@ Widget _buildCategorySection(VehicleRegistrationViewModel viewModel) {
   );
 }
 
-// Builds a section with title and icon
+/// Builds the action buttons section with register and clear options
+Widget _buildActionButtons(
+    BuildContext context, VehicleRegistrationViewModel viewModel) {
+  return _buildSection(
+    title: 'Actions',
+    icon: Icons.play_arrow,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: AppButton.primary(
+              'Register Vehicle',
+              onPressed: () async {
+                final success = await viewModel.registerVehicle(context);
+                if (success) {
+                  viewModel.clearForm();
+                }
+              },
+            ),
+          ),
+          SizedBox(width: context.spacingL),
+          Expanded(
+            child: AppButton.secondary(
+              'Clear Form',
+              onPressed: () {
+                viewModel.clearForm();
+              },
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+/// Builds a section with title, icon, and children widgets
 Widget _buildSection({
   required String title,
   required IconData icon,
@@ -152,42 +196,22 @@ Widget _buildSection({
       return Container(
         decoration: BoxDecoration(
           color: context.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: context.radiusLarge,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: context.onSurface.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: context.paddingXl,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: context.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: context.primary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  AppText.heading(
-                    title,
-                    color: context.onSurface,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
+              _buildSectionHeader(context, icon, title),
+              SizedBox(height: context.spacingL),
               ...children,
             ],
           ),
@@ -197,36 +221,26 @@ Widget _buildSection({
   );
 }
 
-// Builds the action buttons
-Widget _buildActionButtons(
-    BuildContext context, VehicleRegistrationViewModel viewModel) {
-  return Column(
+/// Builds the section header with icon and title
+Widget _buildSectionHeader(BuildContext context, IconData icon, String title) {
+  return Row(
     children: [
-      SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: AppButton.primary(
-          viewModel.vehicleToEdit != null ? 'Update Vehicle' : 'Add Vehicle',
-          onPressed: () async {
-            bool success = await viewModel.registerVehicle(context);
-            if (success) {
-              Navigator.of(context).pop(true); // Return success
-            }
-          },
-          width: double.infinity,
-          height: 52,
+      Container(
+        padding: context.paddingS,
+        decoration: BoxDecoration(
+          color: context.primary.withValues(alpha: 0.1),
+          borderRadius: context.radiusMedium,
+        ),
+        child: Icon(
+          icon,
+          color: context.primary,
+          size: 20,
         ),
       ),
-      const SizedBox(height: 12),
-      SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: AppButton.secondary(
-          'Cancel',
-          onPressed: () => Navigator.of(context).pop(),
-          width: double.infinity,
-          height: 52,
-        ),
+      SizedBox(width: context.spacingM),
+      AppText.heading(
+        title,
+        color: context.onSurface,
       ),
     ],
   );

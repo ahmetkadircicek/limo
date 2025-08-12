@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
-enum ButtonVariant { primary, secondary, tertiary }
+enum ButtonVariant { primary, secondary, tertiary, error }
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -54,6 +54,16 @@ class AppButton extends StatelessWidget {
     this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.tertiary;
+
+  const AppButton.error(
+    this.text, {
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.width,
+    this.height,
+    this.isLoading = false,
+  }) : variant = ButtonVariant.error;
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +134,8 @@ class AppButton extends StatelessWidget {
         return context.secondary;
       case ButtonVariant.tertiary:
         return context.tertiary;
+      case ButtonVariant.error:
+        return context.error;
     }
   }
 
@@ -135,6 +147,8 @@ class AppButton extends StatelessWidget {
         return context.onSecondary;
       case ButtonVariant.tertiary:
         return context.onTertiary;
+      case ButtonVariant.error:
+        return context.onError;
     }
   }
 

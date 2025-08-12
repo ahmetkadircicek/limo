@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:limo/core/constants/constants.dart';
 import 'package:limo/feature/map/models/location_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationService {
   static const String _tag = 'LocationService';
@@ -94,38 +95,38 @@ class LocationService {
 
     developer.log('🔍 Searching for location: "$query"', name: _tag);
 
-          try {
-        // 1. Get user's current location
-        final currentLocation = await getCurrentLocation();
+    try {
+      // 1. Get user's current location
+      final currentLocation = await getCurrentLocation();
 
-              // 2. Try different search strategies
-        final List<LocationModel> allResults = <LocationModel>[];
-        
-        // Strategy 1: Universal Places API search (no region restriction)
-        final placesResults =
-            await _searchPlacesAPIUniversal(query, currentLocation);
-        allResults.addAll(placesResults);
-        
-        // Strategy 2: Search near user's location
-        if (currentLocation != null) {
-          final nearbyResults = await _searchNearbyPlaces(query, currentLocation);
-          allResults.addAll(nearbyResults);
-        }
-        
-        // Strategy 3: Address search with Geocoding API
-        final geocodingResults = await _searchGeocodingAPIUniversal(query);
-        allResults.addAll(geocodingResults);
-        
-        // Strategy 4: Split query into parts (e.g., "2 silver kettle" -> "silver kettle")
-        if (query.split(' ').length > 2) {
-          final partialResults =
-              await _searchPartialQuery(query, currentLocation);
-          allResults.addAll(partialResults);
-        }
-        
-        // Strategy 5: Search with keywords only
-        final keywordResults = await _searchByKeywords(query, currentLocation);
-        allResults.addAll(keywordResults);
+      // 2. Try different search strategies
+      final List<LocationModel> allResults = <LocationModel>[];
+
+      // Strategy 1: Universal Places API search (no region restriction)
+      final placesResults =
+          await _searchPlacesAPIUniversal(query, currentLocation);
+      allResults.addAll(placesResults);
+
+      // Strategy 2: Search near user's location
+      if (currentLocation != null) {
+        final nearbyResults = await _searchNearbyPlaces(query, currentLocation);
+        allResults.addAll(nearbyResults);
+      }
+
+      // Strategy 3: Address search with Geocoding API
+      final geocodingResults = await _searchGeocodingAPIUniversal(query);
+      allResults.addAll(geocodingResults);
+
+      // Strategy 4: Split query into parts (e.g., "2 silver kettle" -> "silver kettle")
+      if (query.split(' ').length > 2) {
+        final partialResults =
+            await _searchPartialQuery(query, currentLocation);
+        allResults.addAll(partialResults);
+      }
+
+      // Strategy 5: Search with keywords only
+      final keywordResults = await _searchByKeywords(query, currentLocation);
+      allResults.addAll(keywordResults);
 
       // Duplicate'ları kaldır
       final uniqueResults = <LocationModel>[];
@@ -523,6 +524,72 @@ class LocationService {
       developer.log('💥 Error getting address from coordinates: $e',
           name: _tag);
       return null;
+    }
+  }
+
+  // MARK: - Location Storage Methods
+
+  /// Save location to persistent storage
+  static Future<bool> saveLocationToStorage(LocationModel location) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final locationJson = location.toJson();
+      final success = await prefs.setString(
+          'last_selected_location', json.encode(locationJson));
+
+      if (success) {
+        developer.log('💾 Location saved to storage: ${location.placeName}',
+            name: _tag);
+      } else {
+        developer.log('❌ Failed to save location to storage', name: _tag);
+      }
+
+      return success;
+    } catch (e) {
+      developer.log('💥 Error saving location to storage: $e', name: _tag);
+      return false;
+    }
+  }
+
+  /// Get location from persistent storage
+  static Future<LocationModel?> getLocationFromStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final locationString = prefs.getString('last_selected_location');
+
+      if (locationString != null && locationString.isNotEmpty) {
+        final locationJson =
+            json.decode(locationString) as Map<String, dynamic>;
+        final location = LocationModel.fromJson(locationJson);
+        developer.log(
+            '📱 Location retrieved from storage: ${location.placeName}',
+            name: _tag);
+        return location;
+      }
+
+      developer.log('📱 No location found in storage', name: _tag);
+      return null;
+    } catch (e) {
+      developer.log('💥 Error retrieving location from storage: $e',
+          name: _tag);
+      return null;
+    }
+  }
+
+  /// Clear location from persistent storage
+  static Future<bool> clearLocationFromStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final success = await prefs.remove('last_selected_location');
+
+      if (success) {
+        developer.log('🗑️ Location cleared from storage', name: _tag);
+      }
+
+      return success;
+    } catch (e) {
+      developer.log('💥 Error clearing location from storage: $e', name: _tag);
+      return false;
     }
   }
 }

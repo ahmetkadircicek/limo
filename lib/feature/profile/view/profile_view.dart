@@ -80,20 +80,18 @@ class _ProfileViewState extends State<ProfileView> {
       child: Row(
         children: [
           // Profile Picture
-          CircleAvatar(
-            radius: 40,
-            backgroundImage:
-                userProvider.isLoggedIn && userProvider.userPhotoUrl != null
-                    ? NetworkImage(userProvider.userPhotoUrl!)
-                    : null,
-            backgroundColor: context.primary.withOpacity(0.1),
+
+          Container(
+            width: 80,
+            height: 80,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              color: context.primary.withValues(alpha: 0.1),
+              borderRadius: GeneralConstants.borderRadius,
+            ),
             child: userProvider.isLoggedIn && userProvider.userPhotoUrl != null
-                ? null
-                : Icon(
-                    Icons.person,
-                    size: 40,
-                    color: context.primary,
-                  ),
+                ? Image.network(userProvider.userPhotoUrl!)
+                : null,
           ),
           const SizedBox(width: 20),
 
