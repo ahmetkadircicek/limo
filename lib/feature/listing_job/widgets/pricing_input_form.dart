@@ -123,7 +123,7 @@ class _PricingInputFormState extends State<PricingInputForm> {
           enabled: widget.enabled,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            hintText: '0.00',
+            hintText: '25.00',
             prefixText: '\$ ',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -172,7 +172,7 @@ class _PricingInputFormState extends State<PricingInputForm> {
           enabled: widget.enabled,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            hintText: '0.00',
+            hintText: '2.50',
             prefixText: '\$ ',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

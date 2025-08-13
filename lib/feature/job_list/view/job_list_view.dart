@@ -226,9 +226,9 @@ class _JobListViewState extends State<JobListView> with WidgetsBindingObserver {
   /// Build the search bar
   Widget _buildSearchBar() {
     return AppInput.primary(
+      labelText: 'Search',
       controller: _searchController,
-      hintText: 'Search city, route or company...',
-      prefixIcon: Icons.search,
+      hintText: 'City, route or company...',
     );
   }
 

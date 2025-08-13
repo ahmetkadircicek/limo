@@ -92,7 +92,7 @@ class AppText extends StatelessWidget {
     this.maxLines,
     this.overflow,
   })  : fontSize = 12.0, // DesignTokens.caption
-        fontWeight = FontWeight.w400;
+        fontWeight = FontWeight.w600;
 
   @override
   Widget build(BuildContext context) {

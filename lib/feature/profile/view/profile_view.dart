@@ -180,8 +180,7 @@ class _ProfileViewState extends State<ProfileView> {
                 AppInput.primary(
                   controller: viewModel.phoneController,
                   labelText: 'Phone',
-                  hintText: 'Enter your phone number',
-                  prefixIcon: Icons.phone,
+                  hintText: '+1 (555) 123-4567',
                   keyboardType: TextInputType.phone,
                   enabled: viewModel.isEditing, // Only enabled in edit mode
                   inputFormatters: viewModel.isEditing

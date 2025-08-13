@@ -10,8 +10,7 @@ enum InputVariant { primary, secondary, tertiary }
 
 class AppInput extends StatelessWidget {
   final String? hintText;
-  final String? labelText;
-  final IconData? prefixIcon;
+  final String labelText;
   final IconData? suffixIcon;
   final TextEditingController? controller;
   final bool obscureText;
@@ -21,7 +20,6 @@ class AppInput extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Function(String)? onChanged;
   final VoidCallback? onSuffixIconTap;
-  // Removed maxLines from here
   final InputVariant variant;
   final bool isDropdown;
   final List<String>? dropdownItems;
@@ -32,8 +30,7 @@ class AppInput extends StatelessWidget {
   const AppInput({
     super.key,
     this.hintText,
-    this.labelText,
-    this.prefixIcon,
+    required this.labelText,
     this.suffixIcon,
     this.controller,
     this.obscureText = false,
@@ -43,7 +40,6 @@ class AppInput extends StatelessWidget {
     this.inputFormatters,
     this.onChanged,
     this.onSuffixIconTap,
-    // maxLines removed
     this.variant = InputVariant.primary,
     this.isDropdown = false,
     this.dropdownItems,
@@ -55,8 +51,7 @@ class AppInput extends StatelessWidget {
   const AppInput.primary({
     Key? key,
     String? hintText,
-    String? labelText,
-    IconData? prefixIcon,
+    required String labelText,
     IconData? suffixIcon,
     TextEditingController? controller,
     bool obscureText = false,
@@ -66,12 +61,10 @@ class AppInput extends StatelessWidget {
     List<TextInputFormatter>? inputFormatters,
     Function(String)? onChanged,
     VoidCallback? onSuffixIconTap,
-    // int maxLines = 1, // removed
   }) : this(
           key: key,
           hintText: hintText,
           labelText: labelText,
-          prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           controller: controller,
           obscureText: obscureText,
@@ -81,7 +74,6 @@ class AppInput extends StatelessWidget {
           inputFormatters: inputFormatters,
           onChanged: onChanged,
           onSuffixIconTap: onSuffixIconTap,
-          // maxLines: maxLines, // removed
           variant: InputVariant.primary,
         );
 
@@ -89,8 +81,7 @@ class AppInput extends StatelessWidget {
   const AppInput.secondary({
     Key? key,
     String? hintText,
-    String? labelText,
-    IconData? prefixIcon,
+    required String labelText,
     IconData? suffixIcon,
     TextEditingController? controller,
     bool obscureText = false,
@@ -100,12 +91,10 @@ class AppInput extends StatelessWidget {
     List<TextInputFormatter>? inputFormatters,
     Function(String)? onChanged,
     VoidCallback? onSuffixIconTap,
-    // int maxLines = 1, // removed
   }) : this(
           key: key,
           hintText: hintText,
           labelText: labelText,
-          prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           controller: controller,
           obscureText: obscureText,
@@ -115,7 +104,6 @@ class AppInput extends StatelessWidget {
           inputFormatters: inputFormatters,
           onChanged: onChanged,
           onSuffixIconTap: onSuffixIconTap,
-          // maxLines: maxLines, // removed
           variant: InputVariant.secondary,
         );
 
@@ -123,8 +111,7 @@ class AppInput extends StatelessWidget {
   const AppInput.tertiary({
     Key? key,
     String? hintText,
-    String? labelText,
-    IconData? prefixIcon,
+    required String labelText,
     IconData? suffixIcon,
     TextEditingController? controller,
     bool obscureText = false,
@@ -134,12 +121,10 @@ class AppInput extends StatelessWidget {
     List<TextInputFormatter>? inputFormatters,
     Function(String)? onChanged,
     VoidCallback? onSuffixIconTap,
-    // int maxLines = 1, // removed
   }) : this(
           key: key,
           hintText: hintText,
           labelText: labelText,
-          prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           controller: controller,
           obscureText: obscureText,
@@ -149,7 +134,6 @@ class AppInput extends StatelessWidget {
           inputFormatters: inputFormatters,
           onChanged: onChanged,
           onSuffixIconTap: onSuffixIconTap,
-          // maxLines: maxLines, // removed
           variant: InputVariant.tertiary,
         );
 
@@ -160,8 +144,7 @@ class AppInput extends StatelessWidget {
     String? dropdownValue,
     required Function(String?) onDropdownChanged,
     String? hintText,
-    String? labelText,
-    IconData? prefixIcon,
+    required String labelText,
     bool enabled = true,
     String? Function(String?)? validator,
     InputVariant variant = InputVariant.primary,
@@ -169,7 +152,6 @@ class AppInput extends StatelessWidget {
           key: key,
           hintText: hintText,
           labelText: labelText,
-          prefixIcon: prefixIcon,
           enabled: enabled,
           validator: validator,
           variant: variant,
@@ -184,15 +166,13 @@ class AppInput extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (labelText != null)
-          Padding(
-            padding: PaddingConstants.onlyBottomS,
-            child: AppText.body(
-              labelText!,
-              color: _getLabelColor(context),
-              fontWeight: FontWeight.w600,
-            ),
+        Padding(
+          padding: PaddingConstants.onlyBottomXs,
+          child: AppText.caption(
+            labelText,
+            color: _getLabelColor(context),
           ),
+        ),
         isDropdown ? _buildDropdown(context) : _buildTextField(context),
       ],
     );
@@ -204,13 +184,13 @@ class AppInput extends StatelessWidget {
     Color borderColor;
     switch (variant) {
       case InputVariant.primary:
-        borderColor = context.primary.withOpacity(0.15);
+        borderColor = context.primary.withValues(alpha: 0.15);
         break;
       case InputVariant.secondary:
-        borderColor = context.onSurface.withOpacity(0.12);
+        borderColor = context.onSurface.withValues(alpha: 0.12);
         break;
       case InputVariant.tertiary:
-        borderColor = context.secondary.withOpacity(0.25);
+        borderColor = context.secondary.withValues(alpha: 0.25);
         break;
     }
 
@@ -218,12 +198,9 @@ class AppInput extends StatelessWidget {
       hintText: hintText,
       hintStyle: GoogleFonts.montserrat(
         color: _getHintColor(context),
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
-      prefixIcon: prefixIcon != null
-          ? Icon(prefixIcon, color: _getIconColor(context))
-          : null,
       suffixIcon: suffixIcon != null
           ? IconButton(
               onPressed: onSuffixIconTap,
@@ -232,7 +209,7 @@ class AppInput extends StatelessWidget {
           : null,
       filled: true,
       fillColor: _getBackgroundColor(context),
-      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      contentPadding: PaddingConstants.horizontalL,
       enabledBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
         borderSide: BorderSide(
@@ -243,14 +220,14 @@ class AppInput extends StatelessWidget {
       focusedBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
         borderSide: BorderSide(
-          color: context.primary.withOpacity(0.2),
+          color: context.primary.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
         borderSide: BorderSide(
-          color: Colors.red.withOpacity(0.7),
+          color: Colors.red.withValues(alpha: 0.7),
           width: 1,
         ),
       ),
@@ -328,16 +305,16 @@ class AppInput extends StatelessWidget {
 
   Color _getHintColor(BuildContext context) =>
       variant == InputVariant.primary && _isPrimaryBackground(context)
-          ? context.onPrimary.withOpacity(0.5)
-          : context.onSurface.withOpacity(0.5);
+          ? context.onPrimary.withValues(alpha: 0.5)
+          : context.onSurface.withValues(alpha: 0.5);
 
   Color _getIconColor(BuildContext context) =>
       variant == InputVariant.primary && _isPrimaryBackground(context)
-          ? context.onPrimary.withOpacity(0.6)
-          : context.onSurface.withOpacity(0.6);
+          ? context.onPrimary.withValues(alpha: 0.6)
+          : context.onSurface.withValues(alpha: 0.6);
 
   bool _isPrimaryBackground(BuildContext context) =>
-      _getBackgroundColor(context).value == context.primary.value;
+      _getBackgroundColor(context).toARGB32() == context.primary.toARGB32();
 
   Color _getBackgroundColor(BuildContext context) {
     switch (variant) {
@@ -346,7 +323,7 @@ class AppInput extends StatelessWidget {
       case InputVariant.secondary:
         return context.surface;
       case InputVariant.tertiary:
-        return context.secondary.withOpacity(0.1);
+        return context.secondary.withValues(alpha: 0.1);
     }
   }
 }

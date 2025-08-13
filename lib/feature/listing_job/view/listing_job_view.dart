@@ -96,14 +96,15 @@ class _ListingJobViewState extends State<ListingJobView> {
       children: [
         AppInput.primary(
           controller: _companyNameController,
-          hintText: 'Enter your company name',
-          prefixIcon: Icons.business,
+          labelText: 'Company Name',
+          hintText: 'ABC Logistics Ltd.',
         ),
         const SizedBox(height: 16),
         AppInput.primary(
+          labelText: 'Contact Information',
           controller: _contactInfoController,
-          hintText: 'Enter your phone number',
-          prefixIcon: Icons.phone,
+          hintText: '+1 (555) 123-4567',
+          keyboardType: TextInputType.phone,
         ),
       ],
     );
@@ -116,7 +117,8 @@ class _ListingJobViewState extends State<ListingJobView> {
       icon: Icons.work_outline,
       children: [
         AppInput.dropdown(
-          hintText: 'Select job type',
+          labelText: 'Job Type',
+          hintText: 'Select job type...',
           dropdownItems: [
             'Point to Point',
             'Daily Rental',
@@ -131,7 +133,6 @@ class _ListingJobViewState extends State<ListingJobView> {
               }
             });
           },
-          prefixIcon: Icons.work,
         ),
         const SizedBox(height: 8),
         _buildJobTypeInfoCard(),
@@ -274,8 +275,8 @@ class _ListingJobViewState extends State<ListingJobView> {
       children: [
         AppInput.primary(
           controller: _descriptionController,
-          hintText: 'Additional information about the job...',
-          prefixIcon: Icons.description,
+          labelText: 'Job Description',
+          hintText: 'Job details, requirements...',
         ),
       ],
     );
@@ -545,13 +546,13 @@ class _ListingJobViewState extends State<ListingJobView> {
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: context.primary.withOpacity(0.12),
+            color: context.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
             Icons.location_on,
             size: 16,
-            color: context.primary.withOpacity(0.8),
+            color: context.primary.withValues(alpha: 0.8),
           ),
         ),
         const SizedBox(width: 8),

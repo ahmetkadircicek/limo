@@ -151,7 +151,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
         DropdownButtonFormField<String>(
           value: _selectedBrand,
           decoration: InputDecoration(
-            hintText: 'Select brand (optional)',
+            hintText: 'Select brand...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
@@ -205,7 +205,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
         DropdownButtonFormField<String>(
           value: _selectedVehicleType,
           decoration: InputDecoration(
-            hintText: 'Select vehicle type (optional)',
+            hintText: 'Select type...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
@@ -259,7 +259,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
         DropdownButtonFormField<VehicleCategory>(
           value: _selectedCategory,
           decoration: InputDecoration(
-            hintText: 'Select minimum category',
+            hintText: 'Select category...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
@@ -333,7 +333,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
       enabled: widget.enabled,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-        hintText: 'Hourly rate',
+        hintText: '25.00',
         prefixText: '\$ ',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -368,7 +368,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
       enabled: widget.enabled,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-        hintText: 'Price per mile',
+        hintText: '2.50',
         prefixText: '\$ ',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),

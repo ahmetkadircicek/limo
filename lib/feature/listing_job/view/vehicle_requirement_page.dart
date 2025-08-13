@@ -371,6 +371,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     // Add "Any" option to the beginning of items
     final itemsWithAny = ['Any', ...items];
     return AppInput.dropdown(
+      labelText: label,
       hintText: hint,
       dropdownValue: value ?? 'Any',
       dropdownItems: itemsWithAny,
@@ -378,7 +379,6 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
         // Convert "Any" back to null
         onChanged(newValue == 'Any' ? null : newValue);
       },
-      prefixIcon: icon,
     );
   }
 
@@ -391,10 +391,10 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     required IconData icon,
   }) {
     return AppInput.primary(
+      labelText: label,
       controller: controller,
       hintText: hint,
       onChanged: onChanged,
-      prefixIcon: icon,
     );
   }
 
@@ -407,11 +407,11 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     required IconData icon,
   }) {
     return AppInput.primary(
+      labelText: label,
       controller: controller,
       hintText: hint,
       keyboardType: TextInputType.number,
       onChanged: onChanged,
-      prefixIcon: icon,
     );
   }
 
@@ -424,11 +424,11 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     required IconData icon,
   }) {
     return AppInput.primary(
+      labelText: label,
       controller: controller,
       hintText: hint,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       onChanged: onChanged,
-      prefixIcon: icon,
     );
   }
 

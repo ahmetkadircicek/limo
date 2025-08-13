@@ -79,7 +79,7 @@ class LocationField extends StatelessWidget {
                               ? context.error
                               : enabled
                                   ? context.secondary
-                                  : context.secondary.withOpacity(0.5),
+                                  : context.secondary.withValues(alpha: 0.5),
                           size: GeneralConstants.iconSizeSmall,
                         ),
                       Expanded(
@@ -94,14 +94,16 @@ class LocationField extends StatelessWidget {
                                         GeneralConstants.fontWeightSubtitle,
                                     color: enabled
                                         ? context.onSurface
-                                        : context.secondary.withOpacity(0.5),
+                                        : context.secondary
+                                            .withValues(alpha: 0.5),
                                   ),
                                   if (selectedLocation!.address.isNotEmpty)
                                     AppText.caption(
                                       selectedLocation!.address,
                                       color: enabled
                                           ? context.secondary
-                                          : context.secondary.withOpacity(0.5),
+                                          : context.secondary
+                                              .withValues(alpha: 0.5),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -110,15 +112,15 @@ class LocationField extends StatelessWidget {
                             : AppText.body(
                                 hintText ?? 'Select location',
                                 color: enabled
-                                    ? context.secondary.withOpacity(0.7)
-                                    : context.secondary.withOpacity(0.5),
+                                    ? context.secondary.withValues(alpha: 0.7)
+                                    : context.secondary.withValues(alpha: 0.5),
                               ),
                       ),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: enabled
-                            ? context.secondary.withOpacity(0.7)
-                            : context.secondary.withOpacity(0.3),
+                            ? context.secondary.withValues(alpha: 0.7)
+                            : context.secondary.withValues(alpha: 0.3),
                         size: GeneralConstants.iconSizeSmall,
                       ),
                     ],

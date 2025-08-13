@@ -56,6 +56,7 @@ class PaddingConstants {
   static const EdgeInsets onlyTopL = EdgeInsets.only(top: spacingL);
   static const EdgeInsets onlyTopXl = EdgeInsets.only(top: spacingXl);
 
+  static const EdgeInsets onlyBottomXs = EdgeInsets.only(bottom: spacingXs);
   static const EdgeInsets onlyBottomS = EdgeInsets.only(bottom: spacingS);
   static const EdgeInsets onlyBottomM = EdgeInsets.only(bottom: spacingM);
   static const EdgeInsets onlyBottomL = EdgeInsets.only(bottom: spacingL);

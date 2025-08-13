@@ -64,27 +64,27 @@ Widget _buildVehicleInfoSection(
     icon: Icons.directions_car,
     children: [
       AppInput.primary(
+        labelText: 'License Plate Number',
         controller: viewModel.licencePlateController,
-        hintText: 'Enter license plate number',
-        prefixIcon: Icons.confirmation_number,
-        validator: viewModel.validateLicencePlate,
+        hintText: 'ABC-123',
+        keyboardType: TextInputType.text,
       ),
       SizedBox(height: context.spacingL),
       AppInput.dropdown(
-        hintText: 'Select vehicle brand',
+        labelText: 'Vehicle Brand',
+        hintText: 'Select brand...',
         dropdownItems: VehicleRegistrationViewModel.brandOptions,
         dropdownValue: viewModel.selectedBrand,
         onDropdownChanged: (value) {
           viewModel.setBrand(value);
         },
-        prefixIcon: Icons.branding_watermark,
       ),
       SizedBox(height: context.spacingL),
       AppInput.primary(
+        labelText: 'Vehicle Model',
         controller: viewModel.modelController,
-        hintText: 'Enter vehicle model',
-        prefixIcon: Icons.directions_car,
-        validator: viewModel.validateModel,
+        hintText: 'Sprinter 2500',
+        keyboardType: TextInputType.text,
       ),
     ],
   );
@@ -98,33 +98,33 @@ Widget _buildVehicleSpecsSection(
     icon: Icons.settings,
     children: [
       AppInput.dropdown(
-        hintText: 'Select vehicle type',
+        labelText: 'Vehicle Type',
+        hintText: 'Select type...',
         dropdownItems: VehicleRegistrationViewModel.vehicleTypes,
         dropdownValue: viewModel.selectedVehicleType,
         onDropdownChanged: (value) {
           viewModel.updateVehicleType(value);
         },
-        prefixIcon: Icons.local_shipping,
       ),
       SizedBox(height: context.spacingL),
       AppInput.dropdown(
-        hintText: 'Select year',
+        labelText: 'Year',
+        hintText: 'Select year...',
         dropdownItems: VehicleRegistrationViewModel.yearOptions,
         dropdownValue: viewModel.selectedYear,
         onDropdownChanged: (value) {
           viewModel.updateYear(value);
         },
-        prefixIcon: Icons.calendar_today,
       ),
       SizedBox(height: context.spacingL),
       AppInput.dropdown(
-        hintText: 'Select capacity',
+        labelText: 'Capacity',
+        hintText: 'Select capacity...',
         dropdownItems: VehicleRegistrationViewModel.capacityOptions,
         dropdownValue: viewModel.selectedCapacity,
         onDropdownChanged: (value) {
           viewModel.updateCapacity(value);
         },
-        prefixIcon: Icons.people,
       ),
     ],
   );
@@ -138,13 +138,13 @@ Widget _buildCategorySection(
     icon: Icons.star,
     children: [
       AppInput.dropdown(
-        hintText: 'Select vehicle category',
+        labelText: 'Vehicle Category',
+        hintText: 'Select category...',
         dropdownItems: VehicleRegistrationViewModel.categoryOptions,
         dropdownValue: viewModel.selectedCategory,
         onDropdownChanged: (value) {
           viewModel.setCategory(value);
         },
-        prefixIcon: Icons.category,
       ),
     ],
   );
