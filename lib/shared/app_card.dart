@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/shared/app_text.dart';
 
 enum CardVariant { primary, secondary, tertiary }
 
@@ -112,5 +113,87 @@ class AppCard extends StatelessWidget {
       case CardVariant.tertiary:
         return context.elevationNone; // No shadow - Context'ten
     }
+  }
+}
+
+/// A reusable card widget for displaying information with icon, label, value, and chevron
+/// Perfect for status cards, location cards, and other info display cards
+class AppInfoCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? iconColor;
+  final Color? labelColor;
+  final Color? valueColor;
+  final Color? backgroundColor;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+
+  const AppInfoCard({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.iconColor,
+    this.labelColor,
+    this.valueColor,
+    this.backgroundColor,
+    this.onTap,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cardContent = Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: backgroundColor ?? context.surfaceContainer,
+        borderRadius: context.radiusMedium,
+        border: Border.all(
+          color: context.onSurface.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: iconColor ?? context.primary,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText.caption(
+                  label,
+                  color: labelColor ?? context.onSurface.withValues(alpha: 0.6),
+                ),
+                AppText.caption(
+                  value,
+                  color: valueColor ?? context.onSurface,
+                ),
+              ],
+            ),
+          ),
+          trailing ??
+              Icon(
+                Icons.chevron_right,
+                color: context.onSurface.withValues(alpha: 0.6),
+                size: 20,
+              ),
+        ],
+      ),
+    );
+
+    if (onTap != null) {
+      return GestureDetector(
+        onTap: onTap,
+        child: cardContent,
+      );
+    }
+
+    return cardContent;
   }
 }

@@ -1,5 +1,4 @@
-import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/feature/company_registration/viewmodel/company_registration_view_model.dart';
+import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/feature/home/viewmodel/home_view_model.dart';
 import 'package:limo/feature/login/viewmodel/login_view_model.dart';
 import 'package:limo/feature/profile/viewmodel/profile_view_model.dart';
@@ -19,14 +18,12 @@ class ProviderManager {
 
   List<SingleChildWidget> get providers => [
         // Core providers
-        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => AppStateProvider()),
 
         // Feature ViewModels
         ChangeNotifierProvider(create: (context) => SplashViewModel()),
         ChangeNotifierProvider(create: (context) => LoginViewModel()),
         ChangeNotifierProvider(create: (context) => HomeViewModel()),
-        ChangeNotifierProvider(
-            create: (context) => CompanyRegistrationViewModel()),
         ChangeNotifierProvider(
             create: (context) => VehicleRegistrationViewModel(context)),
         ChangeNotifierProvider(create: (context) => ProfileViewModel()),

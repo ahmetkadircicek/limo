@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
@@ -62,20 +63,20 @@ class AppInput extends StatelessWidget {
     Function(String)? onChanged,
     VoidCallback? onSuffixIconTap,
   }) : this(
-          key: key,
-          hintText: hintText,
-          labelText: labelText,
-          suffixIcon: suffixIcon,
-          controller: controller,
-          obscureText: obscureText,
-          enabled: enabled,
-          validator: validator,
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters,
-          onChanged: onChanged,
-          onSuffixIconTap: onSuffixIconTap,
-          variant: InputVariant.primary,
-        );
+         key: key,
+         hintText: hintText,
+         labelText: labelText,
+         suffixIcon: suffixIcon,
+         controller: controller,
+         obscureText: obscureText,
+         enabled: enabled,
+         validator: validator,
+         keyboardType: keyboardType,
+         inputFormatters: inputFormatters,
+         onChanged: onChanged,
+         onSuffixIconTap: onSuffixIconTap,
+         variant: InputVariant.primary,
+       );
 
   // Factory: Secondary
   const AppInput.secondary({
@@ -92,20 +93,20 @@ class AppInput extends StatelessWidget {
     Function(String)? onChanged,
     VoidCallback? onSuffixIconTap,
   }) : this(
-          key: key,
-          hintText: hintText,
-          labelText: labelText,
-          suffixIcon: suffixIcon,
-          controller: controller,
-          obscureText: obscureText,
-          enabled: enabled,
-          validator: validator,
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters,
-          onChanged: onChanged,
-          onSuffixIconTap: onSuffixIconTap,
-          variant: InputVariant.secondary,
-        );
+         key: key,
+         hintText: hintText,
+         labelText: labelText,
+         suffixIcon: suffixIcon,
+         controller: controller,
+         obscureText: obscureText,
+         enabled: enabled,
+         validator: validator,
+         keyboardType: keyboardType,
+         inputFormatters: inputFormatters,
+         onChanged: onChanged,
+         onSuffixIconTap: onSuffixIconTap,
+         variant: InputVariant.secondary,
+       );
 
   // Factory: Tertiary
   const AppInput.tertiary({
@@ -122,20 +123,20 @@ class AppInput extends StatelessWidget {
     Function(String)? onChanged,
     VoidCallback? onSuffixIconTap,
   }) : this(
-          key: key,
-          hintText: hintText,
-          labelText: labelText,
-          suffixIcon: suffixIcon,
-          controller: controller,
-          obscureText: obscureText,
-          enabled: enabled,
-          validator: validator,
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters,
-          onChanged: onChanged,
-          onSuffixIconTap: onSuffixIconTap,
-          variant: InputVariant.tertiary,
-        );
+         key: key,
+         hintText: hintText,
+         labelText: labelText,
+         suffixIcon: suffixIcon,
+         controller: controller,
+         obscureText: obscureText,
+         enabled: enabled,
+         validator: validator,
+         keyboardType: keyboardType,
+         inputFormatters: inputFormatters,
+         onChanged: onChanged,
+         onSuffixIconTap: onSuffixIconTap,
+         variant: InputVariant.tertiary,
+       );
 
   // Factory: Dropdown
   const AppInput.dropdown({
@@ -149,17 +150,17 @@ class AppInput extends StatelessWidget {
     String? Function(String?)? validator,
     InputVariant variant = InputVariant.primary,
   }) : this(
-          key: key,
-          hintText: hintText,
-          labelText: labelText,
-          enabled: enabled,
-          validator: validator,
-          variant: variant,
-          isDropdown: true,
-          dropdownItems: dropdownItems,
-          dropdownValue: dropdownValue,
-          onDropdownChanged: onDropdownChanged,
-        );
+         key: key,
+         hintText: hintText,
+         labelText: labelText,
+         enabled: enabled,
+         validator: validator,
+         variant: variant,
+         isDropdown: true,
+         dropdownItems: dropdownItems,
+         dropdownValue: dropdownValue,
+         onDropdownChanged: onDropdownChanged,
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -168,10 +169,7 @@ class AppInput extends StatelessWidget {
       children: [
         Padding(
           padding: PaddingConstants.onlyBottomXs,
-          child: AppText.caption(
-            labelText,
-            color: _getLabelColor(context),
-          ),
+          child: AppText.caption(labelText, color: _getLabelColor(context)),
         ),
         isDropdown ? _buildDropdown(context) : _buildTextField(context),
       ],
@@ -201,21 +199,19 @@ class AppInput extends StatelessWidget {
         fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
-      suffixIcon: suffixIcon != null
-          ? IconButton(
-              onPressed: onSuffixIconTap,
-              icon: Icon(suffixIcon, color: _getIconColor(context)),
-            )
-          : null,
+      suffixIcon:
+          suffixIcon != null
+              ? IconButton(
+                onPressed: onSuffixIconTap,
+                icon: Icon(suffixIcon, color: _getIconColor(context)),
+              )
+              : null,
       filled: true,
       fillColor: _getBackgroundColor(context),
       contentPadding: PaddingConstants.horizontalL,
       enabledBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(
-          color: borderColor,
-          width: 1.2,
-        ),
+        borderSide: BorderSide(color: borderColor, width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
@@ -233,24 +229,15 @@ class AppInput extends StatelessWidget {
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(
-          color: Colors.red,
-          width: 1,
-        ),
+        borderSide: BorderSide(color: Colors.red, width: 1),
       ),
       border: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(
-          color: borderColor,
-          width: 1,
-        ),
+        borderSide: BorderSide(color: borderColor, width: 1),
       ),
       disabledBorder: OutlineInputBorder(
         borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(
-          color: context.surfaceContainer,
-          width: 1,
-        ),
+        borderSide: BorderSide(color: context.surfaceContainer, width: 1),
       ),
     );
   }
@@ -279,17 +266,27 @@ class AppInput extends StatelessWidget {
       onChanged: enabled ? onDropdownChanged : null,
       validator: validator,
       isExpanded: true,
-      style: GoogleFonts.nunito(
+      style: GoogleFonts.montserrat(
         color: _getTextColor(context),
-        fontSize: 16,
+        fontSize:
+            DesignTokens.bodyLarge.fontSize, // 16px - consistent with theme
+        fontWeight: FontWeight.w400, // Normal weight - consistent with theme
+        height: DesignTokens.bodyLarge.height, // 22/16 - consistent line height
       ),
       decoration: _baseDecoration(context),
-      items: dropdownItems?.map((value) {
-        return DropdownMenuItem(
-          value: value,
-          child: AppText.body(value, overflow: TextOverflow.ellipsis),
-        );
-      }).toList(),
+      items:
+          dropdownItems?.map((value) {
+            return DropdownMenuItem(
+              value: value,
+              child: AppText.body(value, overflow: TextOverflow.ellipsis),
+            );
+          }).toList(),
+      menuMaxHeight: 200, // Consistent with theme maximum size
+      dropdownColor:
+          DesignTokens.surface100, // Consistent with theme background
+      borderRadius: BorderRadius.circular(
+        DesignTokens.radiusMedium,
+      ), // Ensure rounded corners
     );
   }
 

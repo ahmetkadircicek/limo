@@ -101,6 +101,23 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.surfaceContainer,
+      appBar: AppBar(
+        backgroundColor: context.surface,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: context.onSurface),
+          onPressed: () {
+            // Form'u sıfırla ve geri git
+            _resetForm();
+            context.pop();
+          },
+        ),
+        title: AppText.heading(
+          'Vehicle Requirements',
+          color: context.onSurface,
+        ),
+        centerTitle: true,
+      ),
       body: _buildBody(),
     );
   }
@@ -114,9 +131,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
           spacing: PaddingConstants.spacingL,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildFlexibleSection(),
             _buildVehicleSpecsSection(),
-            _buildCategorySection(),
             _buildRequirementsSection(),
             _buildPricingSection(),
             _buildActionButtons(),
@@ -127,70 +142,35 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   }
 
   Widget _buildActionButtons() {
-    return Column(
-      children: [
-        AppButton.primary(
-          'Save',
-          onPressed: _saveRequirement,
-          width: double.infinity,
-          height: 52,
-        ),
-        SizedBox(height: PaddingConstants.spacingL),
-        AppButton.secondary(
-          'Cancel',
-          onPressed: () => context.pop(),
-          width: double.infinity,
-          height: 52,
-        ),
-      ],
+    return AppButton.primary(
+      'Save',
+      onPressed: _saveRequirement,
+      width: double.infinity,
+      height: 52,
     );
   }
 
-  // Build flexible requirements header section
-  Widget _buildFlexibleSection() {
-    return AppCard.primary(
-      padding: PaddingConstants.allXl,
-      child: Row(
-        children: [
-          Container(
-            padding: PaddingConstants.allM,
-            decoration: BoxDecoration(
-              color: context.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.settings,
-              color: context.primary,
-              size: 20,
-            ),
-          ),
-          SizedBox(width: PaddingConstants.spacingL),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppText.heading(
-                  'Vehicle Requirements',
-                  color: context.onSurface,
-                ),
-                AppText.bodySmall(
-                  'Specify vehicle criteria for your job posting',
-                  color: context.onSurface.withValues(alpha: 0.7),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Build vehicle specifications section (brand and type)
+  // Build vehicle specifications section (category, brand and type)
   Widget _buildVehicleSpecsSection() {
     return _buildSection(
       title: 'Vehicle Specifications',
-      icon: Icons.directions_car,
       children: [
+        _buildDropdownField(
+          label: 'Category',
+          hint: 'Select minimum category',
+          value: _selectedCategory?.displayName,
+          items: VehicleCategory.values.map((c) => c.displayName).toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedCategory = VehicleCategory.values.firstWhere(
+                (c) => c.displayName == value,
+                orElse: () => VehicleCategory.values.first,
+              );
+            });
+          },
+          icon: Icons.category,
+        ),
+        SizedBox(height: PaddingConstants.spacingL),
         _buildDropdownField(
           label: 'Brand',
           hint: 'Select brand (optional)',
@@ -224,7 +204,6 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   Widget _buildRequirementsSection() {
     return _buildSection(
       title: 'Requirements',
-      icon: Icons.assignment,
       children: [
         _buildNumberInputField(
           label: 'Min Capacity',
@@ -253,31 +232,6 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     );
   }
 
-  // Build category section (prominent placement)
-  Widget _buildCategorySection() {
-    return _buildSection(
-      title: 'Vehicle Category',
-      icon: Icons.category,
-      children: [
-        _buildDropdownField(
-          label: 'Category',
-          hint: 'Select minimum category',
-          value: _selectedCategory?.displayName,
-          items: VehicleCategory.values.map((c) => c.displayName).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedCategory = VehicleCategory.values.firstWhere(
-                (c) => c.displayName == value,
-                orElse: () => VehicleCategory.values.first,
-              );
-            });
-          },
-          icon: Icons.category,
-        ),
-      ],
-    );
-  }
-
   // Build pricing section
   Widget _buildPricingSection() {
     return AppCard.primary(
@@ -285,7 +239,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('Pricing', Icons.attach_money),
+          _buildSectionHeader('Pricing'),
           SizedBox(height: PaddingConstants.spacingXl),
           _buildPriceInputField(
             label: 'Price per Mile',
@@ -318,7 +272,6 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   // Build reusable section container
   Widget _buildSection({
     required String title,
-    required IconData icon,
     required List<Widget> children,
   }) {
     return AppCard.primary(
@@ -326,7 +279,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader(title, icon),
+          _buildSectionHeader(title),
           SizedBox(height: PaddingConstants.spacingXl),
           ...children,
         ],
@@ -334,28 +287,11 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     );
   }
 
-  // Build section header with icon and title
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
-      children: [
-        Container(
-          padding: PaddingConstants.allM,
-          decoration: BoxDecoration(
-            color: context.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: context.primary,
-            size: 20,
-          ),
-        ),
-        SizedBox(width: PaddingConstants.spacingL),
-        AppText.heading(
-          title,
-          color: context.onSurface,
-        ),
-      ],
+  // Build section header with title only
+  Widget _buildSectionHeader(String title) {
+    return AppText.heading(
+      title,
+      color: context.onSurface,
     );
   }
 
@@ -379,22 +315,6 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
         // Convert "Any" back to null
         onChanged(newValue == 'Any' ? null : newValue);
       },
-    );
-  }
-
-  // Build text input field
-  Widget _buildTextField({
-    required String label,
-    required String hint,
-    required TextEditingController controller,
-    required Function(String) onChanged,
-    required IconData icon,
-  }) {
-    return AppInput.primary(
-      labelText: label,
-      controller: controller,
-      hintText: hint,
-      onChanged: onChanged,
     );
   }
 
@@ -451,17 +371,36 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     context.pop();
   }
 
+  // Reset form to initial state
+  void _resetForm() {
+    setState(() {
+      _selectedBrand = null;
+      _selectedVehicleType = null;
+      _minCapacity = null;
+      _minYear = null;
+      _selectedCategory = null;
+      _pricePerMile = null;
+      _pricePerHour = null;
+
+      // Reset controllers
+      _minCapacityController.clear();
+      _minYearController.clear();
+      _pricePerMileController.clear();
+      _pricePerHourController.clear();
+    });
+  }
+
   // Migrate old Turkish vehicle types to new English ones
   String? _migrateVehicleType(String? oldType) {
     if (oldType == null) return null;
 
     const Map<String, String> typeMapping = {
-      'Kamyon': 'Truck',
-      'Tır': 'Semi-Truck',
+      'Truck': 'Truck',
+      'Semi-Truck': 'Semi-Truck',
       'Pickup': 'Pickup Truck',
-      'Traktör': 'Tractor',
-      'Minibüs': 'Minibus',
-      'Otobüs': 'Bus',
+      'Tractor': 'Tractor',
+      'Minibus': 'Minibus',
+      'Bus': 'Bus',
       'Sedan': 'Sedan',
       'SUV': 'SUV',
       'Van': 'Van',

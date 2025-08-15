@@ -33,7 +33,7 @@ class OAuthButtonsSection extends StatelessWidget {
 
   Widget _buildSectionTitle(BuildContext context) {
     return AppText.subtitle(
-      'Hesabınıza giriş yapın',
+      'Sign in to your account',
       color: Colors.white,
       textAlign: TextAlign.center,
     );
@@ -42,26 +42,26 @@ class OAuthButtonsSection extends StatelessWidget {
   Widget _buildGoogleButton(BuildContext context, LoginViewModel viewModel) {
     return OAuthButton(
       icon: FontAwesomeIcons.google,
-      text: 'Google ile devam et',
+      text: 'Continue with Google',
       backgroundColor: const Color(0xFFEA4335),
       borderColor: const Color(0xFFEA4335),
       textColor: Colors.white,
       iconColor: Colors.white,
       isLoading: viewModel.isGoogleLoading,
-      onPressed: viewModel.signInWithGoogle,
+      onPressed: () => viewModel.signInWithGoogle(context),
     );
   }
 
   Widget _buildAppleButton(BuildContext context, LoginViewModel viewModel) {
     return OAuthButton(
       icon: FontAwesomeIcons.apple,
-      text: 'Apple ile devam et',
+      text: 'Continue with Apple',
       backgroundColor: Colors.white,
       borderColor: Colors.white,
       textColor: Colors.black,
       iconColor: Colors.black,
       isLoading: viewModel.isAppleLoading,
-      onPressed: viewModel.signInWithApple,
+      onPressed: () => viewModel.signInWithApple(context),
     );
   }
 
@@ -77,7 +77,7 @@ class OAuthButtonsSection extends StatelessWidget {
         Padding(
           padding: context.horizontalL,
           child: AppText.bodySmall(
-            'VEYA',
+            'OR',
             color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
@@ -94,13 +94,13 @@ class OAuthButtonsSection extends StatelessWidget {
   Widget _buildGuestButton(BuildContext context, LoginViewModel viewModel) {
     return OAuthButton(
       icon: Icons.person_outline_rounded,
-      text: 'Misafir olarak devam et',
+      text: 'Continue as Guest',
       backgroundColor: Colors.white.withValues(alpha: 0.08),
       borderColor: Colors.white.withValues(alpha: 0.18),
       textColor: Colors.white,
       iconColor: Colors.white.withValues(alpha: 0.85),
       isLoading: viewModel.isGuestLoading,
-      onPressed: viewModel.continueAsGuest,
+      onPressed: () => viewModel.continueAsGuest(context),
     );
   }
 }

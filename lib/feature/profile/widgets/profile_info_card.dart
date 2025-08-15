@@ -53,7 +53,7 @@ class ProfileInfoCard extends StatelessWidget {
                   label,
                   color: labelColor ?? context.onSurface.withValues(alpha: 0.6),
                 ),
-                AppText.body(
+                AppText.caption(
                   value,
                   color: valueColor ?? context.onSurface,
                 ),
@@ -73,6 +73,12 @@ class ProfileInfoCard extends StatelessWidget {
                 color: context.primary,
               ),
             ),
+          const SizedBox(width: 8),
+          Icon(
+            Icons.chevron_right,
+            color: context.onSurface.withValues(alpha: 0.6),
+            size: 20,
+          ),
         ],
       ),
     );

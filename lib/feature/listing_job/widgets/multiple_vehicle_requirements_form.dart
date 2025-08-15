@@ -5,7 +5,7 @@ import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:limo/shared/app_button.dart';
-import 'package:limo/shared/app_text.dart';
+import 'package:limo/shared/app_card.dart';
 
 class MultipleVehicleRequirementsForm extends StatefulWidget {
   final List<VehicleRequirement> initialRequirements;
@@ -115,47 +115,27 @@ class _MultipleVehicleRequirementsFormState
 
   // Build individual requirement card
   Widget _buildRequirementCard(VehicleRequirement requirement, int index) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.surface,
-        borderRadius: GeneralConstants.borderRadius,
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-        ),
-      ),
-      child: Column(
-        children: [
-          _buildRequirementHeader(requirement, index),
-          if (!requirement.isFlexible) ...[
-            const Divider(height: 1),
-            _buildRequirementDetails(requirement),
-          ],
-        ],
-      ),
-    );
-  }
-
-  // Build requirement header with title and actions
-  Widget _buildRequirementHeader(VehicleRequirement requirement, int index) {
-    return Container(
-      color: context.surfaceContainer,
-      child: Padding(
-        padding: PaddingConstants.allM,
-        child: Row(
-          children: [
-            _buildRequirementIcon(requirement),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildRequirementTitle(requirement, index),
-            ),
-            if (widget.enabled) ...[
-              _buildEditButton(index),
-              const SizedBox(width: 8),
-              _buildRemoveButton(index),
-            ],
-          ],
-        ),
-      ),
+    return AppInfoCard(
+      icon: requirement.isFlexible ? Icons.check_circle : Icons.directions_car,
+      label: 'Vehicle Requirement ${index + 1}',
+      value: requirement.isFlexible
+          ? 'Flexible Requirements'
+          : 'Specific Requirements',
+      iconColor: requirement.isFlexible ? context.primary : context.secondary,
+      valueColor: requirement.isFlexible
+          ? context.primary
+          : context.onSurface.withValues(alpha: 0.7),
+      onTap: () => _showEditVehicleRequirement(index),
+      trailing: widget.enabled
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildEditButton(index),
+                const SizedBox(width: 8),
+                _buildRemoveButton(index),
+              ],
+            )
+          : null,
     );
   }
 
@@ -174,25 +154,6 @@ class _MultipleVehicleRequirementsFormState
         color: requirement.isFlexible ? context.primary : context.secondary,
         size: 20,
       ),
-    );
-  }
-
-  // Build requirement title and subtitle
-  Widget _buildRequirementTitle(VehicleRequirement requirement, int index) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppText.bodySmall(
-          'Vehicle Requirement ${index + 1}',
-          color: context.onSurface,
-        ),
-        AppText.bodySmall(
-          requirement.isFlexible
-              ? 'Flexible Requirements'
-              : 'Specific Requirements',
-          color: context.onSurface.withValues(alpha: 0.5),
-        ),
-      ],
     );
   }
 
@@ -256,93 +217,6 @@ class _MultipleVehicleRequirementsFormState
         ),
       ),
     );
-  }
-
-  // Build requirement details for specific requirements
-  Widget _buildRequirementDetails(VehicleRequirement requirement) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDetailRow('Brand', requirement.specificBrand ?? 'Any'),
-          _buildDetailRow('Type', requirement.specificVehicleType ?? 'Any'),
-          _buildDetailRow(
-              'Category', requirement.minimumCategory?.name ?? 'Any'),
-          if (requirement.minimumCapacity != null ||
-              requirement.maximumCapacity != null)
-            _buildDetailRow('Capacity', _buildCapacityText(requirement)),
-          if (requirement.minimumYear != null ||
-              requirement.maximumYear != null)
-            _buildDetailRow('Year', _buildYearText(requirement)),
-          if (requirement.hourlyRate != null ||
-              requirement.pricePerMile != null)
-            _buildDetailRow('Pricing', _buildPricingText(requirement)),
-        ],
-      ),
-    );
-  }
-
-  // Build detail row with label and value
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: AppText.bodySmall(
-              '$label:',
-              color: context.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
-          Expanded(
-            child: AppText.bodySmall(
-              value,
-              color: context.onSurface,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Build capacity text
-  String _buildCapacityText(VehicleRequirement requirement) {
-    if (requirement.minimumCapacity != null &&
-        requirement.maximumCapacity != null) {
-      return '${requirement.minimumCapacity} - ${requirement.maximumCapacity} passengers';
-    } else if (requirement.minimumCapacity != null) {
-      return 'Min ${requirement.minimumCapacity} passengers';
-    } else if (requirement.maximumCapacity != null) {
-      return 'Max ${requirement.maximumCapacity} passengers';
-    }
-    return 'Any capacity';
-  }
-
-  // Build year text
-  String _buildYearText(VehicleRequirement requirement) {
-    if (requirement.minimumYear != null && requirement.maximumYear != null) {
-      return '${requirement.minimumYear} - ${requirement.maximumYear}';
-    } else if (requirement.minimumYear != null) {
-      return 'Min ${requirement.minimumYear}';
-    } else if (requirement.maximumYear != null) {
-      return 'Max ${requirement.maximumYear}';
-    }
-    return 'Any year';
-  }
-
-  // Build pricing text
-  String _buildPricingText(VehicleRequirement requirement) {
-    final parts = <String>[];
-    if (requirement.hourlyRate != null) {
-      parts.add('\$${requirement.hourlyRate}/hour');
-    }
-    if (requirement.pricePerMile != null) {
-      parts.add('\$${requirement.pricePerMile}/mile');
-    }
-    return parts.isEmpty ? 'Not specified' : parts.join(', ');
   }
 
   // Build add new requirement button

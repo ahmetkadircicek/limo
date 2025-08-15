@@ -264,7 +264,7 @@ class _JobListViewState extends State<JobListView> with WidgetsBindingObserver {
   BoxDecoration _buildJobCardDecoration() {
     return BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: context.radiusMedium,
       boxShadow: [
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.04),

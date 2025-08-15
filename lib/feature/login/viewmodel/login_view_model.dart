@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/core/init/navigation/navigation_service.dart';
-import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/core/services/google_auth_service.dart';
 import 'package:limo/shared/app_components.dart';
-import 'package:limo/shared/app_text.dart';
 import 'package:provider/provider.dart';
 
 /// OAuth-focused Login ViewModel
@@ -22,42 +20,65 @@ class LoginViewModel extends ChangeNotifier {
       _isGoogleLoading || _isAppleLoading || _isGuestLoading;
 
   /// Sign in with Google OAuth
-  Future<void> signInWithGoogle() async {
+  Future<void> signInWithGoogle(BuildContext context) async {
     if (isAnyLoading) return;
 
     _setGoogleLoading(true);
+    debugPrint('🔐 [AUTH] Starting Google Sign-In process...');
 
     try {
+      debugPrint('🔐 [AUTH] Calling GoogleAuthService.signIn()...');
       final user = await GoogleAuthService.signIn();
-      if (user != null) {
-        // Create user model and set it in provider
-        final userModel = await GoogleAuthService.getUserModel();
-        if (userModel != null) {
-          // Set user in provider (this will be accessed from main.dart)
-          final context = NavigationService.instance.navigatorKey.currentContext;
-          if (context != null) {
-            Provider.of<UserProvider>(context, listen: false)
-                .setUser(userModel);
-          }
-        }
 
-        // Successful Google Sign-In
-        await _handleSuccessfulLogin(
-          user.displayName ?? 'Google User',
-        );
+      if (user != null) {
+        debugPrint('✅ [AUTH] Google Sign-In successful for: ${user.email}');
+        debugPrint('🔐 [AUTH] Google ID received: ${user.id}');
+
+        // Get Google ID for authentication
+        final googleId = user.id;
+        if (googleId.isNotEmpty) {
+          debugPrint(
+            '🔐 [AUTH] Google ID is valid, proceeding to backend authentication...',
+          );
+
+          // Authenticate with backend using Google ID
+          final success = await Provider.of<AppStateProvider>(
+            context,
+            listen: false,
+          ).authenticateWithGoogle(googleId);
+
+          if (success) {
+            debugPrint('✅ [AUTH] Backend authentication successful!');
+            // Successful authentication
+            await _handleSuccessfulLogin(
+              context,
+              user.displayName ?? 'Google User',
+            );
+          } else {
+            debugPrint('❌ [AUTH] Backend authentication failed');
+            // Authentication failed
+            _handleLoginError(context, 'Backend authentication failed');
+          }
+        } else {
+          debugPrint('❌ [AUTH] Invalid Google ID received');
+          _handleLoginError(context, 'Invalid Google ID');
+        }
       } else {
+        debugPrint('❌ [AUTH] Google Sign-In cancelled or failed');
         // User cancelled or error
-        _handleLoginError('Google giriş iptal edildi');
+        _handleLoginError(context, 'Google sign-in cancelled');
       }
     } catch (error) {
-      _handleLoginError('Google giriş hatası: $error');
+      debugPrint('❌ [AUTH] Google Sign-In error: $error');
+      _handleLoginError(context, 'Google sign-in error: $error');
     } finally {
       _setGoogleLoading(false);
+      debugPrint('🔐 [AUTH] Google Sign-In process completed');
     }
   }
 
   /// Sign in with Apple OAuth
-  Future<void> signInWithApple() async {
+  Future<void> signInWithApple(BuildContext context) async {
     if (isAnyLoading) return;
 
     _setAppleLoading(true);
@@ -69,20 +90,20 @@ class LoginViewModel extends ChangeNotifier {
       // TODO: Implement actual Apple Sign-In
       // final SignInWithAppleResult result = await SignInWithApple.getAppleIDCredential();
       // if (result.success) {
-      //   await _handleSuccessfulLogin(result.user);
+      //   await _handleSuccessfulLogin(context, result.user);
       // }
 
       // For now, simulate successful login
-      await _handleSuccessfulLogin('Apple User');
+      await _handleSuccessfulLogin(context, 'Apple User');
     } catch (error) {
-      _handleLoginError('Apple giriş hatası: $error');
+      _handleLoginError(context, 'Apple sign-in error: $error');
     } finally {
       _setAppleLoading(false);
     }
   }
 
   /// Continue as guest (limited access)
-  Future<void> continueAsGuest() async {
+  Future<void> continueAsGuest(BuildContext context) async {
     if (isAnyLoading) return;
 
     _setGuestLoading(true);
@@ -92,58 +113,40 @@ class LoginViewModel extends ChangeNotifier {
       await Future.delayed(const Duration(seconds: 1));
 
       // Navigate to home with guest mode
-      await _navigateToHome(isGuest: true);
+      await _navigateToHome(context, isGuest: true);
     } catch (error) {
-      _handleLoginError('Misafir girişi hatası: $error');
+      _handleLoginError(context, 'Guest login error: $error');
     } finally {
       _setGuestLoading(false);
     }
   }
 
   /// Handle successful login for any method
-  Future<void> _handleSuccessfulLogin(String userInfo) async {
-    final context = NavigationService.instance.navigatorKey.currentContext;
-    if (context == null) return;
-
+  Future<void> _handleSuccessfulLogin(
+    BuildContext context,
+    String userInfo,
+  ) async {
     // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const AppText.body('Başarıyla giriş yapıldı! Hoş geldiniz.'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
+    AppSnackbar.showSuccess(
+      context,
+      message: 'Successfully signed in! Welcome.',
     );
 
     // Navigate to home
-    await _navigateToHome();
+    await _navigateToHome(context);
   }
 
   /// Handle login errors
-  void _handleLoginError(String errorMessage) {
-    final context = NavigationService.instance.navigatorKey.currentContext;
-    if (context == null) return;
-
+  void _handleLoginError(BuildContext context, String errorMessage) {
     // Show error dialog
-    AppDialogExtension(context).showErrorDialog(
-      errorMessage,
-    );
+    AppDialogExtension(context).showErrorDialog(errorMessage);
   }
 
   /// Navigate to home screen
-  Future<void> _navigateToHome({bool isGuest = false}) async {
-    final context = NavigationService.instance.navigatorKey.currentContext;
-    if (context == null) return;
-
+  Future<void> _navigateToHome(
+    BuildContext context, {
+    bool isGuest = false,
+  }) async {
     // Add small delay for better UX
     await Future.delayed(const Duration(milliseconds: 500));
 

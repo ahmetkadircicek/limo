@@ -234,17 +234,17 @@ class VehicleRequirement {
 
     // Map old Turkish values to new English ones
     switch (oldType) {
-      case 'Kamyon':
+      case 'Truck':
         return 'Truck';
-      case 'Tır':
+      case 'Semi-Truck':
         return 'Semi-Truck';
-      case 'Kamyonet':
+      case 'Pickup Truck':
         return 'Pickup Truck';
-      case 'Çekici':
+      case 'Tractor':
         return 'Tractor';
-      case 'Minibüs':
+      case 'Minibus':
         return 'Minibus';
-      case 'Otobüs':
+      case 'Bus':
         return 'Bus';
       default:
         // If it's already in English or unknown, return as is
@@ -258,17 +258,17 @@ class VehicleRequirement {
 
     // Map old Turkish values to new English ones
     switch (oldColor) {
-      case 'Beyaz':
+      case 'White':
         return 'White';
-      case 'Siyah':
+      case 'Black':
         return 'Black';
-      case 'Gri':
+      case 'Gray':
         return 'Gray';
-      case 'Kırmızı':
+      case 'Red':
         return 'Red';
-      case 'Mavi':
+      case 'Blue':
         return 'Blue';
-      case 'Yeşil':
+      case 'Green':
         return 'Green';
       default:
         // If it's already in English or unknown, return as is

@@ -6,6 +6,7 @@ import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:limo/shared/app_button.dart';
+import 'package:limo/shared/app_snackbar.dart';
 import 'package:limo/shared/app_text.dart';
 
 class JobDetailsPage extends StatefulWidget {
@@ -705,23 +706,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   }
 
   void _showApplyMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const AppText.body('Başvuru özelliği yakında eklenecek'),
-        backgroundColor: context.primary,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
+    AppSnackbar.showInfo(context,
+        message: 'Başvuru özelliği yakında eklenecek');
   }
 
   String _getJobTypeDisplayText(JobType? jobType) {
@@ -779,23 +765,9 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           child: AppButton.secondary(
             'Contact',
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const AppText.body(
-                      'Contact information will be displayed'),
-                  backgroundColor: Colors.blue,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.only(
-                    top: 16,
-                    left: 16,
-                    right: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 8,
-                  dismissDirection: DismissDirection.up,
-                ),
+              AppSnackbar.showInfo(
+                context,
+                message: 'Contact information will be displayed',
               );
             },
             icon: Icons.phone,
@@ -809,23 +781,9 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           child: AppButton.secondary(
             'Share',
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      const AppText.body('Sharing options will be displayed'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.only(
-                    top: 16,
-                    left: 16,
-                    right: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 8,
-                  dismissDirection: DismissDirection.up,
-                ),
+              AppSnackbar.showSuccess(
+                context,
+                message: 'Sharing options will be displayed',
               );
             },
             icon: Icons.share,

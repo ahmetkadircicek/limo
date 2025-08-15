@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/pickup_type_enum.dart';
@@ -31,6 +33,9 @@ class _ListingJobViewState extends State<ListingJobView> {
 
   // Form values
   String? _selectedJobType = 'Point to Point';
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+  int _durationValue = 1;
   LocationModel? _fromLocation;
   LocationModel? _toLocation;
   List<VehicleRequirement> _vehicleRequirements = [];
@@ -64,6 +69,8 @@ class _ListingJobViewState extends State<ListingJobView> {
                             SizedBox(height: PaddingConstants.spacingXl),
                             _buildJobTypeSection(),
                             SizedBox(height: PaddingConstants.spacingXl),
+                            _buildDateTimeSection(),
+                            SizedBox(height: PaddingConstants.spacingXl),
                             _buildLocationSection(),
                             SizedBox(height: PaddingConstants.spacingXl),
                             _buildVehicleSection(),
@@ -72,8 +79,10 @@ class _ListingJobViewState extends State<ListingJobView> {
                             SizedBox(height: PaddingConstants.spacingXxl),
                             _buildActionButtons(),
                             SizedBox(
-                                height: PaddingConstants.spacingXxl +
-                                    PaddingConstants.spacingL),
+                              height:
+                                  PaddingConstants.spacingXxl +
+                                  PaddingConstants.spacingL,
+                            ),
                           ],
                         ),
                       ),
@@ -92,7 +101,6 @@ class _ListingJobViewState extends State<ListingJobView> {
   Widget _buildCompanySection() {
     return _buildSection(
       title: 'Company Information',
-      icon: Icons.business_outlined,
       children: [
         AppInput.primary(
           controller: _companyNameController,
@@ -114,16 +122,11 @@ class _ListingJobViewState extends State<ListingJobView> {
   Widget _buildJobTypeSection() {
     return _buildSection(
       title: 'Job Type',
-      icon: Icons.work_outline,
       children: [
         AppInput.dropdown(
           labelText: 'Job Type',
           hintText: 'Select job type...',
-          dropdownItems: [
-            'Point to Point',
-            'Daily Rental',
-            'Hourly Rental',
-          ],
+          dropdownItems: ['Point to Point', 'Hourly Rental', 'Daily Rental'],
           dropdownValue: _selectedJobType,
           onDropdownChanged: (value) {
             setState(() {
@@ -147,9 +150,7 @@ class _ListingJobViewState extends State<ListingJobView> {
       decoration: BoxDecoration(
         color: context.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -172,41 +173,165 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
+  // Build date and time selection section
+  Widget _buildDateTimeSection() {
+    return _buildSection(
+      title: 'Date & Time',
+      children: [
+        // Date Selection
+        _buildDateField(),
+        const SizedBox(height: 16),
+
+        // Time Selection
+        _buildTimeField(),
+        const SizedBox(height: 16),
+
+        // Duration Value Selection based on Job Type
+        AppInput.dropdown(
+          labelText: _selectedJobType == 'Hourly Rental' ? 'Hours' : 'Days',
+          hintText: 'Select duration...',
+          dropdownItems:
+              _selectedJobType == 'Hourly Rental'
+                  ? List.generate(23, (index) => (index + 1).toString())
+                  : List.generate(30, (index) => (index + 1).toString()),
+          dropdownValue: _durationValue.toString(),
+          onDropdownChanged: (value) {
+            setState(() {
+              _durationValue = int.parse(value!);
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  // Build date selection field using AppInfoCard
+  Widget _buildDateField() {
+    return AppInfoCard(
+      icon: Icons.calendar_today,
+      label: 'Pickup Date',
+      onTap: () => _selectDate(context),
+      value:
+          _selectedDate != null
+              ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+              : 'Select pickup date',
+      valueColor:
+          _selectedDate != null
+              ? context.onSurface
+              : context.onSurface.withValues(alpha: 0.5),
+    );
+  }
+
+  // Build time selection field using AppInfoCard
+  Widget _buildTimeField() {
+    return AppInfoCard(
+      icon: Icons.access_time,
+      iconColor: context.primary,
+      label: 'Pickup Time',
+      onTap: () => _selectTime(context),
+      value:
+          _selectedTime != null
+              ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}'
+              : 'Select pickup time',
+      valueColor:
+          _selectedTime != null
+              ? context.onSurface
+              : context.onSurface.withValues(alpha: 0.5),
+    );
+  }
+
+  // Select date method
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  // Select time method
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              timePickerTheme: Theme.of(context).timePickerTheme.copyWith(
+                entryModeIconColor: Colors.transparent,
+                // Keyboard input'u gizle
+                hourMinuteTextStyle: GoogleFonts.montserrat(
+                  fontSize: DesignTokens.h1.fontSize,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.transparent, // Saat/dakika text'i gizle
+                  height: DesignTokens.h1.height,
+                ),
+              ),
+            ),
+            child: child!,
+          ),
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
   // Build location section with pickup and destination inputs
   Widget _buildLocationSection() {
     return _buildSection(
       title: 'Location Information',
-      icon: Icons.location_on_outlined,
       children: [
-        _buildLocationCard(
-          title: 'Pickup Location',
+        AppInfoCard(
           icon: Icons.radio_button_checked,
-          color: const Color(0xFF10B981),
-          location: _fromLocation,
-          onTap: () => _showLocationPicker(
-            title: 'Select Pickup Location',
-            onLocationSelected: (location) {
-              setState(() {
-                _fromLocation = location;
-              });
-            },
-          ),
+          label: 'Pickup Location',
+          value: _fromLocation?.placeName ?? 'Select location',
+          iconColor: const Color(0xFF10B981),
+          valueColor:
+              _fromLocation != null
+                  ? context.onSurface
+                  : context.onSurface.withValues(alpha: 0.5),
+          onTap:
+              () => _showLocationPicker(
+                title: 'Select Pickup Location',
+                onLocationSelected: (location) {
+                  setState(() {
+                    _fromLocation = location;
+                  });
+                },
+              ),
         ),
         const SizedBox(height: 16),
         if (_selectedJobType == 'Point to Point') ...[
-          _buildLocationCard(
-            title: 'Destination Location',
+          AppInfoCard(
             icon: Icons.location_on,
-            color: const Color(0xFFEF4444),
-            location: _toLocation,
-            onTap: () => _showLocationPicker(
-              title: 'Select Destination Location',
-              onLocationSelected: (location) {
-                setState(() {
-                  _toLocation = location;
-                });
-              },
-            ),
+            label: 'Destination Location',
+            value: _toLocation?.placeName ?? 'Select location',
+            iconColor: const Color(0xFFEF4444),
+            valueColor:
+                _toLocation != null
+                    ? context.onSurface
+                    : context.onSurface.withValues(alpha: 0.5),
+            onTap:
+                () => _showLocationPicker(
+                  title: 'Select Destination Location',
+                  onLocationSelected: (location) {
+                    setState(() {
+                      _toLocation = location;
+                    });
+                  },
+                ),
           ),
           if (_fromLocation != null && _toLocation != null) ...[
             const SizedBox(height: 16),
@@ -226,17 +351,11 @@ class _ListingJobViewState extends State<ListingJobView> {
       decoration: BoxDecoration(
         color: context.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            color: context.warning,
-            size: 16,
-          ),
+          Icon(Icons.info_outline, color: context.warning, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: AppText.caption(
@@ -253,7 +372,6 @@ class _ListingJobViewState extends State<ListingJobView> {
   Widget _buildVehicleSection() {
     return _buildSection(
       title: 'Vehicle Requirements',
-      icon: Icons.local_shipping_outlined,
       children: [
         MultipleVehicleRequirementsForm(
           initialRequirements: _vehicleRequirements,
@@ -271,7 +389,6 @@ class _ListingJobViewState extends State<ListingJobView> {
   Widget _buildDescriptionSection() {
     return _buildSection(
       title: 'Description',
-      icon: Icons.description_outlined,
       children: [
         AppInput.primary(
           controller: _descriptionController,
@@ -285,16 +402,15 @@ class _ListingJobViewState extends State<ListingJobView> {
   // Build reusable section container with title and icon
   Widget _buildSection({
     required String title,
-    required IconData icon,
     required List<Widget> children,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: GeneralConstants.borderRadius,
         boxShadow: [
           BoxShadow(
-            color: context.surface,
+            color: context.onSurface.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -305,7 +421,7 @@ class _ListingJobViewState extends State<ListingJobView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionHeader(title, icon),
+            _buildSectionHeader(title),
             const SizedBox(height: 16),
             ...children,
           ],
@@ -314,109 +430,9 @@ class _ListingJobViewState extends State<ListingJobView> {
     );
   }
 
-  // Build section header with icon and title
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: context.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: context.primary,
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: 12),
-        AppText.heading(
-          title,
-          color: context.onSurface,
-        ),
-      ],
-    );
-  }
-
-  // Build location selection card with tap functionality
-  Widget _buildLocationCard({
-    required String title,
-    required IconData icon,
-    required Color color,
-    required LocationModel? location,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: context.surfaceContainer,
-          borderRadius: GeneralConstants.borderRadius,
-          border: Border.all(
-            color: context.onSurface.withValues(alpha: 0.1),
-            width: 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: context.onSurface.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            _buildLocationIcon(icon, color),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildLocationInfo(title, location),
-            ),
-            const SizedBox(width: 16),
-            Icon(
-              Icons.chevron_right,
-              color: context.onSurface.withValues(alpha: 0.5),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Build location icon with background
-  Widget _buildLocationIcon(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 20,
-      ),
-    );
-  }
-
-  // Build location information text
-  Widget _buildLocationInfo(String title, LocationModel? location) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppText.bodySmall(
-          title,
-          color: context.onSurface,
-        ),
-        AppText.bodySmall(
-          location?.placeName ?? 'Select location',
-          color: location != null
-              ? context.onSurface
-              : context.onSurface.withValues(alpha: 0.5),
-        ),
-      ],
-    );
+  // Build section header with title only
+  Widget _buildSectionHeader(String title) {
+    return AppText.heading(title, color: context.onSurface);
   }
 
   // Build route information display with distance and time
@@ -468,16 +484,9 @@ class _ListingJobViewState extends State<ListingJobView> {
   Widget _buildRouteHeader() {
     return Row(
       children: [
-        Icon(
-          Icons.route,
-          color: context.primary,
-          size: 20,
-        ),
+        Icon(Icons.route, color: context.primary, size: 20),
         const SizedBox(width: 12),
-        AppText.body(
-          'Route Information',
-          color: context.primary,
-        ),
+        AppText.body('Route Information', color: context.primary),
       ],
     );
   }
@@ -488,12 +497,16 @@ class _ListingJobViewState extends State<ListingJobView> {
       children: [
         Expanded(
           child: _buildMetricCard(
-              'Distance', '${distanceKm.toStringAsFixed(1)} km'),
+            'Distance',
+            '${distanceKm.toStringAsFixed(1)} km',
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: _buildMetricCard(
-              'Estimated Time', '${(distanceKm / 80).ceil()} hours'),
+            'Estimated Time',
+            '${(distanceKm / 80).ceil()} hours',
+          ),
         ),
       ],
     );
@@ -506,9 +519,7 @@ class _ListingJobViewState extends State<ListingJobView> {
       decoration: BoxDecoration(
         color: context.surface,
         borderRadius: GeneralConstants.borderRadius,
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
       ),
       child: Column(
         children: [
@@ -516,10 +527,7 @@ class _ListingJobViewState extends State<ListingJobView> {
             label,
             color: context.onSurface.withValues(alpha: 0.6),
           ),
-          AppText.body(
-            value,
-            color: context.primary,
-          ),
+          AppText.body(value, color: context.primary),
         ],
       ),
     );
@@ -570,12 +578,7 @@ class _ListingJobViewState extends State<ListingJobView> {
 
   // Build action buttons section
   Widget _buildActionButtons() {
-    return Column(
-      children: [
-        _buildCreateJobButton(),
-        _buildClearButton(),
-      ],
-    );
+    return Column(children: [_buildCreateJobButton(), _buildClearButton()]);
   }
 
   // Build create job button
@@ -639,7 +642,8 @@ class _ListingJobViewState extends State<ListingJobView> {
         }
       } else {
         _showErrorSnackbar(
-            'Error creating job: ${response['error']['message']}');
+          'Error creating job: ${response['error']['message']}',
+        );
       }
     } catch (error) {
       Navigator.of(context).pop();
@@ -656,6 +660,16 @@ class _ListingJobViewState extends State<ListingJobView> {
 
     if (_contactInfoController.text.trim().isEmpty) {
       _showErrorSnackbar('Please enter contact information');
+      return false;
+    }
+
+    if (_selectedDate == null) {
+      _showErrorSnackbar('Please select pickup date');
+      return false;
+    }
+
+    if (_selectedTime == null) {
+      _showErrorSnackbar('Please select pickup time');
       return false;
     }
 
@@ -686,13 +700,15 @@ class _ListingJobViewState extends State<ListingJobView> {
       if (!requirement.isFlexible) {
         if (requirement.minimumCategory == null) {
           _showErrorSnackbar(
-              'Please select minimum category for vehicle requirement ${i + 1}');
+            'Please select minimum category for vehicle requirement ${i + 1}',
+          );
           return false;
         }
         if (requirement.hourlyRate == null &&
             requirement.pricePerMile == null) {
           _showErrorSnackbar(
-              'Please set at least one price for vehicle requirement ${i + 1}');
+            'Please set at least one price for vehicle requirement ${i + 1}',
+          );
           return false;
         }
       }
@@ -722,12 +738,27 @@ class _ListingJobViewState extends State<ListingJobView> {
       longitude: _fromLocation!.longitude,
     );
 
-    final toCoordinate = _toLocation != null
-        ? Coordinate(
-            latitude: _toLocation!.latitude,
-            longitude: _toLocation!.longitude,
-          )
-        : null;
+    final toCoordinate =
+        _toLocation != null
+            ? Coordinate(
+              latitude: _toLocation!.latitude,
+              longitude: _toLocation!.longitude,
+            )
+            : null;
+
+    // Calculate start and end dates based on selected date, time and duration
+    final startDateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
+
+    final endDateTime =
+        _selectedJobType == 'Hourly Rental'
+            ? startDateTime.add(Duration(hours: _durationValue))
+            : startDateTime.add(Duration(days: _durationValue));
 
     return JobModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -740,9 +771,12 @@ class _ListingJobViewState extends State<ListingJobView> {
       jobType: jobType,
       companyName: _companyNameController.text,
       contactInfo: _contactInfoController.text,
-      description: _descriptionController.text.isNotEmpty
-          ? _descriptionController.text
-          : null,
+      description:
+          _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
+      startDate: startDateTime,
+      endDate: endDateTime,
       vehicleRequirements: _vehicleRequirements,
     );
   }
@@ -754,6 +788,9 @@ class _ListingJobViewState extends State<ListingJobView> {
       _contactInfoController.clear();
       _descriptionController.clear();
       _selectedJobType = 'Point to Point';
+      _selectedDate = null;
+      _selectedTime = null;
+      _durationValue = 1;
       _fromLocation = null;
       _toLocation = null;
       _vehicleRequirements = [];
@@ -764,44 +801,12 @@ class _ListingJobViewState extends State<ListingJobView> {
 
   // Show error snackbar with red background
   void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: AppText.body(message),
-        backgroundColor: context.error,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
+    AppSnackbar.showError(context, message: message);
   }
 
   // Show success snackbar with green background
   void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: AppText.body(message),
-        backgroundColor: context.success,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
+    AppSnackbar.showSuccess(context, message: message);
   }
 
   // Show loading dialog during operations
@@ -825,14 +830,19 @@ class _ListingJobViewState extends State<ListingJobView> {
 
   // Calculate distance between two coordinates using Haversine formula
   double _calculateDistanceInMiles(
-      double lat1, double lon1, double lat2, double lon2) {
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const double earthRadiusKm = 6371.0;
     const double kmToMiles = 0.621371;
 
     double dLat = _toRadians(lat2 - lat1);
     double dLon = _toRadians(lon2 - lon1);
 
-    double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    double a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_toRadians(lat1)) *
             math.cos(_toRadians(lat2)) *
             math.sin(dLon / 2) *

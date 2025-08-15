@@ -32,7 +32,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Sol tarafta back button veya logo
+              // Left side: back button or logo
               Positioned(
                 left: 0,
                 child: showBackButton
@@ -51,7 +51,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       )
                     : ColorFiltered(
                         colorFilter: ColorFilter.mode(
-                          context.onSurface, // Yüzey rengine göre logo rengi
+                          context.onSurface, // Logo color based on surface color
                           BlendMode.srcIn,
                         ),
                         child: Image.asset(
@@ -62,7 +62,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       ),
               ),
-              // Ortada title
+              // Center: title
                               if (title != null)
                   Positioned(
                     child: AppText.heading(
@@ -70,7 +70,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       color: context.onSurface,
                     ),
                   ),
-              // Sağda hamburger menü
+              // Right side: hamburger menu
               Positioned(
                 right: 0,
                 child: IconButton(

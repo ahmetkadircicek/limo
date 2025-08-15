@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/enums/field_error_enum.dart';
 import 'package:limo/core/enums/vehicle_category_enum.dart';
+import 'package:limo/shared/app_snackbar.dart';
 
 import '../model/vehicle_model.dart';
 
@@ -20,6 +21,9 @@ class VehicleRegistrationViewModel with ChangeNotifier {
   String? selectedVehicleType;
   String? selectedBrand;
   String? selectedCategory;
+  String? selectedInsuranceStatus;
+  String? selectedLicenseStatus;
+  String? selectedInspectionStatus;
 
   // Controllers for new fields
   late TextEditingController yearController;
@@ -95,6 +99,24 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     'Utility Vehicle',
   ];
 
+  static const List<String> insuranceStatusOptions = [
+    'Valid',
+    'Pending Approval',
+    'Missing',
+  ];
+
+  static const List<String> licenseStatusOptions = [
+    'Valid',
+    'Pending Approval',
+    'Missing',
+  ];
+
+  static const List<String> inspectionStatusOptions = [
+    'Valid',
+    'Pending Approval',
+    'Missing',
+  ];
+
   /// Generates year options from 1990 to current year + 1
   static List<String> get yearOptions {
     final currentYear = DateTime.now().year;
@@ -114,21 +136,39 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     capacityController = TextEditingController();
   }
 
-  /// Updates the selected year and notifies listeners
-  void updateYear(String? year) {
-    selectedYear = year;
+  /// Updates the selected vehicle type
+  void updateVehicleType(String? value) {
+    selectedVehicleType = value;
     notifyListeners();
   }
 
-  /// Updates the selected capacity and notifies listeners
-  void updateCapacity(String? capacity) {
-    selectedCapacity = capacity;
+  /// Updates the selected year
+  void updateYear(String? value) {
+    selectedYear = value;
     notifyListeners();
   }
 
-  /// Updates the selected vehicle type and notifies listeners
-  void updateVehicleType(String? vehicleType) {
-    selectedVehicleType = vehicleType;
+  /// Updates the selected capacity
+  void updateCapacity(String? value) {
+    selectedCapacity = value;
+    notifyListeners();
+  }
+
+  /// Updates the selected insurance status
+  void updateInsuranceStatus(String? value) {
+    selectedInsuranceStatus = value;
+    notifyListeners();
+  }
+
+  /// Updates the selected license status
+  void updateLicenseStatus(String? value) {
+    selectedLicenseStatus = value;
+    notifyListeners();
+  }
+
+  /// Updates the selected inspection status
+  void updateInspectionStatus(String? value) {
+    selectedInspectionStatus = value;
     notifyListeners();
   }
 
@@ -265,35 +305,21 @@ class VehicleRegistrationViewModel with ChangeNotifier {
         (cat) => cat.displayName == selectedCategory,
         orElse: () => VehicleCategory.standardSedan,
       ),
+      hasInsurance: selectedInsuranceStatus == 'Valid',
+      hasRegistration: selectedLicenseStatus == 'Valid',
+      hasInspection: selectedInspectionStatus == 'Valid',
     );
   }
 
   /// Shows error message as snackbar instead of dialog
   void _showErrorSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
+    AppSnackbar.showError(context, message: message);
   }
 
   /// Shows success message as snackbar
   void _showSuccessSnackbar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Vehicle registered successfully!'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
+    AppSnackbar.showSuccess(context,
+        message: 'Vehicle registered successfully!');
   }
 
   /// Logs vehicle data for debugging purposes
@@ -316,11 +342,15 @@ class VehicleRegistrationViewModel with ChangeNotifier {
     yearController.clear();
     capacityController.clear();
 
+    // Reset dropdown selections
     selectedYear = null;
     selectedCapacity = null;
     selectedVehicleType = null;
     selectedBrand = null;
     selectedCategory = null;
+    selectedInsuranceStatus = null;
+    selectedLicenseStatus = null;
+    selectedInspectionStatus = null;
 
     notifyListeners();
   }

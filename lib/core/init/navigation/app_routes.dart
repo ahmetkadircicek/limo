@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/feature/company_registration/view/company_registration_view.dart';
 import 'package:limo/feature/home/view/home_view.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/view/job_details_page.dart';
@@ -14,6 +13,7 @@ import 'package:limo/feature/map/view/location_picker_page.dart';
 import 'package:limo/feature/profile/view/profile_view.dart';
 import 'package:limo/feature/splash/view/splash_view.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/feature/vehicle_registration/view/document_upload_view.dart';
 import 'package:limo/feature/vehicle_registration/view/vehicle_registration_view.dart';
 import 'package:limo/shared/app_button.dart';
 import 'package:limo/shared/app_text.dart';
@@ -24,7 +24,6 @@ class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
   static const String home = '/home';
-  static const String companyRegistration = '/company-registration';
   static const String vehicleRegistration = '/vehicle-registration';
   static const String vehicleManagement = '/vehicle-management';
   static const String jobList = '/job-list';
@@ -35,6 +34,7 @@ class AppRoutes {
   static const String jobTracking = '/job-tracking';
   static const String jobDetails = '/job-details';
   static const String vehicleRequirements = '/vehicle-requirements';
+  static const String documentUpload = '/document-upload';
 
   /// Main router configuration
   static final GoRouter router = GoRouter(
@@ -79,25 +79,7 @@ class AppRoutes {
               return const ProfileView();
             },
           ),
-          GoRoute(
-            path: 'company-registration',
-            name: 'home.company-registration',
-            builder: (context, state) {
-              debugPrint("Navigation to Company Registration from Home");
-              return const CompanyRegistrationView();
-            },
-          ),
         ],
-      ),
-
-      // Company registration route - redirects to home with specific page
-      GoRoute(
-        path: companyRegistration,
-        name: 'company-registration',
-        builder: (context, state) {
-          debugPrint("Navigation to Company Registration via Home");
-          return const HomeView();
-        },
       ),
 
       // Vehicle registration route with parameters
@@ -157,14 +139,14 @@ class AppRoutes {
         name: 'location-picker',
         builder: (context, state) {
           debugPrint("Navigation to Location Picker");
-          
+
           // Get title from extra
           String title = 'Select Location';
           if (state.extra is Map<String, dynamic>) {
             final args = state.extra as Map<String, dynamic>;
             title = args['title'] ?? 'Select Location';
           }
-          
+
           // Create LocationPickerPage that will return the selected location
           return LocationPickerPage(
             title: title,
@@ -225,6 +207,31 @@ class AppRoutes {
           );
         },
       ),
+
+      // Document upload route with parameters
+      GoRoute(
+        path: documentUpload,
+        name: 'document-upload',
+        builder: (context, state) {
+          debugPrint("Navigation to Document Upload");
+          final args = state.extra as Map<String, dynamic>?;
+          if (args != null) {
+            final documentType = args['documentType'] as String;
+            final licencePlate = args['licencePlate'] as String?;
+            return DocumentUploadView(
+              documentType: documentType,
+              vehiclePlate: licencePlate,
+            );
+          }
+          return const Scaffold(
+            body: Center(
+              child: AppText.body(
+                'Document type or vehicle plate not specified',
+              ),
+            ),
+          );
+        },
+      ),
     ],
     errorBuilder: (context, state) {
       debugPrint("Navigation to Error Page: ${state.error}");
@@ -240,22 +247,14 @@ class AppRoutes {
   /// Build error page for unknown routes
   static Widget _buildErrorPage() {
     return Scaffold(
-      appBar: AppBar(
-        title: const AppText.heading('Page Not Found'),
-      ),
+      appBar: AppBar(title: const AppText.heading('Page Not Found')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            const AppText.title(
-              'Page Not Found',
-            ),
+            const AppText.title('Page Not Found'),
             const SizedBox(height: 8),
             const AppText.body(
               'The requested page could not be found.',
@@ -263,10 +262,7 @@ class AppRoutes {
               color: Colors.grey,
             ),
             const SizedBox(height: 24),
-            AppButton.primary(
-              'Go Home',
-              onPressed: null,
-            ),
+            AppButton.primary('Go Home', onPressed: null),
           ],
         ),
       ),
@@ -277,19 +273,27 @@ class AppRoutes {
 /// Extension methods for easier navigation
 extension GoRouterExtension on BuildContext {
   /// Navigate to a named route
-  void goNamed(String name,
-      {Object? extra, Map<String, String> queryParameters = const {}}) {
+  void goNamed(
+    String name, {
+    Object? extra,
+    Map<String, String> queryParameters = const {},
+  }) {
     debugPrint("Navigation to $name");
-    GoRouter.of(this)
-        .goNamed(name, extra: extra, queryParameters: queryParameters);
+    GoRouter.of(
+      this,
+    ).goNamed(name, extra: extra, queryParameters: queryParameters);
   }
 
   /// Push a named route
-  void pushNamed(String name,
-      {Object? extra, Map<String, String> queryParameters = const {}}) {
+  void pushNamed(
+    String name, {
+    Object? extra,
+    Map<String, String> queryParameters = const {},
+  }) {
     debugPrint("Navigation to $name");
-    GoRouter.of(this)
-        .pushNamed(name, extra: extra, queryParameters: queryParameters);
+    GoRouter.of(
+      this,
+    ).pushNamed(name, extra: extra, queryParameters: queryParameters);
   }
 
   /// Pop current route

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
+import 'package:limo/shared/app_input.dart';
 import 'package:limo/shared/app_text.dart';
 
 class VehicleRequirementForm extends StatefulWidget {
@@ -92,9 +93,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
       decoration: BoxDecoration(
         color: context.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,17 +122,10 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
             color: context.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            Icons.directions_car,
-            color: context.primary,
-            size: 20,
-          ),
+          child: Icon(Icons.directions_car, color: context.primary, size: 20),
         ),
         const SizedBox(width: 12),
-        AppText.body(
-          'Vehicle Requirements',
-          color: context.onSurface,
-        ),
+        AppText.body('Vehicle Requirements', color: context.onSurface),
       ],
     );
   }
@@ -143,50 +135,25 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText.bodySmall(
-          'Brand Preference',
-          color: context.onSurface,
-        ),
+        AppText.bodySmall('Brand Preference', color: context.onSurface),
         const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: _selectedBrand,
-          decoration: InputDecoration(
-            hintText: 'Select brand...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.2),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.2),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.primary),
-            ),
-          ),
-          items: [
-            const DropdownMenuItem<String>(
-              value: null,
-              child: AppText.body('Any Brand'),
-            ),
-            ..._vehicleBrands.map((brand) => DropdownMenuItem<String>(
-                  value: brand,
-                  child: AppText.body(brand),
-                )),
-          ],
-          onChanged: widget.enabled
-              ? (value) {
-                  setState(() {
-                    _selectedBrand = value;
-                  });
-                  _notifyChanges();
-                }
-              : null,
+        // BURASI: Dropdown menü panelinin tasarımını değiştirmek için app_theme.dart'taki dropdownMenuTheme'i güncelleyin.
+        // Bu sayede tüm uygulamadaki dropdown'lar aynı anda güncellenir. Dropdown trigger/button'ı etkilemez.
+        AppInput.dropdown(
+          labelText: '',
+          hintText: 'Select brand...',
+          dropdownItems: ['Any Brand', ..._vehicleBrands],
+          dropdownValue: _selectedBrand ?? 'Any Brand',
+          onDropdownChanged:
+              widget.enabled
+                  ? (value) {
+                    setState(() {
+                      _selectedBrand = value == 'Any Brand' ? null : value;
+                    });
+                    _notifyChanges();
+                  }
+                  : (value) {},
+          enabled: widget.enabled,
         ),
       ],
     );
@@ -197,50 +164,25 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText.bodySmall(
-          'Vehicle Type',
-          color: context.onSurface,
-        ),
+        AppText.bodySmall('Vehicle Type', color: context.onSurface),
         const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: _selectedVehicleType,
-          decoration: InputDecoration(
-            hintText: 'Select type...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.2),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.2),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.primary),
-            ),
-          ),
-          items: [
-            const DropdownMenuItem<String>(
-              value: null,
-              child: AppText.body('Any Type'),
-            ),
-            ..._vehicleTypes.map((type) => DropdownMenuItem<String>(
-                  value: type,
-                  child: AppText.body(type),
-                )),
-          ],
-          onChanged: widget.enabled
-              ? (value) {
-                  setState(() {
-                    _selectedVehicleType = value;
-                  });
-                  _notifyChanges();
-                }
-              : null,
+        // BURASI: Dropdown menü panelinin tasarımını değiştirmek için app_theme.dart'taki dropdownMenuTheme'i güncelleyin.
+        // Bu sayede tüm uygulamadaki dropdown'lar aynı anda güncellenir. Dropdown trigger/button'ı etkilemez.
+        AppInput.dropdown(
+          labelText: '',
+          hintText: 'Select type...',
+          dropdownItems: ['Any Type', ..._vehicleTypes],
+          dropdownValue: _selectedVehicleType ?? 'Any Type',
+          onDropdownChanged:
+              widget.enabled
+                  ? (value) {
+                    setState(() {
+                      _selectedVehicleType = value == 'Any Type' ? null : value;
+                    });
+                    _notifyChanges();
+                  }
+                  : (value) {},
+          enabled: widget.enabled,
         ),
       ],
     );
@@ -251,51 +193,36 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText.bodySmall(
-          'Minimum Category',
-          color: context.onSurface,
-        ),
+        AppText.bodySmall('Minimum Category', color: context.onSurface),
         const SizedBox(height: 8),
-        DropdownButtonFormField<VehicleCategory>(
-          value: _selectedCategory,
-          decoration: InputDecoration(
-            hintText: 'Select category...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.2),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.2),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.primary),
-            ),
-          ),
-          items: [
-            const DropdownMenuItem<VehicleCategory>(
-              value: null,
-              child: AppText.body('Any Category'),
-            ),
-            ...VehicleCategory.values
-                .map((category) => DropdownMenuItem<VehicleCategory>(
-                      value: category,
-                      child: AppText.body(category.name),
-                    )),
+        // BURASI: Dropdown menü panelinin tasarımını değiştirmek için app_theme.dart'taki dropdownMenuTheme'i güncelleyin.
+        // Bu sayede tüm uygulamadaki dropdown'lar aynı anda güncellenir. Dropdown trigger/button'ı etkilemez.
+        AppInput.dropdown(
+          labelText: '',
+          hintText: 'Select category...',
+          dropdownItems: [
+            'Any Category',
+            ...VehicleCategory.values.map((category) => category.name),
           ],
-          onChanged: widget.enabled
-              ? (value) {
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                  _notifyChanges();
-                }
-              : null,
+          dropdownValue:
+              _selectedCategory == null
+                  ? 'Any Category'
+                  : _selectedCategory!.name,
+          onDropdownChanged:
+              widget.enabled
+                  ? (value) {
+                    setState(() {
+                      _selectedCategory =
+                          value == 'Any Category'
+                              ? null
+                              : VehicleCategory.values.firstWhere(
+                                (cat) => cat.name == value,
+                              );
+                    });
+                    _notifyChanges();
+                  }
+                  : (value) {},
+          enabled: widget.enabled,
         ),
       ],
     );
@@ -306,20 +233,13 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText.bodySmall(
-          'Pricing',
-          color: context.onSurface,
-        ),
+        AppText.bodySmall('Pricing', color: context.onSurface),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(
-              child: _buildHourlyRateInput(),
-            ),
+            Expanded(child: _buildHourlyRateInput()),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildPricePerMileInput(),
-            ),
+            Expanded(child: _buildPricePerMileInput()),
           ],
         ),
       ],
@@ -352,12 +272,13 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
           borderSide: BorderSide(color: context.primary),
         ),
       ),
-      onChanged: widget.enabled
-          ? (value) {
-              _hourlyRate = double.tryParse(value);
-              _notifyChanges();
-            }
-          : null,
+      onChanged:
+          widget.enabled
+              ? (value) {
+                _hourlyRate = double.tryParse(value);
+                _notifyChanges();
+              }
+              : null,
     );
   }
 
@@ -387,21 +308,24 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
           borderSide: BorderSide(color: context.primary),
         ),
       ),
-      onChanged: widget.enabled
-          ? (value) {
-              _pricePerMile = double.tryParse(value);
-              _notifyChanges();
-            }
-          : null,
+      onChanged:
+          widget.enabled
+              ? (value) {
+                _pricePerMile = double.tryParse(value);
+                _notifyChanges();
+              }
+              : null,
     );
   }
 
   // Notify parent about changes
   void _notifyChanges() {
     final requirement = VehicleRequirement(
-      id: widget.initialRequirement?.id ??
+      id:
+          widget.initialRequirement?.id ??
           'req_${DateTime.now().millisecondsSinceEpoch}',
-      isFlexible: _selectedBrand == null &&
+      isFlexible:
+          _selectedBrand == null &&
           _selectedVehicleType == null &&
           _selectedCategory == null,
       specificBrand: _selectedBrand,

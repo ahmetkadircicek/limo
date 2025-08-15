@@ -26,12 +26,12 @@ class _JobTrackingViewState extends State<JobTrackingView> {
               ),
               const SizedBox(height: 24),
               AppText.heading(
-                'İş Takip',
+                'Job Tracking',
                 color: context.onSurface,
               ),
               const SizedBox(height: 16),
               AppText.body(
-                'Bu özellik yakında eklenecek',
+                'This feature will be added soon',
                 color: context.onSurface.withValues(alpha: 0.6),
               ),
             ],

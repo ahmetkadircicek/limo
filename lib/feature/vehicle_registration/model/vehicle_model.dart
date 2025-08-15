@@ -13,6 +13,9 @@ class VehicleModel {
   final VehicleCategory category;
   final double? hourlyRate;
   final double? pricePerMile;
+  final bool hasInsurance;
+  final bool hasRegistration;
+  final bool hasInspection;
 
   VehicleModel({
     required this.licencePlate,
@@ -26,6 +29,9 @@ class VehicleModel {
     VehicleCategory? category,
     this.hourlyRate,
     this.pricePerMile,
+    this.hasInsurance = false,
+    this.hasRegistration = false,
+    this.hasInspection = false,
   }) : category = category ?? _determineCategory(brand, model, year, capacity);
 
   /// Automatically determine vehicle category based on vehicle specifications
@@ -220,6 +226,9 @@ class VehicleModel {
       'category': category.id,
       'hourlyRate': hourlyRate,
       'pricePerMile': pricePerMile,
+      'hasInsurance': hasInsurance,
+      'hasRegistration': hasRegistration,
+      'hasInspection': hasInspection,
     };
   }
 
@@ -250,6 +259,9 @@ class VehicleModel {
       category: category,
       hourlyRate: json['hourlyRate']?.toDouble(),
       pricePerMile: json['pricePerMile']?.toDouble(),
+      hasInsurance: json['hasInsurance'] as bool? ?? false,
+      hasRegistration: json['hasRegistration'] as bool? ?? false,
+      hasInspection: json['hasInspection'] as bool? ?? false,
     );
   }
 }

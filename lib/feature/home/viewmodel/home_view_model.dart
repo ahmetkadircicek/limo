@@ -15,11 +15,9 @@ class HomeViewModel extends ChangeNotifier {
 
   // Additional pages from drawer
   final int _vehicleManagementIndex = 3;
-  final int _companyRegistrationIndex = 4;
-  final int _profileIndex = 5;
+  final int _profileIndex = 4;
 
   int get vehicleManagementIndex => _vehicleManagementIndex;
-  int get companyRegistrationIndex => _companyRegistrationIndex;
   int get profileIndex => _profileIndex;
 
   /// Handle navigation item tap and update selected index
@@ -33,13 +31,6 @@ class HomeViewModel extends ChangeNotifier {
   void navigateToVehicleManagement() {
     _selectedIndex = _vehicleManagementIndex;
     _pageController.jumpToPage(_vehicleManagementIndex);
-    notifyListeners();
-  }
-
-  /// Navigate to company registration page
-  void navigateToCompanyRegistration() {
-    _selectedIndex = _companyRegistrationIndex;
-    _pageController.jumpToPage(_companyRegistrationIndex);
     notifyListeners();
   }
 

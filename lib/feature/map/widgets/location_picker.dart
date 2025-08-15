@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:limo/feature/map/models/location_model.dart';
 import 'package:limo/feature/map/services/location_service.dart';
 import 'package:limo/shared/app_button.dart';
+import 'package:limo/shared/app_card.dart';
 import 'package:limo/shared/app_text.dart';
 
 class LocationPicker extends StatefulWidget {
@@ -42,15 +45,20 @@ class _LocationPickerState extends State<LocationPicker> {
   );
 
   final Set<Marker> _markers = {};
+  String? _mapTheme;
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
     _initializeStoredLocation();
+    // Delay map theme loading to ensure context is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadMapTheme();
+    });
   }
 
-  // Initialize with stored location instead of automatically getting current location
+  // Initialize with current user location, fallback to stored location for centering only
   Future<void> _initializeStoredLocation() async {
     try {
       // First check if an initial location was passed to the widget
@@ -66,31 +74,113 @@ class _LocationPickerState extends State<LocationPicker> {
         return;
       }
 
-      // If no initial location, try to get the last saved location
-      final lastLocation = await _getLastLocation();
+      // Try to get current user location first
+      try {
+        final currentLocation = await LocationService.getCurrentLocation();
+        if (currentLocation != null) {
+          // Center map to current location but don't set it as selected
+          _animateToLocation(currentLocation);
+          developer.log(
+              '📍 Using current user location for centering: ${currentLocation.placeName}',
+              name: _tag);
+          return;
+        }
+      } catch (e) {
+        developer.log('📍 Could not get current location: $e', name: _tag);
+      }
 
+      // If current location not available, try stored location for centering only
+      final lastLocation = await LocationService.getLocationFromStorage();
       if (lastLocation != null) {
-        setState(() {
-          _selectedLocation = lastLocation;
-        });
-        _addMarker(lastLocation);
+        // Center map to stored location but don't set it as selected
         _animateToLocation(lastLocation);
-        developer.log('📍 Using stored location: ${lastLocation.placeName}',
+        developer.log(
+            '📍 Using stored location for centering only: ${lastLocation.placeName}',
             name: _tag);
       } else {
-        // If no stored location, use the default position but don't set it as selected
+        // If no stored location, use the default position
         developer.log(
-            '📍 No stored location found, using default position (Cupertino, CA, USA)',
+            '📍 No location available, using default position (Cupertino, CA, USA)',
             name: _tag);
       }
     } catch (e) {
-      developer.log('💥 Failed to initialize stored location: $e', name: _tag);
+      developer.log('💥 Failed to initialize location: $e', name: _tag);
+    }
+  }
+
+  // Load custom map theme from JSON file
+  Future<void> _loadMapTheme() async {
+    try {
+      developer.log('🎨 Attempting to load map theme...', name: _tag);
+
+      // First check if the asset exists in manifest
+      try {
+        final manifestContent =
+            await rootBundle.loadString('AssetManifest.json');
+        final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+        final assetPath = 'assets/json/map_theme.json';
+
+        if (!manifestMap.containsKey(assetPath)) {
+          developer.log('💥 Asset not found in manifest: $assetPath',
+              name: _tag);
+          _mapTheme = null;
+          return;
+        }
+
+        developer.log('✅ Asset found in manifest: $assetPath', name: _tag);
+      } catch (manifestError) {
+        developer.log('⚠️ Could not check asset manifest: $manifestError',
+            name: _tag);
+      }
+
+      // Use rootBundle instead of DefaultAssetBundle for more reliable asset loading
+      final themeData =
+          await rootBundle.loadString('assets/json/map_theme.json');
+
+      // Validate JSON format before setting
+      try {
+        json.decode(themeData); // Test if JSON is valid
+        if (mounted) {
+          setState(() {
+            _mapTheme = themeData;
+          });
+          developer.log('🎨 Map theme loaded successfully', name: _tag);
+        }
+      } catch (jsonError) {
+        developer.log('💥 Invalid JSON format in map theme: $jsonError',
+            name: _tag);
+        _mapTheme = null;
+      }
+    } catch (e) {
+      developer.log('💥 Failed to load map theme: $e', name: _tag);
+      // Try alternative loading method
+      try {
+        developer.log('🔄 Trying fallback method...', name: _tag);
+        final themeData = await DefaultAssetBundle.of(context)
+            .loadString('assets/json/map_theme.json');
+        if (mounted) {
+          setState(() {
+            _mapTheme = themeData;
+          });
+          developer.log('🎨 Map theme loaded with fallback method', name: _tag);
+        }
+      } catch (fallbackError) {
+        developer.log('💥 Fallback method also failed: $fallbackError',
+            name: _tag);
+        _mapTheme = null;
+      }
     }
   }
 
   @override
   void dispose() {
-    _mapController?.dispose();
+    // Safely dispose map controller
+    if (_mapController != null) {
+      _mapController!.dispose();
+      _mapController = null;
+      developer.log('🗺️ Map controller disposed', name: _tag);
+    }
+
     _searchController.dispose();
     _debounceTimer?.cancel();
 
@@ -103,7 +193,16 @@ class _LocationPickerState extends State<LocationPicker> {
 
   // Handle map controller creation
   void _onMapCreated(GoogleMapController controller) {
+    // Prevent multiple controller assignments
+    if (_mapController != null) {
+      developer.log('⚠️ Map controller already exists, skipping...',
+          name: _tag);
+      return;
+    }
+
     _mapController = controller;
+    developer.log('🗺️ Map controller created successfully', name: _tag);
+
     if (_selectedLocation != null) {
       _animateToLocation(_selectedLocation!);
     }
@@ -257,12 +356,15 @@ class _LocationPickerState extends State<LocationPicker> {
 
   // Reset map state to initial values (without clearing stored location)
   void _resetMapState() {
-    setState(() {
-      _selectedLocation = null;
-      _searchResults.clear();
-      _searchController.clear();
-      _markers.clear();
-    });
+    if (mounted) {
+      setState(() {
+        _selectedLocation = null;
+        _searchResults.clear();
+        _searchController.clear();
+        _markers.clear();
+      });
+      developer.log('🗺️ Map state reset successfully', name: _tag);
+    }
   }
 
   // Save last known location in persistent storage
@@ -275,41 +377,6 @@ class _LocationPickerState extends State<LocationPicker> {
     } else {
       developer.log('❌ Failed to save location to persistent storage',
           name: _tag);
-    }
-  }
-
-  Future<LocationModel?> _getLastLocation() async {
-    final location = await LocationService.getLocationFromStorage();
-    if (location != null) {
-      developer.log('📍 Stored location found: ${location.placeName}',
-          name: _tag);
-      return location;
-    }
-    developer.log('📍 No stored location found', name: _tag);
-    return null;
-  }
-
-  // Manually clear stored location
-  Future<void> _clearStoredLocation() async {
-    try {
-      await LocationService.clearLocationFromStorage();
-      setState(() {
-        _selectedLocation = null;
-        _markers.clear();
-      });
-      developer.log('🗑️ Stored location cleared manually', name: _tag);
-
-      // Show a snackbar to inform the user
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Stored location cleared'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      developer.log('💥 Failed to clear stored location: $e', name: _tag);
     }
   }
 
@@ -356,23 +423,6 @@ class _LocationPickerState extends State<LocationPicker> {
           ),
         ),
       ),
-      actions: [
-        if (_selectedLocation != null)
-          IconButton(
-            icon: const Icon(
-              Icons.clear,
-              size: 20,
-            ),
-            onPressed: _clearStoredLocation,
-            tooltip: 'Clear stored location',
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-      ],
     );
   }
 
@@ -397,6 +447,8 @@ class _LocationPickerState extends State<LocationPicker> {
     }
 
     return GoogleMap(
+      key: const ValueKey(
+          'location_picker_map'), // Add unique key to prevent recreation
       onMapCreated: _onMapCreated,
       initialCameraPosition: initialPosition,
       markers: _markers,
@@ -405,6 +457,8 @@ class _LocationPickerState extends State<LocationPicker> {
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       mapToolbarEnabled: false,
+      mapType: MapType.normal,
+      style: _mapTheme,
     );
   }
 
@@ -417,14 +471,17 @@ class _LocationPickerState extends State<LocationPicker> {
       child: Column(
         children: [
           _buildSearchBar(),
-          const SizedBox(height: 8),
-          if (_searchResults.isNotEmpty || _isSearching) _buildSearchResults(),
+          if (_searchResults.isNotEmpty || _isSearching)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              child: _buildSearchResults(),
+            ),
         ],
       ),
     );
   }
 
-  // Build the search bar with current location button
+  // Build the search bar
   Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
@@ -472,17 +529,6 @@ class _LocationPickerState extends State<LocationPicker> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: SizedBox(
-              width: 44,
-              height: 44,
-              child: _isLoadingCurrentLocation
-                  ? _buildLoadingIndicator()
-                  : _buildCurrentLocationButton(),
             ),
           ),
         ],
@@ -545,10 +591,15 @@ class _LocationPickerState extends State<LocationPicker> {
   // Build search results container
   Widget _buildSearchResults() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: MediaQuery.of(context).size.height * 0.75,
       decoration: BoxDecoration(
         color: const Color(0xFFF6F6F6),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.12),
@@ -558,7 +609,12 @@ class _LocationPickerState extends State<LocationPicker> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
         child: Column(
           children: [
             _buildSearchResultsHeader(),
@@ -603,8 +659,6 @@ class _LocationPickerState extends State<LocationPicker> {
               ),
             ],
           ),
-          const Spacer(),
-          _buildClearButton(),
         ],
       ),
     );
@@ -698,54 +752,19 @@ class _LocationPickerState extends State<LocationPicker> {
   Widget _buildSearchResultItem(LocationModel location) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey[100]!,
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => _selectSearchResult(location),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppText.body(
-                        location.placeName,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF1A1A1A),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      AppText.bodySmall(
-                        location.address,
-                        color: Colors.grey[600],
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: Colors.grey[400],
-                ),
-              ],
-            ),
-          ),
+      child: AppInfoCard(
+        icon: Icons.location_on,
+        label: location.placeName,
+        value: location.address,
+        iconColor: const Color(0xFF10B981), // Green color for location
+        labelColor: const Color(0xFF1A1A1A),
+        valueColor: Colors.grey[600],
+        backgroundColor: Colors.white, // White background for search results
+        onTap: () => _selectSearchResult(location),
+        trailing: Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 16,
+          color: Colors.grey[400],
         ),
       ),
     );

@@ -6,8 +6,8 @@ import 'package:limo/core/constants/general_constants.dart'
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/feature/vehicle_registration/view/document_upload_view.dart';
 import 'package:limo/shared/app_components.dart';
-import 'package:limo/shared/app_text.dart';
 
 class VehicleManagementView extends StatefulWidget {
   const VehicleManagementView({super.key});
@@ -142,18 +142,18 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                     Row(
                       children: [
                         Container(
-                          padding: PaddingConstants.allL,
+                          padding: context.paddingM,
                           decoration: BoxDecoration(
                             color: context.primary.withValues(alpha: 0.1),
-                            borderRadius: GeneralConstants.borderRadius,
+                            borderRadius: context.radiusMedium,
                           ),
                           child: Icon(
                             Icons.directions_car,
                             color: context.primary,
-                            size: 32,
+                            size: 24,
                           ),
                         ),
-                        SizedBox(width: PaddingConstants.spacingM),
+                        SizedBox(width: context.spacingM),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,20 +178,20 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
               Container(
                 decoration: BoxDecoration(
                   color: context.primary,
-                  borderRadius: GeneralConstants.borderRadiusRound,
+                  borderRadius: context.radiusRound,
                 ),
                 child: InkWell(
                   onTap: _addNewVehicle,
-                  borderRadius: GeneralConstants.borderRadiusRound,
+                  borderRadius: context.radiusRound,
                   child: Padding(
-                    padding: PaddingConstants.allS,
+                    padding: context.paddingM,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.add,
                           color: context.surface,
-                          size: 24,
+                          size: 20,
                         ),
                       ],
                     ),
@@ -242,38 +242,40 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
             // Top row with category badge and action buttons
             Row(
               children: [
-                // Category badge
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal:
-                        PaddingConstants.spacingS + PaddingConstants.spacingXs,
-                    vertical: PaddingConstants.spacingXs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: vehicle.category.backgroundColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: vehicle.category.borderColor,
-                      width: 1,
+                // Category badge - Made larger and more prominent
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PaddingConstants.spacingM,
+                      vertical: PaddingConstants.spacingS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: vehicle.category.backgroundColor,
+                      borderRadius: context.radiusMedium,
+                      border: Border.all(
+                        color: vehicle.category.borderColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          vehicle.category.icon,
+                          size: 20,
+                          color: vehicle.category.primaryColor,
+                        ),
+                        SizedBox(width: PaddingConstants.spacingM),
+                        AppText.body(
+                          vehicle.category.displayName,
+                          color: vehicle.category.primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        vehicle.category.icon,
-                        size: 30,
-                        color: vehicle.category.primaryColor,
-                      ),
-                      SizedBox(width: PaddingConstants.spacingS),
-                      AppText.caption(
-                        vehicle.category.badgeText,
-                        color: vehicle.category.primaryColor,
-                      ),
-                    ],
-                  ),
                 ),
-                const Spacer(),
+                SizedBox(width: PaddingConstants.spacingM),
                 // Action buttons
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -361,6 +363,66 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                 ),
               ],
             ),
+
+            SizedBox(height: PaddingConstants.spacingL),
+
+            // Vehicle Documents Section
+            Container(
+              padding: EdgeInsets.all(PaddingConstants.spacingM),
+              decoration: BoxDecoration(
+                color: context.surfaceContainer,
+                borderRadius: GeneralConstants.borderRadius,
+                border: Border.all(
+                  color: context.onSurface.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppText.caption(
+                    'Araç Belgeleri',
+                    color: context.onSurface.withValues(alpha: 0.7),
+                  ),
+                  SizedBox(height: PaddingConstants.spacingS),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDocumentStatus(
+                          icon: Icons.security,
+                          label: 'Sigorta',
+                          hasDocument: vehicle.hasInsurance,
+                          context: context,
+                          onTap: () => _navigateToDocumentUpload(
+                              'insurance', vehicle.licencePlate),
+                        ),
+                      ),
+                      SizedBox(width: PaddingConstants.spacingM),
+                      Expanded(
+                        child: _buildDocumentStatus(
+                          icon: Icons.description,
+                          label: 'Ruhsat',
+                          hasDocument: vehicle.hasRegistration,
+                          context: context,
+                          onTap: () => _navigateToDocumentUpload(
+                              'license', vehicle.licencePlate),
+                        ),
+                      ),
+                      SizedBox(width: PaddingConstants.spacingM),
+                      Expanded(
+                        child: _buildDocumentStatus(
+                          icon: Icons.verified,
+                          label: 'Muayene',
+                          hasDocument: vehicle.hasInspection,
+                          context: context,
+                          onTap: () => _navigateToDocumentUpload(
+                              'inspection', vehicle.licencePlate),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -398,6 +460,67 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildDocumentStatus({
+    required IconData icon,
+    required String label,
+    required bool hasDocument,
+    required BuildContext context,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: GeneralConstants.borderRadius,
+      child: Container(
+        padding: EdgeInsets.all(PaddingConstants.spacingS),
+        decoration: BoxDecoration(
+          color: hasDocument
+              ? context.success.withValues(alpha: 0.1)
+              : context.error.withValues(alpha: 0.1),
+          borderRadius: GeneralConstants.borderRadius,
+          border: Border.all(
+            color: hasDocument
+                ? context.success.withValues(alpha: 0.3)
+                : context.error.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: hasDocument ? context.success : context.error,
+            ),
+            SizedBox(width: PaddingConstants.spacingS),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppText.caption(
+                    label,
+                    color: hasDocument ? context.success : context.error,
+                  ),
+                  AppText.caption(
+                    hasDocument ? 'Valid' : 'Missing',
+                    color: hasDocument
+                        ? context.success.withValues(alpha: 0.7)
+                        : context.error.withValues(alpha: 0.7),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: hasDocument
+                  ? context.success.withValues(alpha: 0.7)
+                  : context.error.withValues(alpha: 0.7),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -501,43 +624,28 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
   }
 
   void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: AppText.body(message),
-        backgroundColor: context.success,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          top: PaddingConstants.spacingL,
-          left: PaddingConstants.spacingL,
-          right: PaddingConstants.spacingL,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
+    AppSnackbar.showSuccess(context, message: message);
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: AppText.body(message),
-        backgroundColor: context.error,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          top: PaddingConstants.spacingL,
-          left: PaddingConstants.spacingL,
-          right: PaddingConstants.spacingL,
+    AppSnackbar.showError(context, message: message);
+  }
+
+  void _navigateToDocumentUpload(String documentType, String licencePlate) {
+    debugPrint(
+        "Navigation to Document Upload for $documentType for $licencePlate");
+    Navigator.of(context)
+        .push(
+      MaterialPageRoute(
+        builder: (context) => DocumentUploadView(
+          documentType: documentType,
+          vehiclePlate: licencePlate,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
       ),
-    );
+    )
+        .then((_) {
+      _loadVehicles(); // Reload to update document status
+    });
   }
 }
 
@@ -564,12 +672,12 @@ class _FramedContainer extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.radiusMedium,
         border: Border.all(
           color: context.onSurface.withValues(alpha: 0.1),
           width: 1.0,
         ),
-        boxShadow: boxShadow ?? DesignTokens.elevationLow,
+        boxShadow: boxShadow ?? context.elevationLow,
       ),
       child: child,
     );

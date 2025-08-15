@@ -70,18 +70,18 @@ extension StringExtensions on String {
   }
 
   String toTurkishDateFormat() {
-    // Giriş tarihi formatı
+    // Input date format
     final inputFormat = DateFormat('dd-MM-yyyy');
-    // Çıkış tarihi formatı
+    // Output date format
     final outputFormat = DateFormat('d MMMM yyyy', 'tr_TR');
 
     try {
-      // Tarihi parse et
+      // Parse the date
       final date = inputFormat.parse(this);
-      // İstenilen formatta döndür
+      // Return in desired format
       return outputFormat.format(date);
     } catch (e) {
-      // Hata durumunda dönecek mesaj
+      // Message to return in case of error
       return 'Invalid date';
     }
   }

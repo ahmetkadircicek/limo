@@ -5,6 +5,7 @@ import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/vehicle_registration_view_model.dart';
+import 'document_upload_view.dart';
 
 /// Main view for vehicle registration form with comprehensive input fields
 final class VehicleRegistrationView extends StatelessWidget {
@@ -16,6 +17,25 @@ final class VehicleRegistrationView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.surfaceContainer,
+      appBar: AppBar(
+        backgroundColor: context.surface,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: context.onSurface),
+          onPressed: () {
+            // Form'u sıfırla ve geri git
+            final viewModel = Provider.of<VehicleRegistrationViewModel>(context,
+                listen: false);
+            viewModel.clearForm();
+            Navigator.of(context).pop();
+          },
+        ),
+        title: AppText.heading(
+          'Add Vehicle',
+          color: context.onSurface,
+        ),
+        centerTitle: true,
+      ),
       body: _buildFullScreenContent(),
     );
   }
@@ -36,13 +56,19 @@ Widget _buildFullScreenContent() {
                   child: SafeArea(
                     child: Column(
                       children: [
+                        SizedBox(
+                            height: context.spacingL), // Top padding eklendi
                         _buildVehicleInfoSection(viewModel, context),
                         SizedBox(height: context.spacingL),
                         _buildVehicleSpecsSection(viewModel, context),
                         SizedBox(height: context.spacingL),
                         _buildCategorySection(viewModel, context),
                         SizedBox(height: context.spacingL),
-                        _buildActionButtons(context, viewModel),
+                        _buildDocumentSection(viewModel, context),
+                        SizedBox(height: context.spacingL),
+                        _buildRegisterButton(viewModel, context),
+                        SizedBox(
+                            height: context.spacingL), // Bottom padding eklendi
                       ],
                     ),
                   ),
@@ -61,7 +87,6 @@ Widget _buildVehicleInfoSection(
     VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
     title: 'Vehicle Information',
-    icon: Icons.directions_car,
     children: [
       AppInput.primary(
         labelText: 'License Plate Number',
@@ -95,7 +120,6 @@ Widget _buildVehicleSpecsSection(
     VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
     title: 'Vehicle Specifications',
-    icon: Icons.settings,
     children: [
       AppInput.dropdown(
         labelText: 'Vehicle Type',
@@ -135,7 +159,6 @@ Widget _buildCategorySection(
     VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
     title: 'Vehicle Category',
-    icon: Icons.star,
     children: [
       AppInput.dropdown(
         labelText: 'Vehicle Category',
@@ -150,50 +173,80 @@ Widget _buildCategorySection(
   );
 }
 
-/// Builds the action buttons section with register and clear options
-Widget _buildActionButtons(
-    BuildContext context, VehicleRegistrationViewModel viewModel) {
+/// Builds the document status section for insurance, license, and inspection
+Widget _buildDocumentSection(
+    VehicleRegistrationViewModel viewModel, BuildContext context) {
   return _buildSection(
-    title: 'Actions',
-    icon: Icons.play_arrow,
+    title: 'Document Status',
     children: [
-      Row(
-        children: [
-          Expanded(
-            child: AppButton.primary(
-              'Register Vehicle',
-              onPressed: () async {
-                final success = await viewModel.registerVehicle(context);
-                if (success) {
-                  viewModel.clearForm();
-                }
-              },
-            ),
-          ),
-          SizedBox(width: context.spacingL),
-          Expanded(
-            child: AppButton.secondary(
-              'Clear Form',
-              onPressed: () {
-                viewModel.clearForm();
-              },
-            ),
-          ),
-        ],
+      AppInfoCard(
+        icon: Icons.security,
+        label: 'Insurance',
+        value: viewModel.selectedInsuranceStatus == 'Valid'
+            ? 'Approved'
+            : 'Not Uploaded',
+        valueColor: viewModel.selectedInsuranceStatus == 'Valid'
+            ? Colors.green
+            : Colors.red,
+        onTap: () => _navigateToDocumentUpload(context, 'insurance'),
+      ),
+      SizedBox(height: context.spacingL),
+      AppInfoCard(
+        icon: Icons.description,
+        label: 'Registration',
+        value: viewModel.selectedLicenseStatus == 'Valid'
+            ? 'Approved'
+            : 'Not Uploaded',
+        valueColor: viewModel.selectedLicenseStatus == 'Valid'
+            ? Colors.green
+            : Colors.red,
+        onTap: () => _navigateToDocumentUpload(context, 'registration'),
+      ),
+      SizedBox(height: context.spacingL),
+      AppInfoCard(
+        icon: Icons.verified,
+        label: 'Inspection',
+        value: viewModel.selectedInspectionStatus == 'Valid'
+            ? 'Approved'
+            : 'Not Uploaded',
+        valueColor: viewModel.selectedInspectionStatus == 'Valid'
+            ? Colors.green
+            : Colors.red,
+        onTap: () => _navigateToDocumentUpload(context, 'inspection'),
       ),
     ],
   );
 }
 
-/// Builds a section with title, icon, and children widgets
+/// Builds the register vehicle button
+Widget _buildRegisterButton(
+    VehicleRegistrationViewModel viewModel, BuildContext context) {
+  return Container(
+    width: double.infinity,
+    padding: context.horizontalL,
+    child: AppButton.primary(
+      'Register Vehicle',
+      onPressed: () async {
+        final success = await viewModel.registerVehicle(context);
+        if (success) {
+          viewModel.clearForm();
+        }
+      },
+      icon: Icons.add_circle,
+      height: 52,
+    ),
+  );
+}
+
+/// Builds a section with title and children widgets
 Widget _buildSection({
   required String title,
-  required IconData icon,
   required List<Widget> children,
 }) {
   return Builder(
     builder: (context) {
       return Container(
+        margin: EdgeInsets.only(top: context.spacingM), // Top margin eklendi
         decoration: BoxDecoration(
           color: context.surface,
           borderRadius: context.radiusLarge,
@@ -210,7 +263,7 @@ Widget _buildSection({
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader(context, icon, title),
+              _buildSectionHeader(context, title),
               SizedBox(height: context.spacingL),
               ...children,
             ],
@@ -221,27 +274,22 @@ Widget _buildSection({
   );
 }
 
-/// Builds the section header with icon and title
-Widget _buildSectionHeader(BuildContext context, IconData icon, String title) {
-  return Row(
-    children: [
-      Container(
-        padding: context.paddingS,
-        decoration: BoxDecoration(
-          color: context.primary.withValues(alpha: 0.1),
-          borderRadius: context.radiusMedium,
-        ),
-        child: Icon(
-          icon,
-          color: context.primary,
-          size: 20,
-        ),
+/// Builds the section header with title only
+Widget _buildSectionHeader(BuildContext context, String title) {
+  return AppText.heading(
+    title,
+    color: context.onSurface,
+  );
+}
+
+/// Navigate to document upload page
+void _navigateToDocumentUpload(BuildContext context, String documentType) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => DocumentUploadView(
+        documentType: documentType,
+        vehiclePlate: 'New Vehicle',
       ),
-      SizedBox(width: context.spacingM),
-      AppText.heading(
-        title,
-        color: context.onSurface,
-      ),
-    ],
+    ),
   );
 }

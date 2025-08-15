@@ -33,7 +33,7 @@ class LogoSection extends StatelessWidget {
 
   Widget _buildWelcomeMessage(BuildContext context) {
     return AppText.body(
-      'Hızlı ve güvenli yolculuklar sizi bekliyor.',
+      'Fast and secure journeys await you.',
       color: Colors.white.withValues(alpha: 0.85),
       textAlign: TextAlign.center,
       maxLines: 2,

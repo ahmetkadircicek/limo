@@ -44,13 +44,13 @@ class _JobTrackingViewState extends State<JobTrackingView> {
       child: Row(
         children: [
           Expanded(
-            child: _buildSegmentButton('Aktif İşler', 0),
+            child: _buildSegmentButton('Active Jobs', 0),
           ),
           Expanded(
-            child: _buildSegmentButton('Geçmiş İşler', 1),
+            child: _buildSegmentButton('Past Jobs', 1),
           ),
           Expanded(
-            child: _buildSegmentButton('Teklifler', 2),
+            child: _buildSegmentButton('Offers', 2),
           ),
         ],
       ),
@@ -108,7 +108,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AppText.heading(
-                      'İş #${1000 + index}',
+                      'Job #${1000 + index}',
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -118,17 +118,17 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: AppText.caption(
-                        'Aktif',
+                        'Active',
                         color: context.secondary,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                AppText.body('İstanbul → Ankara'),
+                AppText.body('Istanbul → Ankara'),
                 const SizedBox(height: 4),
                 AppText.caption(
-                  'Kamyon • 1 Araç • \$${(500 + index * 100)}',
+                  'Truck • 1 Vehicle • \$${(500 + index * 100)}',
                   color: context.onSurface.withValues(alpha: 0.6),
                 ),
               ],
@@ -153,7 +153,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AppText.heading(
-                      'İş #${900 + index}',
+                      'Job #${900 + index}',
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -163,17 +163,17 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: AppText.caption(
-                        'Tamamlandı',
+                        'Completed',
                         color: Colors.grey[600],
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                AppText.body('Bursa → İzmir'),
+                AppText.body('Bursa → Izmir'),
                 const SizedBox(height: 4),
                 AppText.caption(
-                  'Tır • 2 Araç • \$${(800 + index * 150)}',
+                  'Truck • 2 Vehicles • \$${(800 + index * 150)}',
                   color: context.onSurface.withValues(alpha: 0.6),
                 ),
               ],
@@ -198,7 +198,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AppText.heading(
-                      'Teklif #${200 + index}',
+                      'Offer #${200 + index}',
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -208,7 +208,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: AppText.caption(
-                        'Bekliyor',
+                        'Pending',
                         color: Colors.orange[700],
                       ),
                     ),
@@ -218,7 +218,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 AppText.body('Antalya → Trabzon'),
                 const SizedBox(height: 4),
                 AppText.caption(
-                  'Kamyonet • 1 Araç • \$${(300 + index * 75)}',
+                  'Van • 1 Vehicle • \$${(300 + index * 75)}',
                   color: context.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(height: 12),
@@ -226,14 +226,14 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                   children: [
                     Expanded(
                       child: AppButton.tertiary(
-                        'Reddet',
+                        'Reject',
                         onPressed: () {},
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: AppButton.primary(
-                        'Kabul Et',
+                        'Accept',
                         onPressed: () {},
                       ),
                     ),

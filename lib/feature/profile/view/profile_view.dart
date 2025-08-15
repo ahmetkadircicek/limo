@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/providers/app_state_provider.dart';
+import 'package:limo/feature/vehicle_registration/view/document_upload_view.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
 
@@ -21,12 +22,12 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ProfileViewModel, UserProvider>(
-      builder: (context, viewModel, userProvider, child) {
+    return Consumer2<ProfileViewModel, AppStateProvider>(
+      builder: (context, viewModel, appState, child) {
         // Initialize ViewModel when user data is available
-        if (userProvider.isLoggedIn && !viewModel.isLoading) {
+        if (appState.isAuthenticated && !viewModel.isLoading) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            viewModel.initialize(userProvider);
+            viewModel.initialize(appState);
           });
         }
 
@@ -38,7 +39,7 @@ class _ProfileViewState extends State<ProfileView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Profile Header
-                _buildProfileHeader(context, userProvider),
+                _buildProfileHeader(context, appState),
                 const SizedBox(height: 24),
 
                 // User Information Section
@@ -48,6 +49,9 @@ class _ProfileViewState extends State<ProfileView> {
 
                 // Action Buttons
                 _buildActionButtons(context, viewModel),
+
+                // Bottom Spacing
+                _buildBottomSpacing(),
 
                 // Error/Success Messages
                 if (viewModel.errorMessage != null)
@@ -63,7 +67,7 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   /// Builds the profile header section with avatar and user info
-  Widget _buildProfileHeader(BuildContext context, UserProvider userProvider) {
+  Widget _buildProfileHeader(BuildContext context, AppStateProvider appState) {
     return Container(
       padding: PaddingConstants.allXl,
       decoration: BoxDecoration(
@@ -80,18 +84,22 @@ class _ProfileViewState extends State<ProfileView> {
       child: Row(
         children: [
           // Profile Picture
-
           Container(
-            width: 80,
-            height: 80,
+            width: 70,
+            height: 70,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               color: context.primary.withValues(alpha: 0.1),
-              borderRadius: GeneralConstants.borderRadius,
+              borderRadius: BorderRadius.circular(35),
             ),
-            child: userProvider.isLoggedIn && userProvider.userPhotoUrl != null
-                ? Image.network(userProvider.userPhotoUrl!)
-                : null,
+            child:
+                appState.isAuthenticated &&
+                        appState.currentUser?.photoUrl != null
+                    ? Image.network(
+                      appState.currentUser!.photoUrl!,
+                      fit: BoxFit.cover,
+                    )
+                    : null,
           ),
           const SizedBox(width: 20),
 
@@ -101,25 +109,12 @@ class _ProfileViewState extends State<ProfileView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText.heading(
-                  userProvider.userDisplayName ?? 'User Name',
+                  appState.currentUser?.displayName ?? 'User Name',
                   color: context.onSurface,
                 ),
                 AppText.body(
-                  userProvider.userEmail ?? 'email@example.com',
+                  appState.currentUser?.email ?? 'email@example.com',
                   color: context.onSurface.withValues(alpha: 0.6),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                      PaddingConstants.horizontalM + PaddingConstants.verticalS,
-                  decoration: BoxDecoration(
-                    color: context.primary.withValues(alpha: 0.1),
-                    borderRadius: GeneralConstants.borderRadiusRound,
-                  ),
-                  child: AppText.caption(
-                    'Active User',
-                    color: context.primary,
-                  ),
                 ),
               ],
             ),
@@ -131,7 +126,9 @@ class _ProfileViewState extends State<ProfileView> {
 
   /// Builds the user information section with editable fields
   Widget _buildUserInfoSection(
-      BuildContext context, ProfileViewModel viewModel) {
+    BuildContext context,
+    ProfileViewModel viewModel,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
@@ -146,8 +143,8 @@ class _ProfileViewState extends State<ProfileView> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Consumer<UserProvider>(
-          builder: (context, userProvider, child) {
+        child: Consumer<AppStateProvider>(
+          builder: (context, appState, child) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -162,7 +159,7 @@ class _ProfileViewState extends State<ProfileView> {
                 ProfileInfoCard(
                   icon: Icons.person,
                   label: 'Full Name',
-                  value: userProvider.userDisplayName ?? 'Not specified',
+                  value: appState.currentUser?.displayName ?? 'Not specified',
                   badgeText: 'Google',
                 ),
                 const SizedBox(height: 16),
@@ -171,7 +168,7 @@ class _ProfileViewState extends State<ProfileView> {
                 ProfileInfoCard(
                   icon: Icons.email,
                   label: 'Email',
-                  value: userProvider.userEmail ?? 'Not specified',
+                  value: appState.currentUser?.email ?? 'Not specified',
                   badgeText: 'Google',
                 ),
                 const SizedBox(height: 16),
@@ -183,20 +180,86 @@ class _ProfileViewState extends State<ProfileView> {
                   hintText: '+1 (555) 123-4567',
                   keyboardType: TextInputType.phone,
                   enabled: viewModel.isEditing, // Only enabled in edit mode
-                  inputFormatters: viewModel.isEditing
-                      ? [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9+\-\(\)\s]')),
-                        ]
-                      : null,
-                  onChanged: viewModel.isEditing
-                      ? (value) {
-                          // Clear any previous error messages when user types
-                          if (viewModel.errorMessage != null) {
-                            viewModel.clearError();
+                  inputFormatters:
+                      viewModel.isEditing
+                          ? [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9+\-\(\)\s]'),
+                            ),
+                          ]
+                          : null,
+                  onChanged:
+                      viewModel.isEditing
+                          ? (value) {
+                            // Clear any previous error messages when user types
+                            if (viewModel.errorMessage != null) {
+                              viewModel.clearError();
+                            }
                           }
-                        }
-                      : null,
+                          : null,
+                ),
+                const SizedBox(height: 16),
+
+                // Company Name (Editable in edit mode, read-only in view mode)
+                AppInput.primary(
+                  controller: viewModel.companyNameController,
+                  labelText: 'Company Name',
+                  hintText: 'Enter your company name',
+                  enabled: viewModel.isEditing,
+                  onChanged:
+                      viewModel.isEditing
+                          ? (value) {
+                            if (viewModel.errorMessage != null) {
+                              viewModel.clearError();
+                            }
+                          }
+                          : null,
+                ),
+                const SizedBox(height: 16),
+
+                // Company Contact Information
+                AppInput.primary(
+                  controller: viewModel.companyContactController,
+                  labelText: 'Company Contact',
+                  hintText: 'Enter company contact information',
+                  enabled: viewModel.isEditing,
+                  onChanged:
+                      viewModel.isEditing
+                          ? (value) {
+                            if (viewModel.errorMessage != null) {
+                              viewModel.clearError();
+                            }
+                          }
+                          : null,
+                ),
+                const SizedBox(height: 16),
+
+                // Driver License Status
+                AppInfoCard(
+                  icon: Icons.drive_eta,
+                  label: 'Driver License',
+                  value:
+                      appState.currentUser?.hasDriverLicense == true
+                          ? 'Approved'
+                          : 'Not Uploaded',
+                  iconColor: context.primary,
+                  valueColor:
+                      appState.currentUser?.hasDriverLicense == true
+                          ? Colors.green
+                          : Colors.red,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const DocumentUploadView(
+                              documentType: 'driver_license',
+                              title: 'Driver License',
+                              description:
+                                  'Upload your driver license for verification',
+                            ),
+                      ),
+                    );
+                  },
                 ),
               ],
             );
@@ -240,6 +303,11 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
+  /// Builds bottom spacing box
+  Widget _buildBottomSpacing() {
+    return const SizedBox(height: 80);
+  }
+
   /// Builds error message widget
   Widget _buildErrorMessage(BuildContext context, ProfileViewModel viewModel) {
     return Container(
@@ -255,10 +323,7 @@ class _ProfileViewState extends State<ProfileView> {
           Icon(Icons.error_outline, color: context.error),
           const SizedBox(width: 12),
           Expanded(
-            child: AppText.body(
-              viewModel.errorMessage!,
-              color: context.error,
-            ),
+            child: AppText.body(viewModel.errorMessage!, color: context.error),
           ),
           IconButton(
             icon: Icon(Icons.close, color: context.error),
@@ -271,7 +336,9 @@ class _ProfileViewState extends State<ProfileView> {
 
   /// Builds success message widget
   Widget _buildSuccessMessage(
-      BuildContext context, ProfileViewModel viewModel) {
+    BuildContext context,
+    ProfileViewModel viewModel,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),

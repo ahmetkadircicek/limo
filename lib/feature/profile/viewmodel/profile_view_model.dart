@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/providers/app_state_provider.dart';
 
 /// ViewModel for Profile feature that handles all business logic
 class ProfileViewModel extends ChangeNotifier {
@@ -10,6 +10,9 @@ class ProfileViewModel extends ChangeNotifier {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController licenseController = TextEditingController();
   final TextEditingController expiryController = TextEditingController();
+  final TextEditingController companyNameController = TextEditingController();
+  final TextEditingController companyContactController =
+      TextEditingController();
 
   // State
   bool _isLoading = false;
@@ -20,6 +23,8 @@ class ProfileViewModel extends ChangeNotifier {
 
   // Store original values for cancel functionality
   String _originalPhone = '';
+  String _originalCompanyName = '';
+  String _originalCompanyContact = '';
 
   // Getters
   bool get isLoading => _isLoading;
@@ -29,36 +34,46 @@ class ProfileViewModel extends ChangeNotifier {
   String? get successMessage => _successMessage;
 
   /// Initialize the ViewModel with user data
-  Future<void> initialize(UserProvider userProvider) async {
+  Future<void> initialize(AppStateProvider appState) async {
     _setLoading(true);
 
     try {
-      // Production: Initialize with empty data, no mock data
-      debugPrint('ProfileViewModel: Production mode - no mock data loaded');
-
       // Initialize with empty data
       addressController.text = '';
       licenseController.text = '';
       _vehicles.clear();
 
-      // Load existing phone number if available (you can extend UserProvider to include phone)
+      // Load existing phone number if available (you can extend AppStateProvider to include phone)
       // For demo purposes, let's set a default phone number
       if (phoneController.text.isEmpty) {
         phoneController.text = '+90 555 123 4567'; // Demo phone number
       }
 
+      // Load existing company name if available
+      if (companyNameController.text.isEmpty) {
+        companyNameController.text = 'Demo Company'; // Demo company name
+      }
+
+      // Load existing company contact if available
+      if (companyContactController.text.isEmpty) {
+        companyContactController.text =
+            '+90 555 123 4567'; // Demo company contact
+      }
+
       // Store original values
       _originalPhone = phoneController.text;
+      _originalCompanyName = companyNameController.text;
+      _originalCompanyContact = companyContactController.text;
 
       // Update controllers with user data if available
-      if (userProvider.isLoggedIn) {
-        if (userProvider.userDisplayName != null) {
-          nameController.text = userProvider.userDisplayName!;
+      if (appState.isAuthenticated) {
+        if (appState.currentUser?.displayName != null) {
+          nameController.text = appState.currentUser!.displayName;
         }
-        if (userProvider.userEmail != null) {
-          emailController.text = userProvider.userEmail!;
+        if (appState.currentUser?.email != null) {
+          emailController.text = appState.currentUser!.email;
         }
-        // Load existing phone number if available (you can extend UserProvider to include phone)
+        // Load existing phone number if available (you can extend AppStateProvider to include phone)
         // For now, we'll keep the existing value in the controller
       }
 
@@ -74,6 +89,8 @@ class ProfileViewModel extends ChangeNotifier {
   void startEditing() {
     // Store current values as original values
     _originalPhone = phoneController.text;
+    _originalCompanyName = companyNameController.text;
+    _originalCompanyContact = companyContactController.text;
 
     _isEditing = true;
     notifyListeners();
@@ -86,6 +103,8 @@ class ProfileViewModel extends ChangeNotifier {
 
     // Reset to original values
     phoneController.text = _originalPhone;
+    companyNameController.text = _originalCompanyName;
+    companyContactController.text = _originalCompanyContact;
 
     notifyListeners();
   }
@@ -109,6 +128,11 @@ class ProfileViewModel extends ChangeNotifier {
       // Update user data
       _setSuccess('Profile updated successfully');
       _isEditing = false;
+
+      // Store new values as original values
+      _originalPhone = phoneController.text;
+      _originalCompanyName = companyNameController.text;
+      _originalCompanyContact = companyContactController.text;
 
       notifyListeners();
     } catch (e) {
@@ -212,6 +236,9 @@ class ProfileViewModel extends ChangeNotifier {
     addressController.dispose();
     licenseController.dispose();
     expiryController.dispose();
+    companyNameController.dispose();
+    companyContactController.dispose();
+
     super.dispose();
   }
 }

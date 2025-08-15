@@ -22,7 +22,7 @@ class TermsSection extends StatelessWidget {
 
   Widget _buildTermsText(BuildContext context) {
     return AppText.caption(
-      'Devam ederek Kullanım Şartları ve Gizlilik Politikası\'nı kabul etmiş olursunuz.',
+      'By continuing, you accept the Terms of Service and Privacy Policy.',
       color: Colors.white.withValues(alpha: 0.7),
       textAlign: TextAlign.center,
       maxLines: 3,
@@ -44,7 +44,7 @@ class TermsSection extends StatelessWidget {
     return TextButton(
       onPressed: () => _showTermsDialog(context),
       child: AppText.caption(
-        'Kullanım Şartları',
+        'Terms of Service',
         color: Colors.white,
       ),
     );
@@ -62,7 +62,7 @@ class TermsSection extends StatelessWidget {
     return TextButton(
       onPressed: () => _showPrivacyDialog(context),
       child: AppText.caption(
-        'Gizlilik Politikası',
+        'Privacy Policy',
         color: Colors.white,
       ),
     );
@@ -73,15 +73,15 @@ class TermsSection extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: AppText.title('Kullanım Şartları', color: Colors.white),
+        title: AppText.title('Terms of Service', color: Colors.white),
         content: AppText.body(
-          'Kullanım şartları burada gösterilecek...',
+          'Terms of service will be displayed here...',
           color: Colors.white,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: AppText.body('Kapat', color: Colors.white),
+            child: AppText.body('Close', color: Colors.white),
           ),
         ],
       ),
@@ -93,15 +93,15 @@ class TermsSection extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: AppText.title('Gizlilik Politikası', color: Colors.white),
+        title: AppText.title('Privacy Policy', color: Colors.white),
         content: AppText.body(
-          'Gizlilik politikası burada gösterilecek...',
+          'Privacy policy will be displayed here...',
           color: Colors.white,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: AppText.body('Kapat', color: Colors.white),
+            child: AppText.body('Close', color: Colors.white),
           ),
         ],
       ),

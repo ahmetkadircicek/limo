@@ -9,7 +9,7 @@ extension AppDialogExtension on BuildContext {
     showDialog(
       context: this,
       builder: (context) => _AppDialog(
-        title: 'Başarılı',
+        title: 'Success',
         message: message,
         isSuccess: true,
       ),
@@ -20,7 +20,7 @@ extension AppDialogExtension on BuildContext {
     showDialog(
       context: this,
       builder: (context) => _AppDialog(
-        title: 'Hata',
+        title: 'Error',
         message: message,
         isSuccess: false,
       ),
@@ -48,48 +48,9 @@ extension AppDialogExtension on BuildContext {
       ),
     );
   }
-
-  void showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: AppText.body(message, color: Colors.white),
-        backgroundColor: const Color(0xFF00B14F),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
-  }
-
-  void showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: AppText.body(message, color: Colors.white),
-        backgroundColor: const Color(0xFFD72638),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
-  }
 }
 
+/// Universal frame widget for all cards/sections
 class _AppDialog extends StatelessWidget {
   final String title;
   final String message;
@@ -128,50 +89,11 @@ class _AppDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             AppButton.primary(
-              'Tamam',
+              'OK',
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// Snackbar extension methods
-extension SnackbarExtension on BuildContext {
-  void showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: AppText.body(message),
-        backgroundColor: const Color(0xFFEF4444), // semantic.danger
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
-      ),
-    );
-  }
-
-  void showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: AppText.body(message),
-        backgroundColor: const Color(0xFF16A34A), // semantic.success
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 8,
-        dismissDirection: DismissDirection.up,
       ),
     );
   }

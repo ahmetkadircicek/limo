@@ -90,7 +90,6 @@ class _LoginViewBody extends StatelessWidget {
             const OAuthButtonsSection(),
             SizedBox(height: context.spacingL),
             const TermsSection(),
-            SizedBox(height: 112),
           ],
         ),
       ),

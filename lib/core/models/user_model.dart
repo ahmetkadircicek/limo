@@ -6,6 +6,8 @@ class UserModel {
   final String? photoUrl;
   final DateTime createdAt;
   final DateTime lastLoginAt;
+  final String? companyName;
+  final bool hasDriverLicense;
 
   const UserModel({
     required this.id,
@@ -14,6 +16,8 @@ class UserModel {
     this.photoUrl,
     required this.createdAt,
     required this.lastLoginAt,
+    this.companyName,
+    this.hasDriverLicense = false,
   });
 
   /// Create user from Google authentication data
@@ -43,6 +47,8 @@ class UserModel {
       photoUrl: json['photoUrl'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       lastLoginAt: DateTime.parse(json['lastLoginAt'] as String),
+      companyName: json['companyName'] as String?,
+      hasDriverLicense: json['hasDriverLicense'] as bool? ?? false,
     );
   }
 
@@ -55,6 +61,8 @@ class UserModel {
       'photoUrl': photoUrl,
       'createdAt': createdAt.toIso8601String(),
       'lastLoginAt': lastLoginAt.toIso8601String(),
+      'companyName': companyName,
+      'hasDriverLicense': hasDriverLicense,
     };
   }
 
@@ -66,6 +74,8 @@ class UserModel {
     String? photoUrl,
     DateTime? createdAt,
     DateTime? lastLoginAt,
+    String? companyName,
+    bool? hasDriverLicense,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -74,6 +84,8 @@ class UserModel {
       photoUrl: photoUrl ?? this.photoUrl,
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      companyName: companyName ?? this.companyName,
+      hasDriverLicense: hasDriverLicense ?? this.hasDriverLicense,
     );
   }
 
@@ -84,7 +96,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl)';
+    return 'UserModel(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl, companyName: $companyName, hasDriverLicense: $hasDriverLicense)';
   }
 
   @override

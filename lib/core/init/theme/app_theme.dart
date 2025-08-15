@@ -1,41 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/constants/design_tokens.dart';
+import 'package:limo/core/constants/general_constants.dart';
 
 class AppTheme {
   static ThemeData theme = ThemeData(
     useMaterial3: true,
-    fontFamily: GoogleFonts.nunito().fontFamily,
-
-    // Professional Design Language Color System
+    fontFamily: GoogleFonts.montserrat().fontFamily,
     colorScheme: const ColorScheme.light(
-      primary: DesignTokens.primary900, // #0A0A0A
-      onPrimary: DesignTokens.textInverse, // #FFFFFF
-      secondary: DesignTokens.accent500, // #06B6D4
-      onSecondary: DesignTokens.textInverse, // #FFFFFF
-      tertiary: DesignTokens.surface200, // #F6F6F6
-      onTertiary: DesignTokens.textPrimary, // #0A0A0A
-      surface: DesignTokens.surface100, // #FFFFFF
-      onSurface: DesignTokens.textPrimary, // #0A0A0A
-      surfaceContainer: DesignTokens.surface200, // #F6F6F6
-      error: DesignTokens.danger, // #EF4444
-      onError: DesignTokens.textInverse, // #FFFFFF
+      primary: DesignTokens.primary900,
+      onPrimary: DesignTokens.textInverse,
+      secondary: DesignTokens.accent500,
+      onSecondary: DesignTokens.textInverse,
+      tertiary: DesignTokens.surface200,
+      onTertiary: DesignTokens.textPrimary,
+      surface: DesignTokens.surface100,
+      onSurface: DesignTokens.textPrimary,
+      surfaceContainer: DesignTokens.surface200,
+      error: DesignTokens.danger,
+      onError: DesignTokens.textInverse,
     ),
-
-    // Professional input decoration following design system
     inputDecorationTheme: InputDecorationTheme(
-      filled: false, // filled: true yerine false yap
-      border: InputBorder.none, // Border radius tanımını kaldır
-      enabledBorder: InputBorder.none, // Border radius tanımını kaldır
-      focusedBorder: InputBorder.none, // Border radius tanımını kaldır
-      disabledBorder: InputBorder.none, // Border radius tanımını kaldır
+      filled: false,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: const BorderSide(
+          color: DesignTokens.surface200,
+          width: 1.0,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: const BorderSide(
+          color: DesignTokens.surface200,
+          width: 1.0,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: const BorderSide(
+          color: DesignTokens.primary900,
+          width: 1.0,
+        ),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: const BorderSide(
+          color: DesignTokens.surface200,
+          width: 1.0,
+        ),
+      ),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: DesignTokens.spacing3,
         vertical: DesignTokens.spacing4,
       ),
     ),
-
-    // Professional button styling following design system
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: DesignTokens.primary900,
@@ -52,27 +71,27 @@ class AppTheme {
         minimumSize: const Size(0, DesignTokens.primaryButtonHeight),
       ),
     ),
-
-    // Professional typography system following design tokens
     textTheme: TextTheme(
-      displayLarge:
-          DesignTokens.displayXL.copyWith(color: DesignTokens.textPrimary),
+      displayLarge: DesignTokens.displayXL.copyWith(
+        color: DesignTokens.textPrimary,
+      ),
       headlineLarge: DesignTokens.h1.copyWith(color: DesignTokens.textPrimary),
       headlineMedium: DesignTokens.h2.copyWith(color: DesignTokens.textPrimary),
       titleLarge: DesignTokens.h3.copyWith(color: DesignTokens.textPrimary),
-      bodyLarge:
-          DesignTokens.bodyLarge.copyWith(color: DesignTokens.textPrimary),
-      bodyMedium:
-          DesignTokens.bodySmall.copyWith(color: DesignTokens.textPrimary),
-      bodySmall:
-          DesignTokens.caption.copyWith(color: DesignTokens.textSecondary),
+      bodyLarge: DesignTokens.bodyLarge.copyWith(
+        color: DesignTokens.textPrimary,
+      ),
+      bodyMedium: DesignTokens.bodySmall.copyWith(
+        color: DesignTokens.textPrimary,
+      ),
+      bodySmall: DesignTokens.caption.copyWith(
+        color: DesignTokens.textSecondary,
+      ),
       labelLarge: DesignTokens.bodySmall.copyWith(
         color: DesignTokens.textPrimary,
         fontWeight: FontWeight.w500,
       ),
     ),
-
-    // App Bar Theme
     appBarTheme: const AppBarTheme(
       backgroundColor: DesignTokens.surface100,
       foregroundColor: DesignTokens.textPrimary,
@@ -82,20 +101,16 @@ class AppTheme {
       titleTextStyle: DesignTokens.h3,
       toolbarHeight: DesignTokens.topAppBarHeight,
     ),
-
-    // Card Theme
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: DesignTokens.surface100,
       surfaceTintColor: Colors.transparent,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
+      shadowColor: Colors.black,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       margin: const EdgeInsets.all(DesignTokens.spacing2),
     ),
-
-    // Bottom Navigation Bar Theme
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: DesignTokens.primary900,
       selectedItemColor: DesignTokens.accent500,
@@ -103,64 +118,172 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
       elevation: 0,
     ),
-
-    // FloatingActionButton Theme
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: DesignTokens.accent500,
       foregroundColor: DesignTokens.textInverse,
       elevation: DesignTokens.spacing2,
       shape: CircleBorder(),
     ),
-
-    // Divider Theme
     dividerTheme: const DividerThemeData(
       color: DesignTokens.surface200,
       thickness: 1,
       space: DesignTokens.spacing1,
     ),
-
-    // Popup Menu Theme for consistent dropdown styling
     popupMenuTheme: PopupMenuThemeData(
       color: DesignTokens.surface100,
-      elevation: 8,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
+      elevation: DesignTokens.spacing2,
+      shadowColor: Colors.black.withOpacity(0.08),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
-        side: const BorderSide(
-          color: DesignTokens.surface200,
-          width: 1.0,
-        ),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        side: const BorderSide(color: DesignTokens.surface200, width: 1.0),
+      ),
+      textStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w400,
+        color: DesignTokens.textPrimary,
+        height: DesignTokens.bodyLarge.height,
       ),
     ),
-
-    // Dropdown Menu Theme for Flutter 3.7+ comprehensive styling
-    dropdownMenuTheme: DropdownMenuThemeData(
-      menuStyle: MenuStyle(
+    menuTheme: MenuThemeData(
+      style: MenuStyle(
         backgroundColor: WidgetStateProperty.all(DesignTokens.surface100),
-        elevation: WidgetStateProperty.all(8),
-        shadowColor:
-            WidgetStateProperty.all(Colors.black.withValues(alpha: 0.08)),
+        elevation: WidgetStateProperty.all(DesignTokens.spacing2),
+        shadowColor: WidgetStateProperty.all(Colors.black.withOpacity(0.08)),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
-            side: const BorderSide(
-              color: DesignTokens.surface200,
-              width: 1.0,
-            ),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+            side: const BorderSide(color: DesignTokens.surface200, width: 1.0),
           ),
         ),
         padding: WidgetStateProperty.all(
-          const EdgeInsets.symmetric(vertical: DesignTokens.spacing2),
+          const EdgeInsets.symmetric(
+            vertical: DesignTokens.spacing2,
+            horizontal: DesignTokens.spacing1,
+          ),
         ),
       ),
-      textStyle: GoogleFonts.nunito(
-        fontSize: 16,
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: DesignTokens.surface100,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        side: const BorderSide(color: DesignTokens.surface200, width: 1.0),
+      ),
+      titleTextStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.h3.fontSize,
         fontWeight: FontWeight.w500,
         color: DesignTokens.textPrimary,
+        height: DesignTokens.h3.height,
+      ),
+      contentTextStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w400,
+        color: DesignTokens.textPrimary,
+        height: DesignTokens.bodyLarge.height,
       ),
     ),
-
-    // Animation Duration
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: DesignTokens.surface100,
+      shape: RoundedRectangleBorder(
+        borderRadius: GeneralConstants.borderRadius,
+        side: const BorderSide(color: DesignTokens.surface200, width: 1.0),
+      ),
+      headerBackgroundColor: DesignTokens.primary900,
+      headerForegroundColor: DesignTokens.textInverse,
+      headerHeadlineStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.h3.fontSize,
+        fontWeight: FontWeight.w600,
+        color: DesignTokens.textInverse,
+      ),
+      headerHelpStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodySmall.fontSize,
+        fontWeight: FontWeight.w400,
+        color: DesignTokens.textInverse.withOpacity(0.7),
+        height: DesignTokens.bodySmall.height,
+      ),
+      dayStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w500,
+        color: DesignTokens.primary900,
+        height: DesignTokens.bodyLarge.height,
+      ),
+      yearStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w500,
+        color: DesignTokens.primary900,
+        height: DesignTokens.bodyLarge.height,
+      ),
+      weekdayStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodySmall.fontSize,
+        fontWeight: FontWeight.w600,
+        color: DesignTokens.accent500,
+        height: DesignTokens.bodySmall.height,
+      ),
+    ),
+    timePickerTheme: TimePickerThemeData(
+      backgroundColor: DesignTokens.surface200,
+      elevation: DesignTokens.spacing2,
+      shape: RoundedRectangleBorder(
+        borderRadius: GeneralConstants.borderRadius,
+      ),
+      confirmButtonStyle: ElevatedButton.styleFrom(
+        backgroundColor: DesignTokens.primary900,
+        foregroundColor: DesignTokens.textInverse,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: GeneralConstants.borderRadius,
+        ),
+      ),
+      cancelButtonStyle: ElevatedButton.styleFrom(
+        backgroundColor: DesignTokens.surface200,
+        foregroundColor: DesignTokens.textPrimary,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: GeneralConstants.borderRadius,
+        ),
+      ),
+      hourMinuteTextStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.h1.fontSize,
+        fontWeight: FontWeight.w600,
+        color: DesignTokens.textInverse, // Seçili saat text'i beyaz
+        height: DesignTokens.h1.height,
+      ),
+      hourMinuteColor: DesignTokens.accent500, // Seçili saat background'ı mavi
+      hourMinuteShape: RoundedRectangleBorder(
+        borderRadius: GeneralConstants.borderRadius,
+      ),
+      dayPeriodTextStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w500,
+        color: DesignTokens.accent500,
+        height: DesignTokens.bodyLarge.height,
+      ),
+      dayPeriodColor: DesignTokens.accent500,
+      dayPeriodBorderSide: BorderSide(
+        color: DesignTokens.primary900.withValues(alpha: 0.1),
+        width: 1,
+      ),
+      dialHandColor: DesignTokens.accent500, // Seçili saat için mavi ok
+      dialBackgroundColor:
+          DesignTokens.surface100, // Dial arka planı surface container
+      dialTextColor:
+          DesignTokens.textSecondary, // Seçili olmayan saatler için gri
+      dialTextStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w500,
+        color: DesignTokens.textSecondary, // Seçili olmayan saatler için gri
+        height: DesignTokens.bodyLarge.height,
+      ),
+      helpTextStyle: GoogleFonts.montserrat(
+        fontSize: DesignTokens.bodySmall.fontSize,
+        fontWeight: FontWeight.w400,
+        color: DesignTokens.primary900,
+        height: DesignTokens.bodySmall.height,
+      ),
+      entryModeIconColor: Colors.transparent,
+    ),
     splashFactory: InkRipple.splashFactory,
   );
 }
