@@ -43,7 +43,8 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
 
       // Mock data loading removed - implement real API call here
       debugPrint(
-          'VehicleManagementView: Mock data loading removed - implement real API call');
+        'VehicleManagementView: Mock data loading removed - implement real API call',
+      );
 
       setState(() {
         _vehicles = [];
@@ -77,9 +78,7 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: context.primary,
-          ),
+          CircularProgressIndicator(color: context.primary),
           SizedBox(height: PaddingConstants.spacingL),
           AppText.body(
             'Loading vehicles...',
@@ -100,22 +99,17 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
         slivers: [
           SliverToBoxAdapter(child: _buildHeaderSection()),
           if (_vehicles.isEmpty)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: _buildEmptyState(),
-            )
+            SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState())
           else
             SliverPadding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: PaddingConstants.spacingL),
+              padding: EdgeInsets.symmetric(
+                horizontal: PaddingConstants.spacingL,
+              ),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final vehicle = _vehicles[index];
-                    return _buildVehicleCard(vehicle, index);
-                  },
-                  childCount: _vehicles.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final vehicle = _vehicles[index];
+                  return _buildVehicleCard(vehicle, index);
+                }, childCount: _vehicles.length),
               ),
             ),
         ],
@@ -130,30 +124,34 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main header row
+          // Main header with better spacing and hierarchy
           Row(
             children: [
-              // Left side with title and subtitle
+              // Left side with improved title layout
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Main title with icon
+                    // Main title with better icon integration
                     Row(
                       children: [
                         Container(
-                          padding: context.paddingM,
+                          padding: EdgeInsets.all(context.spacingM),
                           decoration: BoxDecoration(
-                            color: context.primary.withValues(alpha: 0.1),
-                            borderRadius: context.radiusMedium,
+                            color: context.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: context.primary.withValues(alpha: 0.15),
+                              width: 1,
+                            ),
                           ),
                           child: Icon(
                             Icons.directions_car,
                             color: context.primary,
-                            size: 24,
+                            size: 28,
                           ),
                         ),
-                        SizedBox(width: context.spacingM),
+                        SizedBox(width: context.spacingL),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,9 +160,10 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                                 'My Vehicles',
                                 color: context.onSurface,
                               ),
+                              SizedBox(height: context.spacingXs),
                               AppText.bodySmall(
                                 '${_vehicles.length} vehicles in your fleet',
-                                color: context.onSurface.withValues(alpha: 0.6),
+                                color: context.onSurface.withValues(alpha: 0.7),
                               ),
                             ],
                           ),
@@ -174,26 +173,37 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                   ],
                 ),
               ),
-              // Right side with add button
+              // Right side with improved add button
               Container(
                 decoration: BoxDecoration(
                   color: context.primary,
-                  borderRadius: context.radiusRound,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: context.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: InkWell(
-                  onTap: _addNewVehicle,
-                  borderRadius: context.radiusRound,
-                  child: Padding(
-                    padding: context.paddingM,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          color: context.surface,
-                          size: 20,
-                        ),
-                      ],
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _addNewVehicle,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: EdgeInsets.all(context.spacingM),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add, color: context.surface, size: 24),
+                          SizedBox(width: context.spacingS),
+                          AppText.bodySmall(
+                            'Add Vehicle',
+                            color: context.surface,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -392,8 +402,11 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                           label: 'Sigorta',
                           hasDocument: vehicle.hasInsurance,
                           context: context,
-                          onTap: () => _navigateToDocumentUpload(
-                              'insurance', vehicle.licencePlate),
+                          onTap:
+                              () => _navigateToDocumentUpload(
+                                'insurance',
+                                vehicle.licencePlate,
+                              ),
                         ),
                       ),
                       SizedBox(width: PaddingConstants.spacingM),
@@ -403,8 +416,11 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                           label: 'Ruhsat',
                           hasDocument: vehicle.hasRegistration,
                           context: context,
-                          onTap: () => _navigateToDocumentUpload(
-                              'license', vehicle.licencePlate),
+                          onTap:
+                              () => _navigateToDocumentUpload(
+                                'license',
+                                vehicle.licencePlate,
+                              ),
                         ),
                       ),
                       SizedBox(width: PaddingConstants.spacingM),
@@ -414,8 +430,11 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                           label: 'Muayene',
                           hasDocument: vehicle.hasInspection,
                           context: context,
-                          onTap: () => _navigateToDocumentUpload(
-                              'inspection', vehicle.licencePlate),
+                          onTap:
+                              () => _navigateToDocumentUpload(
+                                'inspection',
+                                vehicle.licencePlate,
+                              ),
                         ),
                       ),
                     ],
@@ -437,11 +456,7 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: context.onSurface.withValues(alpha: 0.7),
-        ),
+        Icon(icon, size: 16, color: context.onSurface.withValues(alpha: 0.7)),
         SizedBox(width: PaddingConstants.spacingS),
         Expanded(
           child: Column(
@@ -476,14 +491,16 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
       child: Container(
         padding: EdgeInsets.all(PaddingConstants.spacingS),
         decoration: BoxDecoration(
-          color: hasDocument
-              ? context.success.withValues(alpha: 0.1)
-              : context.error.withValues(alpha: 0.1),
+          color:
+              hasDocument
+                  ? context.success.withValues(alpha: 0.1)
+                  : context.error.withValues(alpha: 0.1),
           borderRadius: GeneralConstants.borderRadius,
           border: Border.all(
-            color: hasDocument
-                ? context.success.withValues(alpha: 0.3)
-                : context.error.withValues(alpha: 0.3),
+            color:
+                hasDocument
+                    ? context.success.withValues(alpha: 0.3)
+                    : context.error.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
@@ -504,9 +521,10 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                   ),
                   AppText.caption(
                     hasDocument ? 'Valid' : 'Missing',
-                    color: hasDocument
-                        ? context.success.withValues(alpha: 0.7)
-                        : context.error.withValues(alpha: 0.7),
+                    color:
+                        hasDocument
+                            ? context.success.withValues(alpha: 0.7)
+                            : context.error.withValues(alpha: 0.7),
                   ),
                 ],
               ),
@@ -514,9 +532,10 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
             Icon(
               Icons.chevron_right,
               size: 16,
-              color: hasDocument
-                  ? context.success.withValues(alpha: 0.7)
-                  : context.error.withValues(alpha: 0.7),
+              color:
+                  hasDocument
+                      ? context.success.withValues(alpha: 0.7)
+                      : context.error.withValues(alpha: 0.7),
             ),
           ],
         ),
@@ -545,16 +564,9 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(DesignTokens.radiusRound),
-              border: Border.all(
-                color: color.withValues(alpha: 0.3),
-                width: 1,
-              ),
+              border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: color,
-            ),
+            child: Icon(icon, size: 20, color: color),
           ),
         ),
       ),
@@ -570,7 +582,8 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
 
   void _editVehicle(VehicleModel vehicle) {
     debugPrint(
-        "Navigation to Vehicle Registration (Edit) from Vehicle Management");
+      "Navigation to Vehicle Registration (Edit) from Vehicle Management",
+    );
     context.push('/vehicle-registration', extra: vehicle).then((_) {
       _loadVehicles();
     });
@@ -597,9 +610,7 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                 context.pop();
                 _confirmDeleteVehicle(index);
               },
-              style: TextButton.styleFrom(
-                foregroundColor: context.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: context.error),
               child: const AppText.body('Delete'),
             ),
           ],
@@ -633,19 +644,21 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
 
   void _navigateToDocumentUpload(String documentType, String licencePlate) {
     debugPrint(
-        "Navigation to Document Upload for $documentType for $licencePlate");
+      "Navigation to Document Upload for $documentType for $licencePlate",
+    );
     Navigator.of(context)
         .push(
-      MaterialPageRoute(
-        builder: (context) => DocumentUploadView(
-          documentType: documentType,
-          vehiclePlate: licencePlate,
-        ),
-      ),
-    )
+          MaterialPageRoute(
+            builder:
+                (context) => DocumentUploadView(
+                  documentType: documentType,
+                  vehiclePlate: licencePlate,
+                ),
+          ),
+        )
         .then((_) {
-      _loadVehicles(); // Reload to update document status
-    });
+          _loadVehicles(); // Reload to update document status
+        });
   }
 }
 

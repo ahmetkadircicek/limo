@@ -57,10 +57,7 @@ class JobCard extends StatelessWidget {
               size: GeneralConstants.iconSizeSmall,
             ),
           ),
-          AppText.body(
-            job.toProvince!.toUpperCase(),
-            color: context.onSurface,
-          ),
+          AppText.body(job.toProvince!.toUpperCase(), color: context.onSurface),
         ],
       ),
     );
@@ -75,12 +72,8 @@ class JobCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (job.jobType != null) ...[
-              _buildJobTypeRow(context),
-            ],
-            if (job.vehicleCount != null) ...[
-              _buildVehicleCountRow(context),
-            ],
+            if (job.jobType != null) ...[_buildJobTypeRow(context)],
+            if (job.vehicleCount != null) ...[_buildVehicleCountRow(context)],
             if (job.price == null) ...[
               _buildQuoteBasedRow(context),
             ] else ...[
@@ -135,10 +128,7 @@ class JobCard extends StatelessWidget {
           color: context.onSecondary,
           size: GeneralConstants.fontSizeExtraSmall,
         ),
-        AppText.caption(
-          'QUOTE BASED',
-          color: context.onSurface,
-        ),
+        AppText.caption('QUOTE BASED', color: context.onSurface),
       ],
     );
   }
@@ -183,10 +173,7 @@ class JobCard extends StatelessWidget {
           ),
         ),
         onPressed: onTap,
-        child: AppText.body(
-          'VIEW',
-          color: context.onPrimary,
-        ),
+        child: AppText.body('VIEW', color: context.onPrimary),
       ),
     );
   }

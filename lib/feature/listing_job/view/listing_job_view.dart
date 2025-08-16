@@ -8,8 +8,8 @@ import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/pickup_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/feature/job_list/model/coordinate_model.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
+import 'package:limo/feature/job_list/model/location_data_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:limo/feature/listing_job/services/job_creation_service.dart';
 import 'package:limo/feature/listing_job/widgets/multiple_vehicle_requirements_form.dart';
@@ -733,16 +733,22 @@ class _ListingJobViewState extends State<ListingJobView> {
       }
     }
 
-    final fromCoordinate = Coordinate(
+    final fromLocationData = LocationData(
+      placeName: _fromLocation!.placeName,
+      address: _fromLocation!.address,
       latitude: _fromLocation!.latitude,
       longitude: _fromLocation!.longitude,
+      placeId: _fromLocation!.placeId ?? '',
     );
 
-    final toCoordinate =
+    final toLocationData =
         _toLocation != null
-            ? Coordinate(
-              latitude: _toLocation!.latitude,
+            ? LocationData(
+              placeName: _toLocation!.placeName,
+              address: _toLocation!.address,
+              latitude: _toLocation!.longitude,
               longitude: _toLocation!.longitude,
+              placeId: _toLocation!.placeId ?? '',
             )
             : null;
 
@@ -764,8 +770,8 @@ class _ListingJobViewState extends State<ListingJobView> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       fromProvince: _fromLocation!.placeName.toUpperCase(),
       toProvince: _toLocation?.placeName.toUpperCase() ?? '',
-      fromLocation: fromCoordinate,
-      toLocation: toCoordinate,
+      fromLocation: fromLocationData,
+      toLocation: toLocationData,
       fromCity: _fromLocation!.address,
       toCity: _toLocation?.address,
       jobType: jobType,

@@ -78,7 +78,10 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       _selectedVehicleType = _migrateVehicleType(req.specificVehicleType);
       _minCapacity = req.minimumCapacity;
       _minYear = req.minimumYear;
-      _selectedCategory = req.minimumCategory;
+      _selectedCategory =
+          req.minimumCategory != null
+              ? VehicleCategory.fromId(req.minimumCategory!)
+              : null;
 
       // Update controllers
       _minCapacityController.text = _minCapacity?.toString() ?? '';
@@ -289,10 +292,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
 
   // Build section header with title only
   Widget _buildSectionHeader(String title) {
-    return AppText.heading(
-      title,
-      color: context.onSurface,
-    );
+    return AppText.heading(title, color: context.onSurface);
   }
 
   // Build dropdown field
@@ -355,14 +355,15 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   // Save vehicle requirement and navigate back
   void _saveRequirement() {
     final requirement = VehicleRequirement(
-      id: widget.initialRequirement?.id ??
+      id:
+          widget.initialRequirement?.id ??
           'req_${DateTime.now().millisecondsSinceEpoch}',
       isFlexible: false, // Always false since we removed the flexible mode
       specificBrand: _selectedBrand,
       specificVehicleType: _selectedVehicleType,
       minimumCapacity: _minCapacity,
       minimumYear: _minYear,
-      minimumCategory: _selectedCategory,
+      minimumCategory: _selectedCategory?.id,
       notes:
           'Mile: ${_pricePerMile ?? 0}, Hour: ${_pricePerHour ?? 0}', // Store pricing info in notes field
     );

@@ -267,9 +267,10 @@ class _VehicleSelectionWidgetState extends State<VehicleSelectionWidget> {
       VehicleCategory? highestRequiredCategory;
       for (final requirement in widget.job.vehicleRequirements) {
         if (requirement.minimumCategory != null) {
+          final category = VehicleCategory.fromId(requirement.minimumCategory!);
           if (highestRequiredCategory == null ||
-              requirement.minimumCategory!.id > highestRequiredCategory.id) {
-            highestRequiredCategory = requirement.minimumCategory;
+              category.id > highestRequiredCategory.id) {
+            highestRequiredCategory = category;
           }
         }
       }
@@ -312,7 +313,7 @@ class _VehicleSelectionWidgetState extends State<VehicleSelectionWidget> {
 
     for (final requirement in widget.job.vehicleRequirements) {
       if (requirement.matchesVehicle(vehicle)) {
-        final categoryId = requirement.minimumCategory?.id ?? 0;
+        final categoryId = requirement.minimumCategory ?? 0;
         if (bestMatch == null || categoryId > (bestCategoryId ?? 0)) {
           bestMatch = requirement;
           bestCategoryId = categoryId;

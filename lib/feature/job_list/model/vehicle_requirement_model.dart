@@ -6,13 +6,13 @@ class VehicleRequirement {
   final String? specificBrand; // null = "Any brand"
   final String? specificModel; // null = "Any model"
   final String? specificVehicleType; // null = "Any type"
-  final String? specificExteriorColor; // null = "Any color"
-  final String? specificInteriorColor; // null = "Any interior color"
+
   final int? minimumCapacity; // null = "Any capacity"
   final int? maximumCapacity; // null = "No max limit"
   final int? minimumYear; // null = "Any year"
   final int? maximumYear; // null = "No max year"
-  final VehicleCategory? minimumCategory; // null = "Any category"
+  final int?
+  minimumCategory; // null = "Any category" - using integer ID from JSON
   final bool isFlexible; // Overall flexibility flag
   final String? notes; // Additional notes about the requirement
 
@@ -25,8 +25,6 @@ class VehicleRequirement {
     this.specificBrand,
     this.specificModel,
     this.specificVehicleType,
-    this.specificExteriorColor,
-    this.specificInteriorColor,
     this.minimumCapacity,
     this.maximumCapacity,
     this.minimumYear,
@@ -40,10 +38,7 @@ class VehicleRequirement {
 
   /// Factory constructor for completely flexible requirements
   factory VehicleRequirement.anyVehicle() {
-    return const VehicleRequirement(
-      id: 'any_vehicle',
-      isFlexible: true,
-    );
+    return const VehicleRequirement(id: 'any_vehicle', isFlexible: true);
   }
 
   /// Factory constructor for specific requirements
@@ -52,13 +47,12 @@ class VehicleRequirement {
     String? brand,
     String? model,
     String? vehicleType,
-    String? exteriorColor,
-    String? interiorColor,
+
     int? minCapacity,
     int? maxCapacity,
     int? minYear,
     int? maxYear,
-    VehicleCategory? minCategory,
+    int? minCategory,
     String? notes,
     double? hourlyRate,
     double? pricePerMile,
@@ -68,8 +62,7 @@ class VehicleRequirement {
       specificBrand: brand,
       specificModel: model,
       specificVehicleType: vehicleType,
-      specificExteriorColor: exteriorColor,
-      specificInteriorColor: interiorColor,
+
       minimumCapacity: minCapacity,
       maximumCapacity: maxCapacity,
       minimumYear: minYear,
@@ -91,7 +84,9 @@ class VehicleRequirement {
 
     // Check category requirement
     if (minimumCategory != null) {
-      if (!vehicle.canHandleJob(minimumCategory!)) {
+      // Convert integer category to VehicleCategory enum for comparison
+      final category = VehicleCategory.fromId(minimumCategory!);
+      if (!vehicle.canHandleJob(category)) {
         return false;
       }
     }
@@ -120,16 +115,6 @@ class VehicleRequirement {
       return false;
     }
 
-    // Check color requirements
-    if (specificExteriorColor != null &&
-        vehicle.exteriorColor != specificExteriorColor) {
-      return false;
-    }
-    if (specificInteriorColor != null &&
-        vehicle.interiorColor != specificInteriorColor) {
-      return false;
-    }
-
     return true;
   }
 
@@ -144,7 +129,9 @@ class VehicleRequirement {
       parts.add('Model: $specificModel');
     }
     if (minimumCategory != null) {
-      parts.add('Category: ${minimumCategory!.displayName}');
+      // Convert integer category to VehicleCategory enum for display
+      final category = VehicleCategory.fromId(minimumCategory!);
+      parts.add('Category: ${category.displayName}');
     }
     if (minimumCapacity != null) {
       parts.add('Capacity: $minimumCapacity+ people');
@@ -185,13 +172,12 @@ class VehicleRequirement {
       'specificBrand': specificBrand,
       'specificModel': specificModel,
       'specificVehicleType': specificVehicleType,
-      'specificExteriorColor': specificExteriorColor,
-      'specificInteriorColor': specificInteriorColor,
+
       'minimumCapacity': minimumCapacity,
       'maximumCapacity': maximumCapacity,
       'minimumYear': minimumYear,
       'maximumYear': maximumYear,
-      'minimumCategory': minimumCategory?.id,
+      'minimumCategory': minimumCategory,
       'isFlexible': isFlexible,
       'notes': notes,
       'hourlyRate': hourlyRate,
@@ -205,22 +191,15 @@ class VehicleRequirement {
       id: json['id'] ?? '',
       specificBrand: json['specificBrand'],
       specificModel: json['specificModel'],
-      specificVehicleType:
-          _migrateVehicleTypeFromJson(json['specificVehicleType']),
-      specificExteriorColor:
-          _migrateColorFromJson(json['specificExteriorColor']),
-      specificInteriorColor:
-          _migrateColorFromJson(json['specificInteriorColor']),
+      specificVehicleType: _migrateVehicleTypeFromJson(
+        json['specificVehicleType'],
+      ),
+
       minimumCapacity: json['minimumCapacity'],
       maximumCapacity: json['maximumCapacity'],
       minimumYear: json['minimumYear'],
       maximumYear: json['maximumYear'],
-      minimumCategory: json['minimumCategory'] != null
-          ? VehicleCategory.values.firstWhere(
-              (cat) => cat.id == json['minimumCategory'],
-              orElse: () => VehicleCategory.standardSedan,
-            )
-          : null,
+      minimumCategory: json['minimumCategory'],
       isFlexible: json['isFlexible'] ?? true,
       notes: json['notes'],
       hourlyRate: json['hourlyRate']?.toDouble(),
@@ -252,30 +231,6 @@ class VehicleRequirement {
     }
   }
 
-  /// Migrate old Turkish colors to new English ones when loading from JSON
-  static String? _migrateColorFromJson(String? oldColor) {
-    if (oldColor == null) return null;
-
-    // Map old Turkish values to new English ones
-    switch (oldColor) {
-      case 'White':
-        return 'White';
-      case 'Black':
-        return 'Black';
-      case 'Gray':
-        return 'Gray';
-      case 'Red':
-        return 'Red';
-      case 'Blue':
-        return 'Blue';
-      case 'Green':
-        return 'Green';
-      default:
-        // If it's already in English or unknown, return as is
-        return oldColor;
-    }
-  }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -284,8 +239,6 @@ class VehicleRequirement {
         other.specificBrand == specificBrand &&
         other.specificModel == specificModel &&
         other.specificVehicleType == specificVehicleType &&
-        other.specificExteriorColor == specificExteriorColor &&
-        other.specificInteriorColor == specificInteriorColor &&
         other.minimumCapacity == minimumCapacity &&
         other.maximumCapacity == maximumCapacity &&
         other.minimumYear == minimumYear &&
@@ -302,8 +255,6 @@ class VehicleRequirement {
         specificBrand.hashCode ^
         specificModel.hashCode ^
         specificVehicleType.hashCode ^
-        specificExteriorColor.hashCode ^
-        specificInteriorColor.hashCode ^
         minimumCapacity.hashCode ^
         maximumCapacity.hashCode ^
         minimumYear.hashCode ^

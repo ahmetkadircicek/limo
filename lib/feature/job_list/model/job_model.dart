@@ -1,20 +1,19 @@
 import 'package:limo/core/enums/pickup_type_enum.dart';
-import 'package:limo/feature/job_list/model/coordinate_model.dart';
 import 'package:limo/feature/job_list/model/job_application_model.dart';
+import 'package:limo/feature/job_list/model/location_data_model.dart';
 import 'package:limo/feature/job_list/model/pricing_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
 class JobModel {
   final String id;
-  final String? title;
   final String? fromProvince;
   final String? toProvince;
   final String? fromCity;
   final String? toCity;
   final String? location;
-  final Coordinate? fromLocation;
-  final Coordinate? toLocation;
+  final LocationData? fromLocation;
+  final LocationData? toLocation;
   final double? price;
   final String? companyName;
   final String? contactInfo;
@@ -28,16 +27,14 @@ class JobModel {
   final double? hourlyRate;
   final double? pricePerMile;
   final DateTime? createdAt;
-  final DateTime? updatedAt;
   final List<VehicleRequirement> vehicleRequirements;
   final PricingModel? pricing;
 
-  // Her araç gereksinimi için ayrı başvurular
+  // Separate applications for each vehicle requirement
   final Map<String, List<JobApplication>> applicationsByRequirement;
 
   JobModel({
     required this.id,
-    this.title,
     this.fromProvince,
     this.toProvince,
     this.fromLocation,
@@ -58,7 +55,6 @@ class JobModel {
     this.hourlyRate,
     this.pricePerMile,
     this.createdAt,
-    this.updatedAt,
     this.vehicleRequirements = const [],
     this.pricing,
     this.applicationsByRequirement = const {},
@@ -100,7 +96,7 @@ class JobModel {
     final applications = getApplicationsForRequirement(requirementId);
     if (applications.isEmpty) return null;
 
-    // En yüksek priority score'a sahip başvuruyu bul
+    // Find the application with the highest priority score
     applications.sort((a, b) {
       final requirement = vehicleRequirements.firstWhere(
         (req) => req.toString().contains(requirementId),
@@ -110,7 +106,7 @@ class JobModel {
       final scoreA = a.getPriorityScore(requirement);
       final scoreB = b.getPriorityScore(requirement);
 
-      return scoreB.compareTo(scoreA); // Yüksek score önce
+      return scoreB.compareTo(scoreA); // Higher score first
     });
 
     return applications.first;
@@ -137,15 +133,15 @@ class JobModel {
 
   /// Check if job is still accepting applications
   bool get isAcceptingApplications {
-    // Eğer tüm araç gereksinimleri için yeterli başvuru varsa false
+    // Return false if there are enough accepted applications for all vehicle requirements
     for (final requirement in vehicleRequirements) {
-      final applications =
-          getApplicationsForRequirement(requirement.toString());
-      final acceptedApplications = applications
-          .where((app) => app.status == ApplicationStatus.accepted)
-          .length;
+      final applications = getApplicationsForRequirement(requirement.id);
+      final acceptedApplications =
+          applications
+              .where((app) => app.status == ApplicationStatus.accepted)
+              .length;
 
-      // Eğer herhangi bir gereksinim için yeterli kabul edilmiş başvuru yoksa true
+      // Return true if there are insufficient accepted applications for any requirement
       if (acceptedApplications < 1) return true;
     }
     return false;
@@ -156,18 +152,18 @@ class JobModel {
     if (json['vehicleRequirements'] != null) {
       try {
         final requirementsList = json['vehicleRequirements'] as List<dynamic>;
-        vehicleRequirements = requirementsList
-            .map((reqJson) {
-              try {
-                final requirement = VehicleRequirement.fromJson(reqJson);
-                return requirement;
-              } catch (e) {
-                return null;
-              }
-            })
-            .where((req) => req != null)
-            .cast<VehicleRequirement>()
-            .toList();
+        vehicleRequirements =
+            requirementsList
+                .map((reqJson) {
+                  try {
+                    return VehicleRequirement.fromJson(reqJson);
+                  } catch (e) {
+                    return null;
+                  }
+                })
+                .where((req) => req != null)
+                .cast<VehicleRequirement>()
+                .toList();
       } catch (e) {
         vehicleRequirements = [];
       }
@@ -180,9 +176,11 @@ class JobModel {
             json['applicationsByRequirement'] as Map<String, dynamic>;
         applicationsJson.forEach((requirementId, applicationsList) {
           if (applicationsList is List) {
-            applicationsMap[requirementId] = applicationsList
-                .map((appJson) => JobApplication.fromJson(appJson))
-                .toList();
+            applicationsMap[requirementId] =
+                applicationsList
+                    .map((appJson) => JobApplication.fromJson(appJson))
+                    .toList()
+                    .cast<JobApplication>();
           }
         });
       } catch (e) {
@@ -192,44 +190,56 @@ class JobModel {
 
     return JobModel(
       id: json['id'] ?? '',
-      title: json['title'],
       fromProvince: json['fromProvince'],
       toProvince: json['toProvince'],
       fromCity: json['fromCity'],
       toCity: json['toCity'],
       location: json['location'],
-      fromLocation: json['fromLocation'] != null
-          ? Coordinate.fromJson(json['fromLocation'])
-          : null,
-      toLocation: json['toLocation'] != null
-          ? Coordinate.fromJson(json['toLocation'])
-          : null,
-      price: json['price']?.toDouble(),
+      fromLocation:
+          json['fromLocation'] != null
+              ? LocationData.fromJson(json['fromLocation'])
+              : null,
+      toLocation:
+          json['toLocation'] != null
+              ? LocationData.fromJson(json['toLocation'])
+              : null,
+      price: json['price'] != null ? (json['price'] as num).toDouble() : null,
       companyName: json['companyName'],
       contactInfo: json['contactInfo'],
       description: json['description'],
       vehicleCount: json['vehicleCount'],
-      vehicles: (json['vehicles'] as List<dynamic>?)
-          ?.map((v) => VehicleModel.fromJson(v))
-          .toList(),
-      jobType: json['jobType'] != null
-          ? JobType.values.firstWhere((e) => e.name == json['jobType'],
-              orElse: () => JobType.pointToPoint)
-          : null,
+      vehicles:
+          json['vehicles'] != null
+              ? (json['vehicles'] as List<dynamic>)
+                  .map((v) => VehicleModel.fromJson(v))
+                  .toList()
+              : null,
+      jobType:
+          json['jobType'] != null
+              ? JobType.values.firstWhere(
+                (e) => e.name == json['jobType'],
+                orElse: () => JobType.pointToPoint,
+              )
+              : null,
       status: json['status'],
       startDate:
           json['startDate'] != null ? DateTime.parse(json['startDate']) : null,
       endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
-      hourlyRate: json['hourlyRate']?.toDouble(),
-      pricePerMile: json['pricePerMile']?.toDouble(),
+      hourlyRate:
+          json['hourlyRate'] != null
+              ? (json['hourlyRate'] as num).toDouble()
+              : null,
+      pricePerMile:
+          json['pricePerMile'] != null
+              ? (json['pricePerMile'] as num).toDouble()
+              : null,
       createdAt:
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt:
-          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
       vehicleRequirements: vehicleRequirements,
-      pricing: json['pricing'] != null
-          ? PricingModel.fromJson(json['pricing'])
-          : null,
+      pricing:
+          json['pricing'] != null
+              ? PricingModel.fromJson(json['pricing'])
+              : null,
       applicationsByRequirement: applicationsMap,
     );
   }
@@ -244,7 +254,6 @@ class JobModel {
 
     return {
       'id': id,
-      'title': title,
       'fromProvince': fromProvince,
       'toProvince': toProvince,
       'fromCity': fromCity,
@@ -265,7 +274,6 @@ class JobModel {
       'hourlyRate': hourlyRate,
       'pricePerMile': pricePerMile,
       'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
       'vehicleRequirements':
           vehicleRequirements.map((req) => req.toJson()).toList(),
       'pricing': pricing?.toJson(),
@@ -276,14 +284,13 @@ class JobModel {
   /// Create a copy with updated applications
   JobModel copyWith({
     String? id,
-    String? title,
     String? fromProvince,
     String? toProvince,
     String? fromCity,
     String? toCity,
     String? location,
-    Coordinate? fromLocation,
-    Coordinate? toLocation,
+    LocationData? fromLocation,
+    LocationData? toLocation,
     double? price,
     String? companyName,
     String? contactInfo,
@@ -297,14 +304,12 @@ class JobModel {
     double? hourlyRate,
     double? pricePerMile,
     DateTime? createdAt,
-    DateTime? updatedAt,
     List<VehicleRequirement>? vehicleRequirements,
     PricingModel? pricing,
     Map<String, List<JobApplication>>? applicationsByRequirement,
   }) {
     return JobModel(
       id: id ?? this.id,
-      title: title ?? this.title,
       fromProvince: fromProvince ?? this.fromProvince,
       toProvince: toProvince ?? this.toProvince,
       fromCity: fromCity ?? this.fromCity,
@@ -325,7 +330,6 @@ class JobModel {
       hourlyRate: hourlyRate ?? this.hourlyRate,
       pricePerMile: pricePerMile ?? this.pricePerMile,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
       vehicleRequirements: vehicleRequirements ?? this.vehicleRequirements,
       pricing: pricing ?? this.pricing,
       applicationsByRequirement:

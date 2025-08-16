@@ -36,10 +36,21 @@ class VehicleModel {
 
   /// Automatically determine vehicle category based on vehicle specifications
   static VehicleCategory _determineCategory(
-      String brand, String model, int year, int capacity) {
+    String brand,
+    String model,
+    int year,
+    int capacity,
+  ) {
     // Premium brands with luxury categorization
-    if (['Mercedes', 'BMW', 'Audi', 'Lexus', 'Porsche', 'Jaguar', 'Land Rover']
-        .contains(brand)) {
+    if ([
+      'Mercedes',
+      'BMW',
+      'Audi',
+      'Lexus',
+      'Porsche',
+      'Jaguar',
+      'Land Rover',
+    ].contains(brand)) {
       if (year >= 2020) {
         if (model.toLowerCase().contains('suv') || capacity > 5) {
           return VehicleCategory.luxurySuv;
@@ -70,7 +81,7 @@ class VehicleModel {
       'Ford',
       'Chevrolet',
       'Hyundai',
-      'Kia'
+      'Kia',
     ].contains(brand)) {
       if (year >= 2020) {
         if (model.toLowerCase().contains('suv') || capacity > 5) {
@@ -131,7 +142,10 @@ class VehicleModel {
   /// Check if this vehicle can apply to a specific job requirement
   bool canApplyToJobRequirement(VehicleRequirement requirement) {
     if (requirement.minimumCategory == null) return true;
-    return category.canApplyToJob(requirement.minimumCategory!);
+    final requiredCategory = VehicleCategory.fromId(
+      requirement.minimumCategory!,
+    );
+    return category.canApplyToJob(requiredCategory);
   }
 
   /// Get the highest category this vehicle can achieve
@@ -175,9 +189,13 @@ class VehicleModel {
 
   /// Get vehicle eligibility summary for a job
   Map<String, dynamic> getJobEligibilitySummary(
-      VehicleRequirement requirement) {
+    VehicleRequirement requirement,
+  ) {
     final isEligible = canApplyToJobRequirement(requirement);
-    final requiredCategory = requirement.minimumCategory;
+    final requiredCategory =
+        requirement.minimumCategory != null
+            ? VehicleCategory.fromId(requirement.minimumCategory!)
+            : null;
 
     if (requiredCategory == null) {
       return {

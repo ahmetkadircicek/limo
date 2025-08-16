@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
-enum ButtonVariant { primary, secondary, tertiary, error }
+enum ButtonVariant { primary, secondary, tertiary, error, success }
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -63,6 +63,16 @@ class AppButton extends StatelessWidget {
     this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.error;
+
+  const AppButton.success(
+    this.text, {
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.width,
+    this.height,
+    this.isLoading = false,
+  }) : variant = ButtonVariant.success;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +145,8 @@ class AppButton extends StatelessWidget {
         return context.tertiary;
       case ButtonVariant.error:
         return context.error;
+      case ButtonVariant.success:
+        return context.success;
     }
   }
 
@@ -148,6 +160,8 @@ class AppButton extends StatelessWidget {
         return context.onTertiary;
       case ButtonVariant.error:
         return context.onError;
+      case ButtonVariant.success:
+        return Colors.white;
     }
   }
 

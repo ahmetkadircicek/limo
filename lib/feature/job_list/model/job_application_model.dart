@@ -1,15 +1,16 @@
 import 'dart:math' as math;
 
 import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
-/// Job Application Model - Her araç gereksinimi için ayrı başvuru
+/// Job Application Model - Separate application for each vehicle requirement
 class JobApplication {
   final String id;
   final String jobId;
-  final String vehicleRequirementId; // Hangi araç gereksinimine başvurulduğu
+  final String vehicleRequirementId; // Which vehicle requirement is being applied for
   final String driverId;
   final String driverName;
   final String driverEmail;
@@ -20,12 +21,12 @@ class JobApplication {
   final String? notes;
   final String? rejectionReason;
 
-  // Fiyatlandırma bilgileri
-  final double? proposedHourlyRate; // Saatlik ücret
-  final double? proposedPricePerMile; // Mil başına ücret
-  final double? totalProposedPrice; // Toplam önerilen fiyat
+  // Pricing information
+  final double? proposedHourlyRate; // Hourly rate
+  final double? proposedPricePerMile; // Price per mile
+  final double? totalProposedPrice; // Total proposed price
 
-  // Araç uygunluk kontrolü
+  // Vehicle compatibility check
   final bool vehicleMeetsRequirements;
   final String? vehicleCompatibilityNotes;
 
@@ -56,8 +57,10 @@ class JobApplication {
 
   /// Calculate the total proposed price based on job type and requirements
   double calculateTotalProposedPrice(
-      JobModel job, VehicleRequirement requirement) {
-    // Eğer zaten hesaplanmışsa onu kullan
+    JobModel job,
+    VehicleRequirement requirement,
+  ) {
+    // Use if already calculated
     if (totalProposedPrice != null) {
       return totalProposedPrice!;
     }
@@ -65,14 +68,14 @@ class JobApplication {
     double totalPrice = 0.0;
 
     if (job.jobType == JobType.hourly) {
-      // Saatlik iş için
+      // For hourly jobs
       if (proposedHourlyRate != null) {
         totalPrice = proposedHourlyRate!;
       } else if (requirement.hourlyRate != null) {
         totalPrice = requirement.hourlyRate!;
       }
     } else if (job.jobType == JobType.pointToPoint) {
-      // Noktadan noktaya iş için
+      // For point-to-point jobs
       if (proposedPricePerMile != null &&
           job.toLocation != null &&
           job.fromLocation != null) {
@@ -106,22 +109,22 @@ class JobApplication {
     List<String> pricing = [];
 
     if (proposedHourlyRate != null) {
-      pricing.add('Saatlik: \$${proposedHourlyRate!.toStringAsFixed(2)}');
+      pricing.add('Hourly: \$${proposedHourlyRate!.toStringAsFixed(2)}');
     } else if (requirement.hourlyRate != null) {
-      pricing.add('Saatlik: \$${requirement.hourlyRate!.toStringAsFixed(2)}');
+      pricing.add('Hourly: \$${requirement.hourlyRate!.toStringAsFixed(2)}');
     }
 
     if (proposedPricePerMile != null) {
-      pricing.add('Mil: \$${proposedPricePerMile!.toStringAsFixed(2)}');
+      pricing.add('Per Mile: \$${proposedPricePerMile!.toStringAsFixed(2)}');
     } else if (requirement.pricePerMile != null) {
-      pricing.add('Mil: \$${requirement.pricePerMile!.toStringAsFixed(2)}');
+      pricing.add('Per Mile: \$${requirement.pricePerMile!.toStringAsFixed(2)}');
     }
 
     if (totalPrice > 0) {
-      pricing.add('Toplam: \$${totalPrice.toStringAsFixed(2)}');
+      pricing.add('Total: \$${totalPrice.toStringAsFixed(2)}');
     }
 
-    if (pricing.isEmpty) return 'Fiyat belirtilmemiş';
+    if (pricing.isEmpty) return 'Price not specified';
     return pricing.join(', ');
   }
 
@@ -129,8 +132,9 @@ class JobApplication {
   bool hasHigherHierarchyVehicle(VehicleRequirement requirement) {
     if (requirement.minimumCategory == null) return true;
 
-    // Araç kategorisini kontrol et
-    return appliedVehicle.canHandleJob(requirement.minimumCategory!);
+    // Araç kategorisini kontrol et - int'i VehicleCategory'ye çevir
+    final category = VehicleCategory.fromId(requirement.minimumCategory!);
+    return appliedVehicle.canHandleJob(category);
   }
 
   /// Get application priority score (higher is better)
@@ -156,11 +160,16 @@ class JobApplication {
   }
 
   double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2) {
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const double earthRadius = 3959; // miles
     final dLat = _toRadians(lat2 - lat1);
     final dLon = _toRadians(lon2 - lon1);
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_toRadians(lat1)) *
             math.cos(_toRadians(lat2)) *
             math.sin(dLon / 2) *
@@ -263,12 +272,12 @@ class JobApplication {
 
 /// Application Status Enum
 enum ApplicationStatus {
-  pending('Beklemede'),
-  accepted('Kabul Edildi'),
-  rejected('Reddedildi'),
-  withdrawn('Geri Çekildi'),
-  underReview('İnceleniyor'),
-  shortlisted('Ön Elemeden Geçti');
+  pending('Pending'),
+  accepted('Accepted'),
+  rejected('Rejected'),
+  withdrawn('Withdrawn'),
+  underReview('Under Review'),
+  shortlisted('Shortlisted');
 
   const ApplicationStatus(this.displayName);
   final String displayName;

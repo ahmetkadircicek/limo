@@ -28,9 +28,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
               const SizedBox(height: 20),
 
               // Content based on selection
-              Expanded(
-                child: _buildContent(),
-              ),
+              Expanded(child: _buildContent()),
             ],
           ),
         ),
@@ -43,15 +41,9 @@ class _JobTrackingViewState extends State<JobTrackingView> {
       padding: const EdgeInsets.all(4),
       child: Row(
         children: [
-          Expanded(
-            child: _buildSegmentButton('Active Jobs', 0),
-          ),
-          Expanded(
-            child: _buildSegmentButton('Past Jobs', 1),
-          ),
-          Expanded(
-            child: _buildSegmentButton('Offers', 2),
-          ),
+          Expanded(child: _buildSegmentButton('Active Jobs', 0)),
+          Expanded(child: _buildSegmentButton('Past Jobs', 1)),
+          Expanded(child: _buildSegmentButton('Offers', 2)),
         ],
       ),
     );
@@ -107,21 +99,8 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText.heading(
-                      'Job #${1000 + index}',
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: context.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: AppText.caption(
-                        'Active',
-                        color: context.secondary,
-                      ),
-                    ),
+                    AppText.heading('Job #${1000 + index}'),
+                    // Active chip removed as requested
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -152,12 +131,12 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText.heading(
-                      'Job #${900 + index}',
-                    ),
+                    AppText.heading('Job #${900 + index}'),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.grey.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -197,12 +176,12 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText.heading(
-                      'Offer #${200 + index}',
-                    ),
+                    AppText.heading('Offer #${200 + index}'),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orange.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -225,17 +204,11 @@ class _JobTrackingViewState extends State<JobTrackingView> {
                 Row(
                   children: [
                     Expanded(
-                      child: AppButton.tertiary(
-                        'Reject',
-                        onPressed: () {},
-                      ),
+                      child: AppButton.tertiary('Reject', onPressed: () {}),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: AppButton.primary(
-                        'Accept',
-                        onPressed: () {},
-                      ),
+                      child: AppButton.primary('Accept', onPressed: () {}),
                     ),
                   ],
                 ),

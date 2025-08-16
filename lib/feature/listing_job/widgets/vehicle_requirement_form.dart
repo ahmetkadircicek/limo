@@ -70,7 +70,10 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
       final req = widget.initialRequirement!;
       _selectedBrand = req.specificBrand;
       _selectedVehicleType = req.specificVehicleType;
-      _selectedCategory = req.minimumCategory;
+      _selectedCategory =
+          req.minimumCategory != null
+              ? VehicleCategory.fromId(req.minimumCategory!)
+              : null;
       _hourlyRate = req.hourlyRate;
       _pricePerMile = req.pricePerMile;
 
@@ -330,7 +333,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
           _selectedCategory == null,
       specificBrand: _selectedBrand,
       specificVehicleType: _selectedVehicleType,
-      minimumCategory: _selectedCategory,
+      minimumCategory: _selectedCategory?.id,
       hourlyRate: _hourlyRate,
       pricePerMile: _pricePerMile,
     );
