@@ -95,31 +95,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     return '$month/$day/$year';
   }
 
-  // Build info group with title and icon
-  Widget _buildInfoGroup({
-    required String title,
-    required IconData icon,
-    required Color color,
-    required List<Widget> children,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(PaddingConstants.spacingM),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppText.heading(title, color: color), // Standard title size
-          SizedBox(height: PaddingConstants.spacingM),
-          ...children,
-        ],
-      ),
-    );
-  }
-
   // Compact info row to match the vehicle card's typography/spacing
   Widget _buildInfoRowCompact({
     required IconData icon,
@@ -252,10 +227,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   }
 
   Widget _buildRouteCard(BuildContext context) {
-    final hasDestination =
-        widget.job.toCity != null ||
-        widget.job.toProvince != null ||
-        widget.job.toLocation != null;
+    final hasDestination = widget.job.toLocation != null;
 
     // Only show destination for point-to-point jobs
     final shouldShowDestination =
@@ -268,10 +240,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         _buildInfoRow(
           icon: Icons.location_on,
           label: 'Pickup',
-          value:
-              widget.job.fromLocation?.address != null
-                  ? widget.job.fromLocation!.address
-                  : '${widget.job.fromCity ?? ''}, ${widget.job.fromProvince}',
+          value: widget.job.fromLocation?.address ?? 'Location not specified',
           color: const Color(0xFF3B82F6),
         ),
         if (shouldShowDestination) ...[
@@ -279,10 +248,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           _buildInfoRow(
             icon: Icons.location_on_outlined,
             label: 'Destination',
-            value:
-                widget.job.toLocation?.address != null
-                    ? widget.job.toLocation!.address
-                    : '${widget.job.toCity ?? ''}, ${widget.job.toProvince}',
+            value: widget.job.toLocation?.address ?? 'Location not specified',
             color: const Color(0xFF3B82F6),
           ),
         ],
@@ -429,10 +395,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         borderRadius: GeneralConstants.borderRadiusLarge, // 16.0
         border: Border.all(
           color:
-              requirement.isFlexible
-                  ? context.primary.withValues(alpha: 0.2)
-                  : (category?.color.withValues(alpha: 0.2) ??
-                      context.primary.withValues(alpha: 0.2)),
+              (category?.color.withValues(alpha: 0.2) ??
+                  context.primary.withValues(alpha: 0.2)),
           width: 1,
         ),
         boxShadow: [
@@ -450,10 +414,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             padding: EdgeInsets.all(PaddingConstants.spacingM),
             decoration: BoxDecoration(
               color:
-                  requirement.isFlexible
-                      ? context.primary.withValues(alpha: 0.05)
-                      : (category?.color.withValues(alpha: 0.05) ??
-                          context.primary.withValues(alpha: 0.05)),
+                  (category?.color.withValues(alpha: 0.05) ??
+                      context.primary.withValues(alpha: 0.05)),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -469,16 +431,11 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                   decoration: BoxDecoration(
                     color:
-                        requirement.isFlexible
-                            ? context.primary.withValues(alpha: 0.1)
-                            : (category?.color.withValues(alpha: 0.1) ??
-                                context.primary.withValues(alpha: 0.1)),
+                        (category?.color.withValues(alpha: 0.1) ??
+                            context.primary.withValues(alpha: 0.1)),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color:
-                          requirement.isFlexible
-                              ? context.primary
-                              : (category?.color ?? context.primary),
+                      color: (category?.color ?? context.primary),
                       width: 1,
                     ),
                   ),
@@ -486,24 +443,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        requirement.isFlexible
-                            ? Icons.check_circle_outline
-                            : (category?.icon ?? Icons.directions_car),
+                        category?.icon ?? Icons.directions_car,
                         size: 20,
-                        color:
-                            requirement.isFlexible
-                                ? context.primary
-                                : (category?.color ?? context.primary),
+                        color: (category?.color ?? context.primary),
                       ),
                       SizedBox(width: PaddingConstants.spacingS),
                       AppText.bodySmall(
-                        requirement.isFlexible
-                            ? 'Flexible Requirements'
-                            : (category?.displayName ?? 'Vehicle'),
-                        color:
-                            requirement.isFlexible
-                                ? context.primary
-                                : (category?.color ?? context.primary),
+                        category?.displayName ?? 'Vehicle',
+                        color: (category?.color ?? context.primary),
                       ),
                     ],
                   ),
@@ -560,22 +507,20 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                   SizedBox(height: PaddingConstants.spacingM),
                 ],
-                if (requirement.minimumCapacity != null ||
-                    requirement.maximumCapacity != null) ...[
+                if (requirement.capacity != null) ...[
                   _buildInfoRowCompact(
                     icon: Icons.people_outline,
                     label: 'Capacity',
-                    value: _getCapacityDisplayValue(requirement),
+                    value: '${requirement.capacity}+ people',
                     color: context.primary,
                   ),
                   SizedBox(height: PaddingConstants.spacingM),
                 ],
-                if (requirement.minimumYear != null ||
-                    requirement.maximumYear != null) ...[
+                if (requirement.year != null) ...[
                   _buildInfoRowCompact(
                     icon: Icons.calendar_today,
                     label: 'Year',
-                    value: _getYearDisplayValue(requirement),
+                    value: '${requirement.year}+',
                     color: context.onSurface,
                   ),
                   SizedBox(height: PaddingConstants.spacingM),
@@ -640,60 +585,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
     );
-  }
-
-  // Helper method to get capacity display value
-  String _getCapacityDisplayValue(VehicleRequirement requirement) {
-    if (requirement.minimumCapacity != null &&
-        requirement.maximumCapacity != null) {
-      if (requirement.minimumCapacity == requirement.maximumCapacity) {
-        return '${requirement.minimumCapacity} people';
-      } else {
-        return '${requirement.minimumCapacity}-${requirement.maximumCapacity} people';
-      }
-    } else if (requirement.minimumCapacity != null) {
-      return '${requirement.minimumCapacity}+ people';
-    } else if (requirement.maximumCapacity != null) {
-      return 'Up to ${requirement.maximumCapacity} people';
-    }
-    return 'Any capacity';
-  }
-
-  // Helper method to get year display value
-  String _getYearDisplayValue(VehicleRequirement requirement) {
-    if (requirement.minimumYear != null && requirement.maximumYear != null) {
-      if (requirement.minimumYear == requirement.maximumYear) {
-        return requirement.minimumYear.toString();
-      } else {
-        return '${requirement.minimumYear}-${requirement.maximumYear}';
-      }
-    } else if (requirement.minimumYear != null) {
-      return '${requirement.minimumYear}+';
-    } else if (requirement.maximumYear != null) {
-      return 'Up to ${requirement.maximumYear}';
-    }
-    return 'Any year';
-  }
-
-  /// Get a clean vehicle type display value
-  String _getVehicleTypeDisplayValue(VehicleRequirement requirement) {
-    if (requirement.isFlexible) {
-      return 'Any Vehicle';
-    }
-
-    // First priority: specific vehicle type (e.g., "Sedan", "SUV")
-    if (requirement.specificVehicleType != null) {
-      return requirement.specificVehicleType!;
-    }
-
-    // Second priority: category name (e.g., "Economy", "Premium")
-    if (requirement.minimumCategory != null) {
-      final category = VehicleCategory.fromId(requirement.minimumCategory!);
-      return category.displayName;
-    }
-
-    // Fallback
-    return 'Vehicle';
   }
 
   void _showApplyMessage(BuildContext context) {

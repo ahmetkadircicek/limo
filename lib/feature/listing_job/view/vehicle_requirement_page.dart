@@ -76,8 +76,8 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       final req = widget.initialRequirement!;
       _selectedBrand = req.specificBrand;
       _selectedVehicleType = _migrateVehicleType(req.specificVehicleType);
-      _minCapacity = req.minimumCapacity;
-      _minYear = req.minimumYear;
+      _minCapacity = req.capacity;
+      _minYear = req.year;
       _selectedCategory =
           req.minimumCategory != null
               ? VehicleCategory.fromId(req.minimumCategory!)
@@ -358,11 +358,10 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       id:
           widget.initialRequirement?.id ??
           'req_${DateTime.now().millisecondsSinceEpoch}',
-      isFlexible: false, // Always false since we removed the flexible mode
       specificBrand: _selectedBrand,
       specificVehicleType: _selectedVehicleType,
-      minimumCapacity: _minCapacity,
-      minimumYear: _minYear,
+      capacity: _minCapacity,
+      year: _minYear,
       minimumCategory: _selectedCategory?.id,
       notes:
           'Mile: ${_pricePerMile ?? 0}, Hour: ${_pricePerHour ?? 0}', // Store pricing info in notes field

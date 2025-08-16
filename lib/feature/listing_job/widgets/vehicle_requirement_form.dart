@@ -327,10 +327,7 @@ class _VehicleRequirementFormState extends State<VehicleRequirementForm> {
       id:
           widget.initialRequirement?.id ??
           'req_${DateTime.now().millisecondsSinceEpoch}',
-      isFlexible:
-          _selectedBrand == null &&
-          _selectedVehicleType == null &&
-          _selectedCategory == null,
+
       specificBrand: _selectedBrand,
       specificVehicleType: _selectedVehicleType,
       minimumCategory: _selectedCategory?.id,

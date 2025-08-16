@@ -56,10 +56,10 @@ class JobListViewModel extends ChangeNotifier {
         _jobs.where((job) {
           final matchesSearch =
               query.isEmpty ||
-              (job.fromProvince?.toLowerCase().contains(query) ?? false) ||
-              (job.toProvince?.toLowerCase().contains(query) ?? false) ||
-              (job.fromCity?.toLowerCase().contains(query) ?? false) ||
-              (job.toCity?.toLowerCase().contains(query) ?? false) ||
+              (job.fromLocation?.placeName.toLowerCase().contains(query) ??
+                  false) ||
+              (job.toLocation?.placeName.toLowerCase().contains(query) ??
+                  false) ||
               (job.companyName?.toLowerCase().contains(query) ?? false) ||
               (job.description?.toLowerCase().contains(query) ?? false);
 
@@ -120,17 +120,13 @@ class JobListViewModel extends ChangeNotifier {
           longitude: 32.9951,
           placeId: 'ChIJ0987654321',
         ),
-        fromProvince: 'ISTANBUL',
-        toProvince: 'ANKARA',
-        fromCity: 'Istanbul Airport, 34283 Arnavutkoy/Istanbul',
-        toCity: 'Esenboga Airport, 06790 Akyurt/Ankara',
+
         vehicleRequirements: [
           VehicleRequirement(
             id: 'req_001',
             minimumCategory: 8,
-            minimumCapacity: 4,
-            minimumYear: 2020,
-            isFlexible: false,
+            capacity: 4,
+            year: 2020,
             hourlyRate: 150.0,
             pricePerMile: 2.5,
             notes: 'Premium vehicle required for VIP transport',
@@ -156,24 +152,19 @@ class JobListViewModel extends ChangeNotifier {
           placeId: 'ChIJ4567890123',
         ),
         toLocation: null,
-        fromProvince: 'ISTANBUL',
-        toProvince: '',
-        fromCity: 'Harbiye District, 34367 Sisli/Istanbul',
-        toCity: '',
+
         vehicleRequirements: [
           VehicleRequirement(
             id: 'req_002',
             minimumCategory: 6,
-            minimumCapacity: 8,
-            isFlexible: true,
+            capacity: 8,
             hourlyRate: 100.0,
             notes: 'Comfortable vehicle for executive transport',
           ),
           VehicleRequirement(
             id: 'req_003',
             minimumCategory: 4,
-            minimumCapacity: 4,
-            isFlexible: true,
+            capacity: 4,
             hourlyRate: 80.0,
             notes: 'Standard sedan for staff transport',
           ),
@@ -197,16 +188,12 @@ class JobListViewModel extends ChangeNotifier {
           placeId: 'ChIJ7890123456',
         ),
         toLocation: null,
-        fromProvince: 'ISTANBUL',
-        toProvince: '',
-        fromCity: 'Taksim Square, 34367 Beyoglu/Istanbul',
-        toCity: '',
+
         vehicleRequirements: [
           VehicleRequirement(
             id: 'req_004',
             minimumCategory: 5,
-            minimumCapacity: 6,
-            isFlexible: true,
+            capacity: 6,
             hourlyRate: 75.0,
             notes: 'Comfortable vehicle for tourist groups',
           ),

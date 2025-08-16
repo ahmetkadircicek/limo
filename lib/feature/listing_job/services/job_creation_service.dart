@@ -70,11 +70,14 @@ class JobCreationService {
       developer.log('🎉 Job created successfully!', name: _tag);
       developer.log('🆔 Job ID: ${job.id}', name: _tag);
       developer.log('🏢 Company: ${job.companyName}', name: _tag);
-      developer.log('📍 Location: ${job.fromProvince} → ${job.toProvince}',
-          name: _tag);
       developer.log(
-          '🚛 Vehicle Requirements: ${job.vehicleRequirements.length} items',
-          name: _tag);
+        '📍 Location: ${job.fromLocation?.placeName ?? 'Unknown'} → ${job.toLocation?.placeName ?? 'Unknown'}',
+        name: _tag,
+      );
+      developer.log(
+        '🚛 Vehicle Requirements: ${job.vehicleRequirements.length} items',
+        name: _tag,
+      );
 
       return responseData;
     } catch (error, stackTrace) {
@@ -153,11 +156,19 @@ class JobCreationService {
     developer.log('  ID: ${job.id}', name: _tag);
     developer.log('  Company: ${job.companyName}', name: _tag);
     developer.log('  Contact: ${job.contactInfo}', name: _tag);
-    developer.log('  From: ${job.fromProvince}', name: _tag);
-    developer.log('  To: ${job.toProvince}', name: _tag);
+    developer.log(
+      '  From: ${job.fromLocation?.placeName ?? 'Unknown'}',
+      name: _tag,
+    );
+    developer.log(
+      '  To: ${job.toLocation?.placeName ?? 'Unknown'}',
+      name: _tag,
+    );
     developer.log('  Type: ${job.jobType}', name: _tag);
-    developer.log('  Requirements: ${job.vehicleRequirements.length}',
-        name: _tag);
+    developer.log(
+      '  Requirements: ${job.vehicleRequirements.length}',
+      name: _tag,
+    );
 
     if (job.description != null) {
       developer.log('  Description: ${job.description}', name: _tag);

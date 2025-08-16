@@ -7,13 +7,11 @@ class VehicleRequirement {
   final String? specificModel; // null = "Any model"
   final String? specificVehicleType; // null = "Any type"
 
-  final int? minimumCapacity; // null = "Any capacity"
-  final int? maximumCapacity; // null = "No max limit"
-  final int? minimumYear; // null = "Any year"
-  final int? maximumYear; // null = "No max year"
+  final int? capacity; // null = "Any capacity"
+  final int? year; // null = "Any year"
   final int?
   minimumCategory; // null = "Any category" - using integer ID from JSON
-  final bool isFlexible; // Overall flexibility flag
+
   final String? notes; // Additional notes about the requirement
 
   // Pricing for this specific vehicle requirement
@@ -25,12 +23,10 @@ class VehicleRequirement {
     this.specificBrand,
     this.specificModel,
     this.specificVehicleType,
-    this.minimumCapacity,
-    this.maximumCapacity,
-    this.minimumYear,
-    this.maximumYear,
+    this.capacity,
+    this.year,
     this.minimumCategory,
-    this.isFlexible = true,
+
     this.notes,
     this.hourlyRate,
     this.pricePerMile,
@@ -38,7 +34,7 @@ class VehicleRequirement {
 
   /// Factory constructor for completely flexible requirements
   factory VehicleRequirement.anyVehicle() {
-    return const VehicleRequirement(id: 'any_vehicle', isFlexible: true);
+    return const VehicleRequirement(id: 'any_vehicle');
   }
 
   /// Factory constructor for specific requirements
@@ -48,10 +44,8 @@ class VehicleRequirement {
     String? model,
     String? vehicleType,
 
-    int? minCapacity,
-    int? maxCapacity,
-    int? minYear,
-    int? maxYear,
+    int? capacity,
+    int? year,
     int? minCategory,
     String? notes,
     double? hourlyRate,
@@ -63,12 +57,10 @@ class VehicleRequirement {
       specificModel: model,
       specificVehicleType: vehicleType,
 
-      minimumCapacity: minCapacity,
-      maximumCapacity: maxCapacity,
-      minimumYear: minYear,
-      maximumYear: maxYear,
+      capacity: capacity,
+      year: year,
       minimumCategory: minCategory,
-      isFlexible: false,
+
       notes: notes,
       hourlyRate: hourlyRate,
       pricePerMile: pricePerMile,
@@ -78,7 +70,7 @@ class VehicleRequirement {
   /// Check if a vehicle matches this requirement
   bool matchesVehicle(VehicleModel vehicle) {
     // Check capacity requirement
-    if (minimumCapacity != null && vehicle.capacity < minimumCapacity!) {
+    if (capacity != null && vehicle.capacity < capacity!) {
       return false;
     }
 
@@ -108,10 +100,7 @@ class VehicleRequirement {
     }
 
     // Check year requirement
-    if (minimumYear != null && vehicle.year < minimumYear!) {
-      return false;
-    }
-    if (maximumYear != null && vehicle.year > maximumYear!) {
+    if (year != null && vehicle.year < year!) {
       return false;
     }
 
@@ -133,11 +122,11 @@ class VehicleRequirement {
       final category = VehicleCategory.fromId(minimumCategory!);
       parts.add('Category: ${category.displayName}');
     }
-    if (minimumCapacity != null) {
-      parts.add('Capacity: $minimumCapacity+ people');
+    if (capacity != null) {
+      parts.add('Capacity: $capacity+ people');
     }
-    if (minimumYear != null) {
-      parts.add('Year: $minimumYear+');
+    if (year != null) {
+      parts.add('Year: $year+');
     }
     if (specificVehicleType != null) {
       parts.add('Type: $specificVehicleType');
@@ -173,12 +162,10 @@ class VehicleRequirement {
       'specificModel': specificModel,
       'specificVehicleType': specificVehicleType,
 
-      'minimumCapacity': minimumCapacity,
-      'maximumCapacity': maximumCapacity,
-      'minimumYear': minimumYear,
-      'maximumYear': maximumYear,
+      'capacity': capacity,
+      'year': year,
       'minimumCategory': minimumCategory,
-      'isFlexible': isFlexible,
+
       'notes': notes,
       'hourlyRate': hourlyRate,
       'pricePerMile': pricePerMile,
@@ -195,12 +182,10 @@ class VehicleRequirement {
         json['specificVehicleType'],
       ),
 
-      minimumCapacity: json['minimumCapacity'],
-      maximumCapacity: json['maximumCapacity'],
-      minimumYear: json['minimumYear'],
-      maximumYear: json['maximumYear'],
+      capacity: json['capacity'],
+      year: json['year'],
       minimumCategory: json['minimumCategory'],
-      isFlexible: json['isFlexible'] ?? true,
+
       notes: json['notes'],
       hourlyRate: json['hourlyRate']?.toDouble(),
       pricePerMile: json['pricePerMile']?.toDouble(),
@@ -239,12 +224,10 @@ class VehicleRequirement {
         other.specificBrand == specificBrand &&
         other.specificModel == specificModel &&
         other.specificVehicleType == specificVehicleType &&
-        other.minimumCapacity == minimumCapacity &&
-        other.maximumCapacity == maximumCapacity &&
-        other.minimumYear == minimumYear &&
-        other.maximumYear == maximumYear &&
+        other.capacity == capacity &&
+        other.year == year &&
         other.minimumCategory == minimumCategory &&
-        other.isFlexible == isFlexible &&
+
         other.hourlyRate == hourlyRate &&
         other.pricePerMile == pricePerMile;
   }
@@ -255,12 +238,10 @@ class VehicleRequirement {
         specificBrand.hashCode ^
         specificModel.hashCode ^
         specificVehicleType.hashCode ^
-        minimumCapacity.hashCode ^
-        maximumCapacity.hashCode ^
-        minimumYear.hashCode ^
-        maximumYear.hashCode ^
+        capacity.hashCode ^
+        year.hashCode ^
         minimumCategory.hashCode ^
-        isFlexible.hashCode ^
+
         hourlyRate.hashCode ^
         pricePerMile.hashCode;
   }

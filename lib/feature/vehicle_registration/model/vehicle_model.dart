@@ -8,8 +8,7 @@ class VehicleModel {
   final int year;
   final int capacity;
   final String vehicleType;
-  final String interiorColor;
-  final String exteriorColor;
+
   final VehicleCategory category;
   final double? hourlyRate;
   final double? pricePerMile;
@@ -24,8 +23,7 @@ class VehicleModel {
     required this.year,
     required this.capacity,
     required this.vehicleType,
-    required this.interiorColor,
-    required this.exteriorColor,
+
     VehicleCategory? category,
     this.hourlyRate,
     this.pricePerMile,
@@ -239,8 +237,7 @@ class VehicleModel {
       'year': year,
       'capacity': capacity,
       'vehicleType': vehicleType,
-      'interiorColor': interiorColor,
-      'exteriorColor': exteriorColor,
+
       'category': category.id,
       'hourlyRate': hourlyRate,
       'pricePerMile': pricePerMile,
@@ -272,8 +269,7 @@ class VehicleModel {
       year: json['year'] ?? 0,
       capacity: json['capacity'] ?? 0,
       vehicleType: json['vehicleType'] ?? '',
-      interiorColor: json['interiorColor'] ?? '',
-      exteriorColor: json['exteriorColor'] ?? '',
+
       category: category,
       hourlyRate: json['hourlyRate']?.toDouble(),
       pricePerMile: json['pricePerMile']?.toDouble(),

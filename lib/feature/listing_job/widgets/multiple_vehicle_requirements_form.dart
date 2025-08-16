@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
@@ -33,10 +32,9 @@ class _MultipleVehicleRequirementsFormState
     super.initState();
     _requirements = List.from(widget.initialRequirements);
     if (_requirements.isEmpty) {
-      _requirements.add(VehicleRequirement(
-        id: 'req_${DateTime.now().millisecondsSinceEpoch}',
-        isFlexible: true,
-      ));
+      _requirements.add(
+        VehicleRequirement(id: 'req_${DateTime.now().millisecondsSinceEpoch}'),
+      );
     }
   }
 
@@ -45,15 +43,19 @@ class _MultipleVehicleRequirementsFormState
     if (!widget.enabled) return;
 
     debugPrint(
-        "Navigation to Vehicle Requirements (Add) from Multiple Requirements Form");
-    context.push('/vehicle-requirements', extra: {
-      'onSave': (requirement) {
-        setState(() {
-          _requirements.add(requirement);
-        });
-        _notifyChanges();
+      "Navigation to Vehicle Requirements (Add) from Multiple Requirements Form",
+    );
+    context.push(
+      '/vehicle-requirements',
+      extra: {
+        'onSave': (requirement) {
+          setState(() {
+            _requirements.add(requirement);
+          });
+          _notifyChanges();
+        },
       },
-    });
+    );
   }
 
   // Show edit vehicle requirement page
@@ -61,16 +63,20 @@ class _MultipleVehicleRequirementsFormState
     if (!widget.enabled) return;
 
     debugPrint(
-        "Navigation to Vehicle Requirements (Edit) from Multiple Requirements Form");
-    context.push('/vehicle-requirements', extra: {
-      'initialRequirement': _requirements[index],
-      'onSave': (requirement) {
-        setState(() {
-          _requirements[index] = requirement;
-        });
-        _notifyChanges();
+      "Navigation to Vehicle Requirements (Edit) from Multiple Requirements Form",
+    );
+    context.push(
+      '/vehicle-requirements',
+      extra: {
+        'initialRequirement': _requirements[index],
+        'onSave': (requirement) {
+          setState(() {
+            _requirements[index] = requirement;
+          });
+          _notifyChanges();
+        },
       },
-    });
+    );
   }
 
   // Remove vehicle requirement at specified index
@@ -105,10 +111,7 @@ class _MultipleVehicleRequirementsFormState
         ],
 
         // Add new requirement button
-        if (widget.enabled) ...[
-          const SizedBox(height: 16),
-          _buildAddButton(),
-        ],
+        if (widget.enabled) ...[const SizedBox(height: 16), _buildAddButton()],
       ],
     );
   }
@@ -116,44 +119,23 @@ class _MultipleVehicleRequirementsFormState
   // Build individual requirement card
   Widget _buildRequirementCard(VehicleRequirement requirement, int index) {
     return AppInfoCard(
-      icon: requirement.isFlexible ? Icons.check_circle : Icons.directions_car,
+      icon: Icons.directions_car,
       label: 'Vehicle Requirement ${index + 1}',
-      value: requirement.isFlexible
-          ? 'Flexible Requirements'
-          : 'Specific Requirements',
-      iconColor: requirement.isFlexible ? context.primary : context.secondary,
-      valueColor: requirement.isFlexible
-          ? context.primary
-          : context.onSurface.withValues(alpha: 0.7),
+      value: 'Vehicle Requirements',
+      iconColor: context.secondary,
+      valueColor: context.onSurface.withValues(alpha: 0.7),
       onTap: () => _showEditVehicleRequirement(index),
-      trailing: widget.enabled
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildEditButton(index),
-                const SizedBox(width: 8),
-                _buildRemoveButton(index),
-              ],
-            )
-          : null,
-    );
-  }
-
-  // Build requirement icon based on flexibility
-  Widget _buildRequirementIcon(VehicleRequirement requirement) {
-    return Container(
-      padding: PaddingConstants.allS,
-      decoration: BoxDecoration(
-        color: requirement.isFlexible
-            ? context.primary.withValues(alpha: 0.1)
-            : context.secondary.withValues(alpha: 0.1),
-        borderRadius: GeneralConstants.borderRadius,
-      ),
-      child: Icon(
-        requirement.isFlexible ? Icons.check_circle : Icons.directions_car,
-        color: requirement.isFlexible ? context.primary : context.secondary,
-        size: 20,
-      ),
+      trailing:
+          widget.enabled
+              ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildEditButton(index),
+                  const SizedBox(width: 8),
+                  _buildRemoveButton(index),
+                ],
+              )
+              : null,
     );
   }
 
@@ -165,9 +147,7 @@ class _MultipleVehicleRequirementsFormState
         color: context.primary.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: context.primary.withValues(alpha: 0.2),
-          ),
+          side: BorderSide(color: context.primary.withValues(alpha: 0.2)),
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -176,11 +156,7 @@ class _MultipleVehicleRequirementsFormState
             width: 32,
             height: 32,
             child: Center(
-              child: Icon(
-                Icons.edit,
-                color: context.primary,
-                size: 18,
-              ),
+              child: Icon(Icons.edit, color: context.primary, size: 18),
             ),
           ),
         ),
@@ -193,12 +169,10 @@ class _MultipleVehicleRequirementsFormState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Material(
-        color: context.error.withOpacity(0.08),
+        color: context.error.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: context.error.withOpacity(0.2),
-          ),
+          side: BorderSide(color: context.error.withValues(alpha: 0.2)),
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -207,11 +181,7 @@ class _MultipleVehicleRequirementsFormState
             width: 32,
             height: 32,
             child: Center(
-              child: Icon(
-                Icons.delete,
-                color: context.error,
-                size: 18,
-              ),
+              child: Icon(Icons.delete, color: context.error, size: 18),
             ),
           ),
         ),

@@ -299,8 +299,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
       year: int.parse(selectedYear!),
       capacity: selectedCapacity! == '10+' ? 10 : int.parse(selectedCapacity!),
       vehicleType: selectedVehicleType!,
-      interiorColor: 'N/A',
-      exteriorColor: 'N/A',
+      
       category: VehicleCategory.values.firstWhere(
         (cat) => cat.displayName == selectedCategory,
         orElse: () => VehicleCategory.standardSedan,

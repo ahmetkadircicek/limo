@@ -1,10 +1,7 @@
 enum FieldError {
   emptyFromCountry("Please fill the departure country field!"),
-  emptyFromProvince("Please fill the departure province field!"),
-  emptyFromDistrict("Please fill the departure district field!"),
-  emptyToCountry("Please fill the destination country field!"),
-  emptyToProvince("Please fill the destination province field!"),
-  emptyToDistrict("Please fill the destination district field!"),
+  emptyFromLocation("Please fill the departure location field!"),
+  emptyToLocation("Please fill the destination location field!"),
   emptyVehicleType("Please fill the vehicle type field!"),
   emptyTrailerType("Please fill the trailer type field!"),
   emptyLoadType("Please fill the load type field!"),
@@ -24,7 +21,8 @@ enum FieldError {
   invalidEmail("Please enter a valid email address!"),
   emailsNotMatch("Email addresses do not match!"),
   invalidPassword(
-      "Password must be at least 8 characters with uppercase, lowercase and number!"),
+    "Password must be at least 8 characters with uppercase, lowercase and number!",
+  ),
   passwordsNotMatch("Passwords do not match!"),
   termsNotAccepted("You must accept the terms and conditions!"),
 
@@ -35,8 +33,6 @@ enum FieldError {
   emptyModel("Please fill the model field!"),
   emptyYear("Please select the year!"),
   emptyCapacity("Please select the capacity!"),
-  emptyInteriorColor("Please select the interior color!"),
-  emptyExteriorColor("Please select the exterior color!"),
 
   // Company registration specific errors
   emptyCompanyName("Please fill the company name field!"),

@@ -7,6 +7,10 @@ class UserModel {
   final DateTime createdAt;
   final DateTime lastLoginAt;
   final String? companyName;
+  final String? companyAddress;
+  final String? companyPhone;
+  final String? companyWebsite;
+  final String? companyTaxNumber;
   final bool hasDriverLicense;
 
   const UserModel({
@@ -17,6 +21,10 @@ class UserModel {
     required this.createdAt,
     required this.lastLoginAt,
     this.companyName,
+    this.companyAddress,
+    this.companyPhone,
+    this.companyWebsite,
+    this.companyTaxNumber,
     this.hasDriverLicense = false,
   });
 
@@ -48,6 +56,10 @@ class UserModel {
       createdAt: DateTime.parse(json['createdAt'] as String),
       lastLoginAt: DateTime.parse(json['lastLoginAt'] as String),
       companyName: json['companyName'] as String?,
+      companyAddress: json['companyAddress'] as String?,
+      companyPhone: json['companyPhone'] as String?,
+      companyWebsite: json['companyWebsite'] as String?,
+      companyTaxNumber: json['companyTaxNumber'] as String?,
       hasDriverLicense: json['hasDriverLicense'] as bool? ?? false,
     );
   }
@@ -62,6 +74,10 @@ class UserModel {
       'createdAt': createdAt.toIso8601String(),
       'lastLoginAt': lastLoginAt.toIso8601String(),
       'companyName': companyName,
+      'companyAddress': companyAddress,
+      'companyPhone': companyPhone,
+      'companyWebsite': companyWebsite,
+      'companyTaxNumber': companyTaxNumber,
       'hasDriverLicense': hasDriverLicense,
     };
   }
@@ -75,6 +91,10 @@ class UserModel {
     DateTime? createdAt,
     DateTime? lastLoginAt,
     String? companyName,
+    String? companyAddress,
+    String? companyPhone,
+    String? companyWebsite,
+    String? companyTaxNumber,
     bool? hasDriverLicense,
   }) {
     return UserModel(
@@ -85,6 +105,10 @@ class UserModel {
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       companyName: companyName ?? this.companyName,
+      companyAddress: companyAddress ?? this.companyAddress,
+      companyPhone: companyPhone ?? this.companyPhone,
+      companyWebsite: companyWebsite ?? this.companyWebsite,
+      companyTaxNumber: companyTaxNumber ?? this.companyTaxNumber,
       hasDriverLicense: hasDriverLicense ?? this.hasDriverLicense,
     );
   }
@@ -96,7 +120,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl, companyName: $companyName, hasDriverLicense: $hasDriverLicense)';
+    return 'UserModel(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl, companyName: $companyName, companyAddress: $companyAddress, companyPhone: $companyPhone, companyWebsite: $companyWebsite, companyTaxNumber: $companyTaxNumber, hasDriverLicense: $hasDriverLicense)';
   }
 
   @override

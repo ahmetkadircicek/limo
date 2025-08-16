@@ -7,10 +7,7 @@ import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
 class JobModel {
   final String id;
-  final String? fromProvince;
-  final String? toProvince;
-  final String? fromCity;
-  final String? toCity;
+
   final String? location;
   final LocationData? fromLocation;
   final LocationData? toLocation;
@@ -35,12 +32,8 @@ class JobModel {
 
   JobModel({
     required this.id,
-    this.fromProvince,
-    this.toProvince,
     this.fromLocation,
     this.toLocation,
-    this.fromCity,
-    this.toCity,
     this.location,
     this.price,
     this.companyName,
@@ -190,10 +183,7 @@ class JobModel {
 
     return JobModel(
       id: json['id'] ?? '',
-      fromProvince: json['fromProvince'],
-      toProvince: json['toProvince'],
-      fromCity: json['fromCity'],
-      toCity: json['toCity'],
+
       location: json['location'],
       fromLocation:
           json['fromLocation'] != null
@@ -254,10 +244,7 @@ class JobModel {
 
     return {
       'id': id,
-      'fromProvince': fromProvince,
-      'toProvince': toProvince,
-      'fromCity': fromCity,
-      'toCity': toCity,
+
       'location': location,
       'fromLocation': fromLocation?.toJson(),
       'toLocation': toLocation?.toJson(),
@@ -284,10 +271,7 @@ class JobModel {
   /// Create a copy with updated applications
   JobModel copyWith({
     String? id,
-    String? fromProvince,
-    String? toProvince,
-    String? fromCity,
-    String? toCity,
+
     String? location,
     LocationData? fromLocation,
     LocationData? toLocation,
@@ -310,10 +294,7 @@ class JobModel {
   }) {
     return JobModel(
       id: id ?? this.id,
-      fromProvince: fromProvince ?? this.fromProvince,
-      toProvince: toProvince ?? this.toProvince,
-      fromCity: fromCity ?? this.fromCity,
-      toCity: toCity ?? this.toCity,
+
       location: location ?? this.location,
       fromLocation: fromLocation ?? this.fromLocation,
       toLocation: toLocation ?? this.toLocation,

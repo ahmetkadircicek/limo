@@ -697,7 +697,8 @@ class _ListingJobViewState extends State<ListingJobView> {
   bool _validateVehicleRequirements() {
     for (int i = 0; i < _vehicleRequirements.length; i++) {
       final requirement = _vehicleRequirements[i];
-      if (!requirement.isFlexible) {
+      if (requirement.specificBrand != null ||
+          requirement.specificVehicleType != null) {
         if (requirement.minimumCategory == null) {
           _showErrorSnackbar(
             'Please select minimum category for vehicle requirement ${i + 1}',
@@ -738,7 +739,7 @@ class _ListingJobViewState extends State<ListingJobView> {
       address: _fromLocation!.address,
       latitude: _fromLocation!.latitude,
       longitude: _fromLocation!.longitude,
-      placeId: _fromLocation!.placeId ?? '',
+      placeId: _fromLocation!.placeId,
     );
 
     final toLocationData =
@@ -748,7 +749,7 @@ class _ListingJobViewState extends State<ListingJobView> {
               address: _toLocation!.address,
               latitude: _toLocation!.longitude,
               longitude: _toLocation!.longitude,
-              placeId: _toLocation!.placeId ?? '',
+              placeId: _toLocation!.placeId,
             )
             : null;
 
@@ -768,12 +769,10 @@ class _ListingJobViewState extends State<ListingJobView> {
 
     return JobModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      fromProvince: _fromLocation!.placeName.toUpperCase(),
-      toProvince: _toLocation?.placeName.toUpperCase() ?? '',
+
       fromLocation: fromLocationData,
       toLocation: toLocationData,
-      fromCity: _fromLocation!.address,
-      toCity: _toLocation?.address,
+
       jobType: jobType,
       companyName: _companyNameController.text,
       contactInfo: _contactInfoController.text,

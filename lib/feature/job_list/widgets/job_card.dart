@@ -46,7 +46,7 @@ class JobCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AppText.body(
-            job.fromProvince!.toUpperCase(),
+            (job.fromLocation?.placeName ?? 'LOCATION').toUpperCase(),
             color: context.onSurface,
           ),
           Padding(
@@ -57,7 +57,10 @@ class JobCard extends StatelessWidget {
               size: GeneralConstants.iconSizeSmall,
             ),
           ),
-          AppText.body(job.toProvince!.toUpperCase(), color: context.onSurface),
+          AppText.body(
+            (job.toLocation?.placeName ?? 'DESTINATION').toUpperCase(),
+            color: context.onSurface,
+          ),
         ],
       ),
     );

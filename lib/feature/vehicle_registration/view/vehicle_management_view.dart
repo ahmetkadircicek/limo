@@ -365,7 +365,7 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                         icon: Icons.palette,
                         label: 'Colors',
                         value:
-                            '${vehicle.exteriorColor} / ${vehicle.interiorColor}',
+                            'Color not specified',
                         color: context.secondary,
                       ),
                     ],

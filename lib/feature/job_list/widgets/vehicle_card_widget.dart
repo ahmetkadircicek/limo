@@ -159,7 +159,7 @@ class VehicleCardWidget extends StatelessWidget {
         _buildDetailItem(
             context, Icons.confirmation_number, vehicle.licencePlate),
         const SizedBox(width: 16),
-        _buildDetailItem(context, Icons.palette, vehicle.exteriorColor),
+        _buildDetailItem(context, Icons.palette, 'Color not specified'),
         const SizedBox(width: 16),
         _buildDetailItem(
             context, Icons.calendar_today, vehicle.year.toString()),

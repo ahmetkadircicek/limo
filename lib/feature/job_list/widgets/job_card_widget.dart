@@ -73,10 +73,7 @@ class JobCardWidget extends StatelessWidget {
   Widget _buildRouteSection(BuildContext context) {
     // Only show destination for point-to-point jobs
     final shouldShowDestination =
-        job.jobType == JobType.pointToPoint &&
-        (job.toLocation != null ||
-            job.toCity != null ||
-            job.toProvince != null);
+        job.jobType == JobType.pointToPoint && job.toLocation != null;
 
     if (!shouldShowDestination) {
       // Single location layout for full day, hourly, or jobs without destination
@@ -90,10 +87,7 @@ class JobCardWidget extends StatelessWidget {
               SizedBox(width: context.spacingS),
               Expanded(
                 child: AppText.bodySmall(
-                  job.fromLocation?.placeName ??
-                      job.fromCity ??
-                      job.fromProvince ??
-                      'Location',
+                  job.fromLocation?.placeName ?? 'Location',
                   color: context.textSecondary,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -142,10 +136,7 @@ class JobCardWidget extends StatelessWidget {
             SizedBox(width: context.spacingS),
             Expanded(
               child: AppText.bodySmall(
-                job.fromLocation?.placeName ??
-                    job.fromCity ??
-                    job.fromProvince ??
-                    'Pickup',
+                            job.fromLocation?.placeName ?? 'Pickup',
                 color: context.textSecondary,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -178,10 +169,7 @@ class JobCardWidget extends StatelessWidget {
     }
 
     // Only show if there's actual destination information
-    final hasDestinationInfo =
-        job.toLocation?.placeName != null ||
-        job.toCity != null ||
-        job.toProvince != null;
+    final hasDestinationInfo = job.toLocation?.placeName != null;
 
     if (!hasDestinationInfo) {
       return const SizedBox.shrink(); // Don't show anything if no destination
@@ -196,10 +184,7 @@ class JobCardWidget extends StatelessWidget {
             SizedBox(width: context.spacingS),
             Expanded(
               child: AppText.bodySmall(
-                job.toLocation?.placeName ??
-                    job.toCity ??
-                    job.toProvince ??
-                    'Destination',
+                            job.toLocation?.placeName ?? 'Destination',
                 color: context.textSecondary,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
