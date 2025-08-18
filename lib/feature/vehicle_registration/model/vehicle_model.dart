@@ -175,14 +175,8 @@ class VehicleModel {
   double? getUpgradeCostEstimate(VehicleCategory targetCategory) {
     if (!canUpgradeToCategory(targetCategory)) return null;
 
-    // Placeholder for upgrade cost calculation
-    // This could be implemented with actual upgrade cost logic
-    final upgradePath = getUpgradePath(targetCategory);
-    if (upgradePath.isEmpty) return null;
-
-    // Simple cost estimation based on category difference
-    final categoryDifference = targetCategory.id - category.id;
-    return categoryDifference * 5000.0; // Placeholder: 5000 per category level
+    // Upgrade cost calculation not implemented yet
+    return 0.0;
   }
 
   /// Get vehicle eligibility summary for a job

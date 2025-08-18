@@ -102,6 +102,65 @@ extension ThemeExtensions on BuildContext {
       BorderRadius.circular(DesignTokens.radiusRound); // 9999
 
   // =============================================================================
+  // BOX SHADOWS - Tüm shadow'lar context üzerinden
+  // =============================================================================
+
+  /// Subtle shadow for cards and elevated elements
+  List<BoxShadow> get shadowSmall => [
+    BoxShadow(
+      color: surface.withValues(alpha: 0.08),
+      blurRadius: 4,
+      offset: const Offset(0, 1),
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Medium shadow for buttons and interactive elements
+  List<BoxShadow> get shadowMedium => [
+    BoxShadow(
+      color: surface.withValues(alpha: 0.12),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Large shadow for modals and floating elements
+  List<BoxShadow> get shadowLarge => [
+    BoxShadow(
+      color: surface.withValues(alpha: 0.16),
+      blurRadius: 16,
+      offset: const Offset(0, 4),
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Extra large shadow for prominent elements
+  List<BoxShadow> get shadowXl => [
+    BoxShadow(
+      color: surface.withValues(alpha: 0.20),
+      blurRadius: 24,
+      offset: const Offset(0, 6),
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Custom shadow with specified parameters
+  List<BoxShadow> shadowCustom({
+    double blurRadius = 8,
+    Offset offset = const Offset(0, 2),
+    double spreadRadius = 0,
+    double alpha = 0.12,
+  }) => [
+    BoxShadow(
+      color: surface.withValues(alpha: alpha),
+      blurRadius: blurRadius,
+      offset: offset,
+      spreadRadius: spreadRadius,
+    ),
+  ];
+
+  // =============================================================================
   // ELEVATION - Tüm shadow'lar context üzerinden
   // =============================================================================
 
@@ -202,16 +261,16 @@ extension StringExtensions on String {
       isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
 
   String get formatCurrency => NumberFormat.currency(
-        locale: 'tr_TR',
-        symbol: '₺',
-        decimalDigits: 2,
-      ).format(double.tryParse(this) ?? 0);
+    locale: 'tr_TR',
+    symbol: '₺',
+    decimalDigits: 2,
+  ).format(double.tryParse(this) ?? 0);
 }
 
 extension DoubleExtensions on double {
   String get formatCurrency => NumberFormat.currency(
-        locale: 'tr_TR',
-        symbol: '₺',
-        decimalDigits: 2,
-      ).format(this);
+    locale: 'tr_TR',
+    symbol: '₺',
+    decimalDigits: 2,
+  ).format(this);
 }

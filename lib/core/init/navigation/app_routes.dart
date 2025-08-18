@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/feature/home/view/home_view.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/view/job_details_page.dart';
@@ -46,7 +47,7 @@ class AppRoutes {
         path: splash,
         name: 'splash',
         builder: (context, state) {
-          debugPrint("Navigation to Splash");
+          LoggerService.info("Navigation to Splash");
           return const SplashView();
         },
       ),
@@ -56,7 +57,7 @@ class AppRoutes {
         path: login,
         name: 'login',
         builder: (context, state) {
-          debugPrint("Navigation to Login");
+          LoggerService.info("Navigation to Login");
           return const LoginView();
         },
       ),
@@ -66,7 +67,7 @@ class AppRoutes {
         path: home,
         name: 'home',
         builder: (context, state) {
-          debugPrint("Navigation to Home");
+          LoggerService.info("Navigation to Home");
           return const HomeView();
         },
         routes: [
@@ -75,7 +76,7 @@ class AppRoutes {
             path: 'profile',
             name: 'home.profile',
             builder: (context, state) {
-              debugPrint("Navigation to Profile from Home");
+              LoggerService.info("Navigation to Profile from Home");
               return const ProfileView();
             },
           ),
@@ -87,7 +88,7 @@ class AppRoutes {
         path: vehicleRegistration,
         name: 'vehicle-registration',
         builder: (context, state) {
-          debugPrint("Navigation to Vehicle Registration");
+          LoggerService.info("Navigation to Vehicle Registration");
           final vehicleToEdit = state.extra as VehicleModel?;
           return VehicleRegistrationView(vehicleToEdit: vehicleToEdit);
         },
@@ -98,7 +99,7 @@ class AppRoutes {
         path: vehicleManagement,
         name: 'vehicle-management',
         builder: (context, state) {
-          debugPrint("Navigation to Vehicle Management via Home");
+          LoggerService.info("Navigation to Vehicle Management via Home");
           return const HomeView();
         },
       ),
@@ -108,7 +109,7 @@ class AppRoutes {
         path: jobList,
         name: 'job-list',
         builder: (context, state) {
-          debugPrint("Navigation to Job List");
+          LoggerService.info("Navigation to Job List");
           return const JobListView();
         },
       ),
@@ -118,7 +119,7 @@ class AppRoutes {
         path: listingJob,
         name: 'listing-job',
         builder: (context, state) {
-          debugPrint("Navigation to Listing Job");
+          LoggerService.info("Navigation to Listing Job");
           return const ListingJobView();
         },
       ),
@@ -128,7 +129,7 @@ class AppRoutes {
         path: profile,
         name: 'profile',
         builder: (context, state) {
-          debugPrint("Navigation to Profile");
+          LoggerService.info("Navigation to Profile");
           return const ProfileView();
         },
       ),
@@ -138,7 +139,7 @@ class AppRoutes {
         path: locationPicker,
         name: 'location-picker',
         builder: (context, state) {
-          debugPrint("Navigation to Location Picker");
+          LoggerService.info("Navigation to Location Picker");
 
           // Get title from extra
           String title = 'Select Location';
@@ -163,7 +164,7 @@ class AppRoutes {
         path: dashboard,
         name: 'dashboard',
         builder: (context, state) {
-          debugPrint("Navigation to Dashboard");
+          LoggerService.info("Navigation to Dashboard");
           return const tracking.JobTrackingView();
         },
       ),
@@ -173,7 +174,7 @@ class AppRoutes {
         path: jobTracking,
         name: 'job-tracking',
         builder: (context, state) {
-          debugPrint("Navigation to Job Tracking");
+          LoggerService.info("Navigation to Job Tracking");
           return const tracking.JobTrackingView();
         },
       ),
@@ -183,7 +184,7 @@ class AppRoutes {
         path: jobDetails,
         name: 'job-details',
         builder: (context, state) {
-          debugPrint("Navigation to Job Details");
+          LoggerService.info("Navigation to Job Details");
           final job = state.extra as JobModel?;
           if (job != null) {
             return JobDetailsPage(job: job);
@@ -199,7 +200,7 @@ class AppRoutes {
         path: vehicleRequirements,
         name: 'vehicle-requirements',
         builder: (context, state) {
-          debugPrint("Navigation to Vehicle Requirements");
+          LoggerService.info("Navigation to Vehicle Requirements");
           final args = state.extra as Map<String, dynamic>?;
           return VehicleRequirementPage(
             initialRequirement: args?['initialRequirement'],
@@ -213,7 +214,7 @@ class AppRoutes {
         path: documentUpload,
         name: 'document-upload',
         builder: (context, state) {
-          debugPrint("Navigation to Document Upload");
+          LoggerService.info("Navigation to Document Upload");
           final args = state.extra as Map<String, dynamic>?;
           if (args != null) {
             final documentType = args['documentType'] as String;
@@ -234,7 +235,7 @@ class AppRoutes {
       ),
     ],
     errorBuilder: (context, state) {
-      debugPrint("Navigation to Error Page: ${state.error}");
+      LoggerService.error("Navigation to Error Page: ${state.error}");
       return _buildErrorPage();
     },
     redirect: (context, state) {
@@ -278,7 +279,7 @@ extension GoRouterExtension on BuildContext {
     Object? extra,
     Map<String, String> queryParameters = const {},
   }) {
-    debugPrint("Navigation to $name");
+    LoggerService.info("Navigation to $name");
     GoRouter.of(
       this,
     ).goNamed(name, extra: extra, queryParameters: queryParameters);
@@ -290,7 +291,7 @@ extension GoRouterExtension on BuildContext {
     Object? extra,
     Map<String, String> queryParameters = const {},
   }) {
-    debugPrint("Navigation to $name");
+    LoggerService.info("Navigation to $name");
     GoRouter.of(
       this,
     ).pushNamed(name, extra: extra, queryParameters: queryParameters);
@@ -303,13 +304,13 @@ extension GoRouterExtension on BuildContext {
 
   /// Go back to home
   void goHome() {
-    debugPrint("Navigation to Home");
+    LoggerService.info("Navigation to Home");
     GoRouter.of(this).go('/home');
   }
 
   /// Go to login
   void goLogin() {
-    debugPrint("Navigation to Login");
+    LoggerService.info("Navigation to Login");
     GoRouter.of(this).go('/login');
   }
 }

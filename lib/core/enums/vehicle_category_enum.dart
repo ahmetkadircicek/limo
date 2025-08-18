@@ -3,63 +3,177 @@ import 'package:limo/core/constants/vehicle_category_colors.dart';
 
 enum VehicleCategory {
   // Ultra Premium/Luxury Vehicles (ID: 10)
-  ultraLuxury(10, 'Ultra Luxury', 'Top-tier luxury vehicles',
-      VehicleCategoryColors.ultraLuxury, Icons.diamond, 'Ultra Premium'),
+  ultraLuxury(
+    10,
+    'Ultra Luxury',
+    'Top-tier luxury vehicles',
+    VehicleCategoryColors.ultraLuxury,
+    Icons.diamond,
+    'Ultra Premium',
+  ),
 
   // Premium Luxury Vehicles (ID: 9)
-  luxurySedan(9, 'Luxury Sedan', 'Premium luxury sedan vehicles',
-      VehicleCategoryColors.luxury, Icons.star, 'Luxury'),
-  luxurySuv(9, 'Luxury SUV', 'Premium luxury SUV vehicles',
-      VehicleCategoryColors.luxury, Icons.terrain, 'Luxury'),
+  luxurySedan(
+    9,
+    'Luxury Sedan',
+    'Premium luxury sedan vehicles',
+    VehicleCategoryColors.luxury,
+    Icons.star,
+    'Luxury',
+  ),
+  luxurySuv(
+    9,
+    'Luxury SUV',
+    'Premium luxury SUV vehicles',
+    VehicleCategoryColors.luxury,
+    Icons.terrain,
+    'Luxury',
+  ),
 
   // High-End Premium Vehicles (ID: 8)
-  premiumSedan(8, 'Premium Sedan', 'High-quality sedan vehicles',
-      VehicleCategoryColors.premium, Icons.directions_car, 'Premium'),
-  premiumSuv(8, 'Premium SUV', 'High-quality SUV vehicles',
-      VehicleCategoryColors.premium, Icons.airport_shuttle, 'Premium'),
+  premiumSedan(
+    8,
+    'Premium Sedan',
+    'High-quality sedan vehicles',
+    VehicleCategoryColors.premium,
+    Icons.directions_car,
+    'Premium',
+  ),
+  premiumSuv(
+    8,
+    'Premium SUV',
+    'High-quality SUV vehicles',
+    VehicleCategoryColors.premium,
+    Icons.airport_shuttle,
+    'Premium',
+  ),
 
   // Mid-Range Premium Vehicles (ID: 7)
-  executiveSedan(7, 'Executive Sedan', 'Business-oriented sedan vehicles',
-      VehicleCategoryColors.executive, Icons.business, 'Executive'),
-  executiveSuv(7, 'Executive SUV', 'Business-oriented SUV vehicles',
-      VehicleCategoryColors.executive, Icons.work, 'Executive'),
+  executiveSedan(
+    7,
+    'Executive Sedan',
+    'Business-oriented sedan vehicles',
+    VehicleCategoryColors.executive,
+    Icons.business,
+    'Executive',
+  ),
+  executiveSuv(
+    7,
+    'Executive SUV',
+    'Business-oriented SUV vehicles',
+    VehicleCategoryColors.executive,
+    Icons.work,
+    'Executive',
+  ),
 
   // Standard Mid-Range Vehicles (ID: 6)
-  standardSedan(6, 'Standard Sedan', 'Mid-range sedan vehicles',
-      VehicleCategoryColors.standard, Icons.directions_car, 'Standard'),
-  standardSuv(6, 'Standard SUV', 'Mid-range SUV vehicles',
-      VehicleCategoryColors.standard, Icons.airport_shuttle, 'Standard'),
+  standardSedan(
+    6,
+    'Standard Sedan',
+    'Mid-range sedan vehicles',
+    VehicleCategoryColors.standard,
+    Icons.directions_car,
+    'Standard',
+  ),
+  standardSuv(
+    6,
+    'Standard SUV',
+    'Mid-range SUV vehicles',
+    VehicleCategoryColors.standard,
+    Icons.airport_shuttle,
+    'Standard',
+  ),
 
   // Economy Mid-Range Vehicles (ID: 5)
-  economySedan(5, 'Economy Sedan', 'Economy sedan vehicles',
-      VehicleCategoryColors.economy, Icons.directions_car, 'Economy'),
-  economySuv(5, 'Economy SUV', 'Economy SUV vehicles',
-      VehicleCategoryColors.economy, Icons.airport_shuttle, 'Economy'),
+  economySedan(
+    5,
+    'Economy Sedan',
+    'Economy sedan vehicles',
+    VehicleCategoryColors.economy,
+    Icons.directions_car,
+    'Economy',
+  ),
+  economySuv(
+    5,
+    'Economy SUV',
+    'Economy SUV vehicles',
+    VehicleCategoryColors.economy,
+    Icons.airport_shuttle,
+    'Economy',
+  ),
 
   // Compact Economy Vehicles (ID: 4)
-  compactSedan(4, 'Compact Sedan', 'Compact sedan vehicles', Color(0xFFE2E8F0),
-      Icons.directions_car, 'Compact'),
-  compactSuv(4, 'Compact SUV', 'Compact SUV vehicles',
-      VehicleCategoryColors.compact, Icons.airport_shuttle, 'Compact'),
+  compactSedan(
+    4,
+    'Compact Sedan',
+    'Compact sedan vehicles',
+    Color(0xFFE2E8F0),
+    Icons.directions_car,
+    'Compact',
+  ),
+  compactSuv(
+    4,
+    'Compact SUV',
+    'Compact SUV vehicles',
+    VehicleCategoryColors.compact,
+    Icons.airport_shuttle,
+    'Compact',
+  ),
 
   // Small Economy Vehicles (ID: 3)
-  economyHatchback(3, 'Economy Hatchback', 'Economy hatchback vehicles',
-      VehicleCategoryColors.small, Icons.directions_car, 'Small'),
-  compactHatchback(3, 'Compact Hatchback', 'Compact hatchback vehicles',
-      VehicleCategoryColors.small, Icons.directions_car, 'Small'),
+  economyHatchback(
+    3,
+    'Economy Hatchback',
+    'Economy hatchback vehicles',
+    VehicleCategoryColors.small,
+    Icons.directions_car,
+    'Small',
+  ),
+  compactHatchback(
+    3,
+    'Compact Hatchback',
+    'Compact hatchback vehicles',
+    VehicleCategoryColors.small,
+    Icons.directions_car,
+    'Small',
+  ),
 
   // Micro Vehicles (ID: 2)
-  microCar(2, 'Micro Car', 'Micro vehicles', VehicleCategoryColors.micro,
-      Icons.directions_car, 'Micro'),
-  cityCar(2, 'City Car', 'Urban use vehicles', VehicleCategoryColors.micro,
-      Icons.location_city, 'City'),
+  microCar(
+    2,
+    'Micro Car',
+    'Micro vehicles',
+    VehicleCategoryColors.micro,
+    Icons.directions_car,
+    'Micro',
+  ),
+  cityCar(
+    2,
+    'City Car',
+    'Urban use vehicles',
+    VehicleCategoryColors.micro,
+    Icons.location_city,
+    'City',
+  ),
 
   // Utility/Basic Vehicles (ID: 1)
-  utilityVehicle(1, 'Utility Vehicle', 'Basic utility vehicles',
-      VehicleCategoryColors.utility, Icons.local_shipping, 'Basic');
+  utilityVehicle(
+    1,
+    'Utility Vehicle',
+    'Basic utility vehicles',
+    VehicleCategoryColors.utility,
+    Icons.local_shipping,
+    'Basic',
+  );
 
-  const VehicleCategory(this.id, this.displayName, this.description, this.color,
-      this.icon, this.levelName);
+  const VehicleCategory(
+    this.id,
+    this.displayName,
+    this.description,
+    this.color,
+    this.icon,
+    this.levelName,
+  );
 
   final int id;
   final String displayName;
@@ -222,8 +336,7 @@ enum VehicleCategory {
 
   /// Get upgrade cost estimate (placeholder for future implementation)
   double? getUpgradeCostEstimate() {
-    // This could be implemented with actual upgrade cost logic
-    // For now, return null to indicate no estimate available
+    // Upgrade cost calculation not implemented yet
     return null;
   }
 

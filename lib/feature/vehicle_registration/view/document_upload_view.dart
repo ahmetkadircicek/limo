@@ -9,7 +9,7 @@ import 'package:limo/shared/app_components.dart';
 
 class DocumentUploadView extends StatefulWidget {
   final String
-      documentType; // 'insurance', 'license', 'inspection', 'driver_license', etc.
+  documentType; // 'insurance', 'license', 'inspection', 'driver_license', etc.
   final String? vehiclePlate; // Optional for non-vehicle documents
   final String? title; // Custom title override
   final String? description; // Custom description override
@@ -70,10 +70,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
     return Scaffold(
       backgroundColor: context.surfaceContainer,
       appBar: AppBar(
-        title: AppText.body(
-          'Document Upload',
-          fontWeight: FontWeight.w600,
-        ),
+        title: AppText.body('Document Upload', fontWeight: FontWeight.w600),
         backgroundColor: context.surface,
         elevation: 0,
         iconTheme: IconThemeData(color: context.onSurface),
@@ -170,20 +167,11 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
             color: context.onSurface,
           ),
           const SizedBox(height: 16),
-          _buildInstructionItem(
-            '1',
-            'Select PDF file',
-          ),
+          _buildInstructionItem('1', 'Select PDF file'),
           const SizedBox(height: 12),
-          _buildInstructionItem(
-            '2',
-            'Verify content is readable',
-          ),
+          _buildInstructionItem('2', 'Verify content is readable'),
           const SizedBox(height: 12),
-          _buildInstructionItem(
-            '3',
-            'Upload for review',
-          ),
+          _buildInstructionItem('3', 'Upload for review'),
         ],
       ),
     );
@@ -198,12 +186,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
           color: context.primary,
         ),
         const SizedBox(width: 16),
-        Expanded(
-          child: AppText.body(
-            text,
-            color: context.onSurface,
-          ),
-        ),
+        Expanded(child: AppText.body(text, color: context.onSurface)),
       ],
     );
   }
@@ -271,9 +254,10 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
           color: context.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _selectedPdfFile != null
-                ? context.success.withValues(alpha: 0.3)
-                : context.onSurface.withValues(alpha: 0.15),
+            color:
+                _selectedPdfFile != null
+                    ? context.success.withValues(alpha: 0.3)
+                    : context.onSurface.withValues(alpha: 0.15),
             width: 1.5,
             style: BorderStyle.solid,
           ),
@@ -285,9 +269,10 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
             ),
           ],
         ),
-        child: _selectedPdfFile != null
-            ? _buildSelectedPdfDisplay()
-            : _buildEmptyUploadState(),
+        child:
+            _selectedPdfFile != null
+                ? _buildSelectedPdfDisplay()
+                : _buildEmptyUploadState(),
       ),
     );
   }
@@ -335,11 +320,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
               color: context.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(40),
             ),
-            child: Icon(
-              Icons.picture_as_pdf,
-              size: 28,
-              color: context.success,
-            ),
+            child: Icon(Icons.picture_as_pdf, size: 28, color: context.success),
           ),
           const SizedBox(height: 12),
           AppText.body(
@@ -350,10 +331,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          AppText.caption(
-            'PDF selected',
-            color: context.success,
-          ),
+          AppText.caption('PDF selected', color: context.success),
         ],
       ),
     );
@@ -380,11 +358,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.check_circle,
-            color: context.success,
-            size: 32,
-          ),
+          Icon(Icons.check_circle, color: context.success, size: 32),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -420,16 +394,9 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.error_outline,
-                color: context.error,
-                size: 32,
-              ),
+              Icon(Icons.error_outline, color: context.error, size: 32),
               const SizedBox(width: 16),
-              AppText.heading(
-                'Verification Failed',
-                color: context.error,
-              ),
+              AppText.heading('Verification Failed', color: context.error),
             ],
           ),
           const SizedBox(height: 16),
@@ -463,10 +430,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
   Widget _buildRejectionReason(String reason) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: AppText.body(
-        reason,
-        color: context.error.withValues(alpha: 0.7),
-      ),
+      child: AppText.body(reason, color: context.error.withValues(alpha: 0.7)),
     );
   }
 
@@ -481,28 +445,13 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
     });
 
     try {
-      // Simulate API call
+      // API call not implemented yet
       await Future.delayed(const Duration(seconds: 2));
 
-      // Simulate verification result (in real app, this would come from API)
-      final random = DateTime.now().millisecondsSinceEpoch % 3;
-      if (random == 0) {
-        setState(() {
-          _verificationStatus = 'approved';
-        });
-        _showSuccessSnackBar('Verification submitted successfully!');
-      } else if (random == 1) {
-        setState(() {
-          _verificationStatus = 'rejected';
-        });
-        _showErrorSnackBar('Verification failed. Please check your documents.');
-      } else {
-        setState(() {
-          _verificationStatus = 'pending';
-        });
-        _showSuccessSnackBar(
-            'Documents submitted for review. Please wait for approval.');
-      }
+      setState(() {
+        _verificationStatus = 'pending';
+      });
+      _showSuccessSnackBar('Verification not implemented yet');
     } catch (e) {
       _showErrorSnackBar('Failed to submit verification: $e');
     } finally {
@@ -550,7 +499,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
     });
 
     try {
-      // Simulate PDF upload
+      // PDF upload not implemented yet
       await Future.delayed(const Duration(seconds: 2));
 
       setState(() {
@@ -558,7 +507,8 @@ class _DocumentUploadViewState extends State<DocumentUploadView> {
       });
 
       _showSuccessSnackBar(
-          'PDF uploaded successfully! Verification in progress.');
+        'PDF uploaded successfully! Verification in progress.',
+      );
     } catch (e) {
       _showErrorSnackBar('Failed to upload PDF: $e');
     } finally {

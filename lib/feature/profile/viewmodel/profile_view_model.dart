@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
 
-/// ViewModel for Profile feature that handles all business logic
+/// Profile ViewModel for managing profile data and state
 class ProfileViewModel extends ChangeNotifier {
   // Controllers
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController licenseController = TextEditingController();
-  final TextEditingController expiryController = TextEditingController();
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController companyContactController =
       TextEditingController();
 
-  // State
+  // State variables
   bool _isLoading = false;
   bool _isEditing = false;
-  final List<Map<String, String>> _vehicles = [];
   String? _errorMessage;
   String? _successMessage;
+  final List<Map<String, String>> _vehicles = [];
 
-  // Store original values for cancel functionality
+  // Original values for reset functionality
   String _originalPhone = '';
   String _originalCompanyName = '';
   String _originalCompanyContact = '';
+
+  // AppStateProvider reference
+  AppStateProvider? _appStateProvider;
 
   // Getters
   bool get isLoading => _isLoading;
@@ -33,49 +33,33 @@ class ProfileViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
 
+  /// Set the AppStateProvider for profile updates
+  void setAppStateProvider(AppStateProvider provider) {
+    _appStateProvider = provider;
+  }
+
   /// Initialize the ViewModel with user data
   Future<void> initialize(AppStateProvider appState) async {
     _setLoading(true);
 
     try {
+      // Set the AppStateProvider reference
+      _appStateProvider = appState;
+
       // Initialize with empty data
       addressController.text = '';
       licenseController.text = '';
       _vehicles.clear();
 
-      // Load existing phone number if available (you can extend AppStateProvider to include phone)
-      // For demo purposes, let's set a default phone number
-      if (phoneController.text.isEmpty) {
-        phoneController.text = '+90 555 123 4567'; // Demo phone number
-      }
+      // Clear all demo data - leave fields empty
+      phoneController.text = '';
+      companyNameController.text = '';
+      companyContactController.text = '';
 
-      // Load existing company name if available
-      if (companyNameController.text.isEmpty) {
-        companyNameController.text = 'Demo Company'; // Demo company name
-      }
-
-      // Load existing company contact if available
-      if (companyContactController.text.isEmpty) {
-        companyContactController.text =
-            '+90 555 123 4567'; // Demo company contact
-      }
-
-      // Store original values
+      // Store original values (empty)
       _originalPhone = phoneController.text;
       _originalCompanyName = companyNameController.text;
       _originalCompanyContact = companyContactController.text;
-
-      // Update controllers with user data if available
-      if (appState.isAuthenticated) {
-        if (appState.currentUser?.displayName != null) {
-          nameController.text = appState.currentUser!.displayName;
-        }
-        if (appState.currentUser?.email != null) {
-          emailController.text = appState.currentUser!.email;
-        }
-        // Load existing phone number if available (you can extend AppStateProvider to include phone)
-        // For now, we'll keep the existing value in the controller
-      }
 
       _clearMessages();
     } catch (e) {
@@ -122,8 +106,17 @@ class ProfileViewModel extends ChangeNotifier {
         return;
       }
 
-      // Simulate API call
+      // API call not implemented yet
       await Future.delayed(const Duration(milliseconds: 500));
+
+      // Update user profile in AppStateProvider
+      if (_appStateProvider != null) {
+        _appStateProvider!.updateUserProfile(
+          companyName: companyNameController.text.trim(),
+          companyPhone: companyContactController.text.trim(),
+          // Note: phone number is not part of UserModel yet, so we'll skip it for now
+        );
+      }
 
       // Update user data
       _setSuccess('Profile updated successfully');
@@ -230,12 +223,9 @@ class ProfileViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    nameController.dispose();
-    emailController.dispose();
     phoneController.dispose();
     addressController.dispose();
     licenseController.dispose();
-    expiryController.dispose();
     companyNameController.dispose();
     companyContactController.dispose();
 

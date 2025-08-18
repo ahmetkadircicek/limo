@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/splash/view/splash_view_mixin.dart';
 import 'package:limo/feature/splash/viewmodel/splash_view_model.dart';
+import 'package:limo/feature/splash/widgets/splash_loading_widget.dart';
+import 'package:limo/feature/splash/widgets/splash_logo_widget.dart';
 import 'package:provider/provider.dart';
 
 class SplashView extends StatefulWidget {
@@ -11,84 +13,53 @@ class SplashView extends StatefulWidget {
   State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> {
-  @override
-  void initState() {
-    super.initState();
-    _initializeViewModel();
-  }
-
-  void _initializeViewModel() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final viewModel = Provider.of<SplashViewModel>(context, listen: false);
-      viewModel.initialize().then((isUserSignedIn) {
-        _handleNavigation(isUserSignedIn);
-      });
-    });
-  }
-
-  void _handleNavigation(bool isUserSignedIn) async {
-    if (!mounted) return;
-
-    if (mounted) {
-      if (isUserSignedIn) {
-        debugPrint("Navigation to Home from Splash");
-        context.go('/home');
-      } else {
-        debugPrint("Navigation to Login from Splash");
-        context.go('/login');
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
+class _SplashViewState extends State<SplashView> with SplashViewMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer<SplashViewModel>(
       builder: (context, viewModel, child) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          body: SafeArea(
-            child: Center(
-              child: Column(
-                children: [
-                  Spacer(),
-                  ColorFiltered(
-                    colorFilter: ColorFilter.mode(
-                      context.onPrimary,
-                      BlendMode.srcIn,
-                    ),
-                    child: Image.asset(
-                      'assets/png/image/image_logo.png',
-                      width: context.width * 0.7,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  Spacer(),
-                  if (viewModel.isLoading)
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation(context.onPrimary),
-                      ),
-                    )
-                  else
-                    const SizedBox(
-                      width: 24,
-                      height: 24,
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
+        return _buildScaffold(viewModel);
       },
+    );
+  }
+
+  /// Builds the main scaffold with splash content
+  Widget _buildScaffold(SplashViewModel viewModel) {
+    return Scaffold(
+      backgroundColor: context.primary,
+      body: _buildBody(viewModel),
+    );
+  }
+
+  /// Builds the main body content
+  Widget _buildBody(SplashViewModel viewModel) {
+    return SafeArea(child: _buildContent(viewModel));
+  }
+
+  /// Builds the centered content layout
+  Widget _buildContent(SplashViewModel viewModel) {
+    return Center(
+      child: Column(
+        children: [
+          const Spacer(),
+          _buildLogo(),
+          const Spacer(),
+          _buildLoadingIndicator(viewModel),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the app logo using reusable widget
+  Widget _buildLogo() {
+    return const SplashLogoWidget();
+  }
+
+  /// Builds the loading indicator using reusable widget
+  Widget _buildLoadingIndicator(SplashViewModel viewModel) {
+    return SplashLoadingWidget(
+      isLoading: viewModel.isLoading,
+      color: context.onPrimary,
     );
   }
 }

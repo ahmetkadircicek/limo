@@ -1,106 +1,155 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/feature/login/viewmodel/login_view_model.dart';
 import 'package:limo/feature/login/widgets/oauth_button.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
 
 /// OAuth authentication buttons section for login view
-class OAuthButtonsSection extends StatelessWidget {
+class OAuthButtonsSection extends StatefulWidget {
   const OAuthButtonsSection({super.key});
 
   @override
+  State<OAuthButtonsSection> createState() => _OAuthButtonsSectionState();
+}
+
+class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
+  // Local loading states - only Google is active
+  bool _isGoogleLoading = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<LoginViewModel>(
-      builder: (context, viewModel, child) {
+    const googleRed = Color(0xFFEA4335);
+
+    return Consumer2<LoginViewModel, AppStateProvider>(
+      builder: (context, viewModel, appStateProvider, child) {
+        // Set the AppStateProvider in the LoginViewModel
+        viewModel.setAppStateProvider(appStateProvider);
+
+        // Set the BuildContext in the LoginViewModel for snackbars
+        viewModel.setContext(context);
+
         return Column(
           children: [
             _buildSectionTitle(context),
             SizedBox(height: context.spacingXl),
-            _buildGoogleButton(context, viewModel),
+            _buildGoogleButton(context, viewModel, googleRed),
             SizedBox(height: context.spacingL),
-            _buildAppleButton(context, viewModel),
+            _buildAppleButton(context),
             SizedBox(height: context.spacingXl),
             _buildDivider(context),
             SizedBox(height: context.spacingXl),
-            _buildGuestButton(context, viewModel),
+            _buildGuestButton(context),
           ],
         );
       },
     );
   }
 
+  /// Builds the section title text with improved formatting
   Widget _buildSectionTitle(BuildContext context) {
-    return AppText.subtitle(
-      'Sign in to your account',
-      color: Colors.white,
-      textAlign: TextAlign.center,
-    );
-  }
-
-  Widget _buildGoogleButton(BuildContext context, LoginViewModel viewModel) {
-    return OAuthButton(
-      icon: FontAwesomeIcons.google,
-      text: 'Continue with Google',
-      backgroundColor: const Color(0xFFEA4335),
-      borderColor: const Color(0xFFEA4335),
-      textColor: Colors.white,
-      iconColor: Colors.white,
-      isLoading: viewModel.isGoogleLoading,
-      onPressed: () => viewModel.signInWithGoogle(context),
-    );
-  }
-
-  Widget _buildAppleButton(BuildContext context, LoginViewModel viewModel) {
-    return OAuthButton(
-      icon: FontAwesomeIcons.apple,
-      text: 'Continue with Apple',
-      backgroundColor: Colors.white,
-      borderColor: Colors.white,
-      textColor: Colors.black,
-      iconColor: Colors.black,
-      isLoading: viewModel.isAppleLoading,
-      onPressed: () => viewModel.signInWithApple(context),
-    );
-  }
-
-  Widget _buildDivider(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Divider(
-            color: Colors.white.withValues(alpha: 0.15),
-            thickness: 1,
-          ),
-        ),
-        Padding(
-          padding: context.horizontalL,
-          child: AppText.bodySmall(
-            'OR',
-            color: Colors.white.withValues(alpha: 0.7),
-          ),
-        ),
-        Expanded(
-          child: Divider(
-            color: Colors.white.withValues(alpha: 0.15),
-            thickness: 1,
-          ),
-        ),
+        AppText.title('Welcome back!', color: context.onPrimary),
+        AppText.body("Let's get you moving.", color: context.onPrimary),
       ],
     );
   }
 
-  Widget _buildGuestButton(BuildContext context, LoginViewModel viewModel) {
+  /// Builds the Google sign-in button
+  Widget _buildGoogleButton(
+    BuildContext context,
+    LoginViewModel viewModel,
+    Color googleRed,
+  ) {
+    return OAuthButton(
+      icon: FontAwesomeIcons.google,
+      text: 'Continue with Google',
+      backgroundColor: googleRed,
+      borderColor: googleRed,
+      textColor: context.onPrimary,
+      iconColor: context.onPrimary,
+      isLoading: _isGoogleLoading,
+      onPressed:
+          _isGoogleLoading
+              ? null
+              : () => _handleGoogleSignIn(context, viewModel),
+    );
+  }
+
+  /// Builds the Apple sign-in button
+  Widget _buildAppleButton(BuildContext context) {
+    return OAuthButton(
+      icon: FontAwesomeIcons.apple,
+      text: 'Continue with Apple',
+      backgroundColor: context.onPrimary.withValues(
+        alpha: 0.3,
+      ), // Dimmed background
+      borderColor: context.onPrimary.withValues(alpha: 0.3), // Dimmed border
+      textColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed text
+      iconColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed icon
+      isLoading: false, // Never loading since it's disabled
+      onPressed: () {
+        // Show info message that Apple Sign-In is not available
+        AppSnackbar.showInfo(
+          context,
+          message:
+              'Apple Sign-In is not available yet. Please use Google Sign-In.',
+        );
+      },
+    );
+  }
+
+  /// Builds the divider between OAuth and guest options
+  Widget _buildDivider(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(child: Divider(thickness: 0.5)),
+        Padding(
+          padding: context.horizontalL,
+          child: AppText.bodySmall('OR', color: context.onPrimary),
+        ),
+        Expanded(child: Divider(thickness: 0.5)),
+      ],
+    );
+  }
+
+  /// Builds the guest mode button
+  Widget _buildGuestButton(BuildContext context) {
     return OAuthButton(
       icon: Icons.person_outline_rounded,
       text: 'Continue as Guest',
-      backgroundColor: Colors.white.withValues(alpha: 0.08),
-      borderColor: Colors.white.withValues(alpha: 0.18),
-      textColor: Colors.white,
-      iconColor: Colors.white.withValues(alpha: 0.85),
-      isLoading: viewModel.isGuestLoading,
-      onPressed: () => viewModel.continueAsGuest(context),
+      backgroundColor: context.onPrimary.withValues(
+        alpha: 0.3,
+      ), // Dimmed background
+      borderColor: context.onPrimary.withValues(alpha: 0.3), // Dimmed border
+      textColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed text
+      iconColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed icon
+      isLoading: false, // Never loading since it's disabled
+      onPressed: () {
+        // Show info message that guest mode is not available
+        AppSnackbar.showInfo(
+          context,
+          message:
+              'Guest mode is not available yet. Please sign in with Google.',
+        );
+      },
     );
+  }
+
+  /// Handles Google sign-in with local loading state
+  Future<void> _handleGoogleSignIn(
+    BuildContext context,
+    LoginViewModel viewModel,
+  ) async {
+    setState(() => _isGoogleLoading = true);
+    try {
+      await viewModel.signInWithGoogle();
+    } finally {
+      setState(() => _isGoogleLoading = false);
+    }
   }
 }

@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart' show debugPrint;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:limo/core/services/auth_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Manages authentication tokens securely
 class AuthTokenManager {
@@ -47,11 +48,11 @@ class AuthTokenManager {
   Future<void> initialize() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Restore tokens from storage
       _currentAccessToken = prefs.getString(_accessTokenKey);
       _currentRefreshToken = prefs.getString(_refreshTokenKey);
-      
+
       final expiryString = prefs.getString(_tokenExpiryKey);
       if (expiryString != null) {
         _currentTokenExpiry = DateTime.parse(expiryString);
@@ -70,11 +71,11 @@ class AuthTokenManager {
   /// Store authentication tokens
   Future<void> storeTokens(AuthResponse authResponse) async {
     debugPrint('🔐 [TOKEN_MANAGER] Starting to store authentication tokens...');
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       debugPrint('✅ [TOKEN_MANAGER] SharedPreferences instance obtained');
-      
+
       debugPrint('🔐 [TOKEN_MANAGER] Storing tokens in memory...');
       // Store in memory
       _currentAccessToken = authResponse.accessToken;
@@ -86,18 +87,24 @@ class AuthTokenManager {
       // Store in SharedPreferences
       await prefs.setString(_accessTokenKey, authResponse.accessToken);
       await prefs.setString(_refreshTokenKey, authResponse.refreshToken);
-      await prefs.setString(_tokenExpiryKey, authResponse.expiresAt.toIso8601String());
+      await prefs.setString(
+        _tokenExpiryKey,
+        authResponse.expiresAt.toIso8601String(),
+      );
       debugPrint('✅ [TOKEN_MANAGER] Tokens stored in SharedPreferences');
 
       // Store user data if available
       if (authResponse.user != null) {
         debugPrint('🔐 [TOKEN_MANAGER] Storing user data...');
-        await prefs.setString(_userDataKey, json.encode(authResponse.user!.toJson()));
+        await prefs.setString(
+          _userDataKey,
+          json.encode(authResponse.user!.toJson()),
+        );
         debugPrint('✅ [TOKEN_MANAGER] User data stored');
       } else {
         debugPrint('ℹ️ [TOKEN_MANAGER] No user data to store');
       }
-      
+
       debugPrint('✅ [TOKEN_MANAGER] All tokens stored successfully!');
     } catch (e) {
       debugPrint('❌ [TOKEN_MANAGER] Failed to store tokens: $e');
@@ -124,7 +131,9 @@ class AuthTokenManager {
     if (_currentRefreshToken == null) return false;
 
     try {
-      final authResponse = await AuthApiService.refreshToken(_currentRefreshToken!);
+      final authResponse = await AuthApiService.refreshToken(
+        _currentRefreshToken!,
+      );
       await storeTokens(authResponse);
       return true;
     } catch (e) {
@@ -138,7 +147,7 @@ class AuthTokenManager {
   Future<void> clearTokens() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Clear from memory
       _currentAccessToken = null;
       _currentRefreshToken = null;
@@ -159,7 +168,7 @@ class AuthTokenManager {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userDataString = prefs.getString(_userDataKey);
-      
+
       if (userDataString != null) {
         return json.decode(userDataString) as Map<String, dynamic>;
       }
@@ -187,7 +196,7 @@ class AuthTokenManager {
   /// Validate current token with backend
   Future<bool> validateCurrentToken() async {
     if (_currentAccessToken == null) return false;
-    
+
     try {
       return await AuthApiService.validateToken(_currentAccessToken!);
     } catch (e) {

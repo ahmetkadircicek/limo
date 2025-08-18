@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:limo/core/models/user_model.dart';
@@ -22,27 +21,21 @@ class AuthApiService {
   static const String _userProfileEndpoint = '/user/profile';
   static const String _refreshTokenEndpoint = '/auth/refresh';
 
-    /// Authenticate with Google ID
+  /// Authenticate with Google ID
   /// 1. Encrypts Google ID using AES
   /// 2. Sends encrypted ID to backend
   /// 3. Returns authentication token
   static Future<AuthResponse> authenticateWithGoogle(String googleId) async {
-    debugPrint('🔐 [AUTH_API] Starting Google authentication for ID: $googleId');
-    
     try {
-      debugPrint('🔐 [AUTH_API] Encrypting Google ID using AES...');
       // Encrypt Google ID using AES
       final encryptedId = EncryptionService.encryptData(googleId);
-      debugPrint('✅ [AUTH_API] Google ID encrypted successfully');
-      
+
       // Prepare request payload
       final payload = {
         'encryptedGoogleId': encryptedId,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
         'platform': 'flutter',
       };
-      debugPrint('🔐 [AUTH_API] Request payload prepared: ${payload.keys.join(', ')}');
-      debugPrint('🔐 [AUTH_API] Making POST request to: $_baseUrl$_loginEndpoint');
 
       // Make API call
       final response = await http.post(
@@ -54,16 +47,10 @@ class AuthApiService {
         body: json.encode(payload),
       );
 
-      debugPrint('🔐 [AUTH_API] Response received - Status: ${response.statusCode}');
-      
       if (response.statusCode == 200) {
-        debugPrint('✅ [AUTH_API] Authentication successful!');
         final responseData = json.decode(response.body);
-        debugPrint('🔐 [AUTH_API] Response data keys: ${responseData.keys.join(', ')}');
         return AuthResponse.fromJson(responseData);
       } else {
-        debugPrint('❌ [AUTH_API] Authentication failed - Status: ${response.statusCode}');
-        debugPrint('❌ [AUTH_API] Response body: ${response.body}');
         throw AuthException(
           'Authentication failed',
           response.statusCode,
@@ -71,7 +58,6 @@ class AuthApiService {
         );
       }
     } catch (e) {
-      debugPrint('❌ [AUTH_API] Error during authentication: $e');
       if (e is AuthException) rethrow;
       throw AuthException('Network error: $e', 0, '');
     }

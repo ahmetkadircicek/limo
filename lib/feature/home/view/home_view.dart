@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/core/services/google_auth_service.dart';
 import 'package:limo/feature/about/about_view.dart';
@@ -33,41 +34,16 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _initializeAppState();
     _handleInitialPageNavigation();
   }
 
-  /// Initialize AppStateProvider with current user data if available
-  void _initializeAppState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final appState = Provider.of<AppStateProvider>(context, listen: false);
 
-      // Check if user is already authenticated
-      if (!appState.isAuthenticated) {
-        // Try to get user from Google Auth Service
-        final userModel = await GoogleAuthService.getUserModel();
-        if (userModel != null) {
-          // Use the Google ID to authenticate with backend
-          final googleId = userModel.id;
-          if (googleId.isNotEmpty) {
-            final success = await appState.authenticateWithGoogle(googleId);
-            if (success) {
-              debugPrint(
-                'AppStateProvider initialized with: ${userModel.displayName}',
-              );
-            }
-          }
-        }
-      }
-    });
-  }
 
   /// Handle initial page navigation based on query parameters
   void _handleInitialPageNavigation() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // For now, we'll handle this through the ViewModel
       // In the future, this can be enhanced with URL parameter handling
-      debugPrint("Initial page navigation setup complete");
     });
   }
 
@@ -90,7 +66,6 @@ class _HomeViewState extends State<HomeView> {
     return AppDrawer(
       onProfileTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Profile from Home Drawer");
         homePageViewModel.navigateToProfile();
       },
       onLogoutTap: () async {
@@ -99,55 +74,46 @@ class _HomeViewState extends State<HomeView> {
       },
       onVehicleManagementTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Vehicle Management from Home Drawer");
         homePageViewModel.navigateToVehicleManagement();
       },
       onDebugTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Debug Components from Home Drawer");
         homePageViewModel.pageController.jumpToPage(
           5,
         ); // Debug Components page index
       },
       onSettingsTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Settings from Home Drawer");
         homePageViewModel.pageController.jumpToPage(6); // Settings page index
       },
       onHelpSupportTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Help & Support from Home Drawer");
         homePageViewModel.pageController.jumpToPage(
           7,
         ); // Help & Support page index
       },
       onFAQTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to FAQ from Home Drawer");
         homePageViewModel.pageController.jumpToPage(8); // FAQ page index
       },
       onAboutTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to About from Home Drawer");
         homePageViewModel.pageController.jumpToPage(9); // About page index
       },
       onPrivacyPolicyTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Privacy Policy from Home Drawer");
         homePageViewModel.pageController.jumpToPage(
           10,
         ); // Privacy Policy page index
       },
       onTermsConditionsTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Terms & Conditions from Home Drawer");
         homePageViewModel.pageController.jumpToPage(
           11,
         ); // Terms & Conditions page index
       },
       onNotificationsTap: () {
         context.pop(); // Close drawer
-        debugPrint("Navigation to Notifications from Home Drawer");
         homePageViewModel.pageController.jumpToPage(
           12,
         ); // Notifications page index
@@ -218,17 +184,17 @@ class _HomeViewState extends State<HomeView> {
 
   /// Handle user logout and navigation to login
   Future<void> _handleLogout() async {
-    final appState = Provider.of<AppStateProvider>(context, listen: false);
-
-    // Clear user data and tokens
-    await appState.logout();
-
-    // Sign out from Google
-    await GoogleAuthService.signOut();
+    // Get the AppStateProvider and sign out
+    final appStateProvider = Provider.of<AppStateProvider>(
+      context,
+      listen: false,
+    );
+    
+    // Sign out from Google and clear local state
+    await appStateProvider.signOut();
 
     // Navigate to login
     if (mounted) {
-      debugPrint("Navigation to Login from Home (Logout)");
       context.go('/login');
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/core/utils/local_data_checker.dart';
 import 'package:limo/shared/app_bar.dart';
 import 'package:limo/shared/app_button.dart';
 import 'package:limo/shared/app_card.dart';
@@ -65,6 +66,10 @@ class _DebugViewState extends State<DebugView> {
             const SizedBox(height: 32),
             _buildSectionHeader('App Bar - AppTopBar'),
             _buildAppBarSection(),
+
+            const SizedBox(height: 32),
+            _buildSectionHeader('Local Data Control'),
+            _buildLocalDataSection(),
 
             const SizedBox(height: 100), // Bottom padding
           ],
@@ -459,6 +464,43 @@ class _DebugViewState extends State<DebugView> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocalDataSection() {
+    return AppCard.primary(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText.heading('Local Data Control'),
+          AppText.body('Check and clear local SharedPreferences data'),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              AppButton.primary(
+                'Check Local Data',
+                onPressed: () async {
+                  final dataInfo = await LocalDataChecker.checkAllLocalData();
+                  if (context.mounted) {
+                    context.showInfoTopSnackbar(dataInfo);
+                  }
+                },
+              ),
+              AppButton.primary(
+                'Clear All Local Data',
+                onPressed: () async {
+                  final result = await LocalDataChecker.clearAllLocalData();
+                  if (context.mounted) {
+                    context.showSuccessTopSnackbar(result);
+                  }
+                },
+              ),
+            ],
           ),
         ],
       ),

@@ -115,7 +115,7 @@ class AppDrawer extends StatelessWidget {
   /// Builds the user display name text
   Widget _buildUserName(BuildContext context, AppStateProvider appState) {
     return AppText.heading(
-      appState.currentUser?.displayName ?? 'Kullanıcı',
+      appState.currentUser?.displayName ?? 'Not specified',
       color: context.onSurface,
     );
   }
@@ -123,7 +123,7 @@ class AppDrawer extends StatelessWidget {
   /// Builds the user email text
   Widget _buildUserEmail(BuildContext context, AppStateProvider appState) {
     return AppText.caption(
-      appState.currentUser?.email ?? 'email@example.com',
+      appState.currentUser?.email ?? 'Not specified',
       color: context.textSecondary,
     );
   }

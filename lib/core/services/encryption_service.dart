@@ -11,6 +11,7 @@ class EncryptionService {
   EncryptionService._();
 
   // Encryption key (in production, this should be stored securely)
+  // Must be exactly 32 characters for AES-256
   static const String _secretKey = 'your-secret-key-here-32-chars-long!';
 
   /// Encrypt data using AES-256-CBC

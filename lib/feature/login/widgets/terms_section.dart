@@ -20,91 +20,66 @@ class TermsSection extends StatelessWidget {
     );
   }
 
+  /// Builds the terms acceptance text
   Widget _buildTermsText(BuildContext context) {
     return AppText.caption(
       'By continuing, you accept the Terms of Service and Privacy Policy.',
-      color: Colors.white.withValues(alpha: 0.7),
+      color: context.onPrimary.withValues(alpha: 0.7),
       textAlign: TextAlign.center,
       maxLines: 3,
     );
   }
 
+  /// Builds the terms and privacy policy buttons
   Widget _buildTermsButtons(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildTermsButton(context),
-        _buildDivider(),
+        _buildDivider(context),
         _buildPrivacyButton(context),
       ],
     );
   }
 
+  /// Builds the Terms of Service button
   Widget _buildTermsButton(BuildContext context) {
     return TextButton(
-      onPressed: () => _showTermsDialog(context),
-      child: AppText.caption(
-        'Terms of Service',
-        color: Colors.white,
-      ),
+      onPressed: () => _showTermsSnackbar(context),
+      child: AppText.caption('Terms of Service', color: context.onPrimary),
     );
   }
 
-  Widget _buildDivider() {
+  /// Builds the visual divider between buttons
+  Widget _buildDivider(BuildContext context) {
     return Container(
       width: 1,
       height: 12,
-      color: Colors.white.withValues(alpha: 0.18),
+      color: context.onPrimary.withValues(alpha: 0.3),
     );
   }
 
+  /// Builds the Privacy Policy button
   Widget _buildPrivacyButton(BuildContext context) {
     return TextButton(
-      onPressed: () => _showPrivacyDialog(context),
-      child: AppText.caption(
-        'Privacy Policy',
-        color: Colors.white,
-      ),
+      onPressed: () => _showPrivacySnackbar(context),
+      child: AppText.caption('Privacy Policy', color: context.onPrimary),
     );
   }
 
-  void _showTermsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: AppText.title('Terms of Service', color: Colors.white),
-        content: AppText.body(
-          'Terms of service will be displayed here...',
-          color: Colors.white,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: AppText.body('Close', color: Colors.white),
-          ),
-        ],
-      ),
+  /// Shows Terms of Service information via snackbar
+  void _showTermsSnackbar(BuildContext context) {
+    AppSnackbar.showInfo(
+      context,
+      message: 'Terms of Service will be available soon.',
     );
   }
 
-  void _showPrivacyDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: AppText.title('Privacy Policy', color: Colors.white),
-        content: AppText.body(
-          'Privacy policy will be displayed here...',
-          color: Colors.white,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: AppText.body('Close', color: Colors.white),
-          ),
-        ],
-      ),
+  /// Shows Privacy Policy information via snackbar
+  void _showPrivacySnackbar(BuildContext context) {
+    AppSnackbar.showInfo(
+      context,
+      message: 'Privacy Policy will be available soon.',
     );
   }
 }

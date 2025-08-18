@@ -109,11 +109,11 @@ class _ProfileViewState extends State<ProfileView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText.heading(
-                  appState.currentUser?.displayName ?? 'User Name',
+                  appState.currentUser?.displayName ?? 'Not specified',
                   color: context.onSurface,
                 ),
                 AppText.body(
-                  appState.currentUser?.email ?? 'email@example.com',
+                  appState.currentUser?.email ?? 'Not specified',
                   color: context.onSurface.withValues(alpha: 0.6),
                 ),
               ],
@@ -177,7 +177,7 @@ class _ProfileViewState extends State<ProfileView> {
                 AppInput.primary(
                   controller: viewModel.phoneController,
                   labelText: 'Phone',
-                  hintText: '+1 (555) 123-4567',
+                  hintText: 'Enter your phone number',
                   keyboardType: TextInputType.phone,
                   enabled: viewModel.isEditing, // Only enabled in edit mode
                   inputFormatters:

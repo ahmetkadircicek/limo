@@ -42,15 +42,12 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
       });
 
       // Mock data loading removed - implement real API call here
-      debugPrint(
-        'VehicleManagementView: Mock data loading removed - implement real API call',
-      );
 
       setState(() {
         _vehicles = [];
       });
     } catch (e) {
-      debugPrint('Error loading vehicles: $e');
+
       _showErrorSnackBar('Error loading vehicles: $e');
     } finally {
       setState(() {
@@ -574,7 +571,7 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
   }
 
   void _addNewVehicle() {
-    debugPrint("Navigation to Vehicle Registration from Vehicle Management");
+
     context.push('/vehicle-registration').then((_) {
       _loadVehicles();
     });

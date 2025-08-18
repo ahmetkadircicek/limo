@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:limo/core/models/user_model.dart';
 
@@ -24,37 +25,38 @@ class GoogleAuthService {
       await _googleSignIn.initialize();
 
       if (!_googleSignIn.supportsAuthenticate()) {
-        developer.log('Google authentication not supported on this platform');
+        debugPrint(
+          '❌ [GOOGLE_AUTH] Google authentication not supported on this platform',
+        );
         return null;
       }
 
-      GoogleSignInAccount? user =
-          await _googleSignIn.attemptLightweightAuthentication();
+      // Force interactive authentication - no lightweight auth
+      // This ensures user sees the Google sign-in screen every time
+      debugPrint('🔐 [GOOGLE_AUTH] Forcing interactive authentication...');
 
-      if (user != null) {
-        developer.log('Lightweight authentication successful: ${user.email}');
-        currentUser = user;
-        return user;
-      }
+      final user = await _googleSignIn.authenticate();
 
-      user = await _googleSignIn.authenticate();
-
-      developer.log('Interactive authentication successful: ${user.email}');
+      debugPrint(
+        '🔐 [GOOGLE_AUTH] Interactive authentication başarılı: ${user.email}',
+      );
       currentUser = user;
       return user;
+
+      return null;
     } catch (error) {
-      developer.log('Google Sign-In Error: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Google Sign-In Error: $error');
 
       String errorMessage = error.toString().toLowerCase();
       if (errorMessage.contains('canceled') ||
           errorMessage.contains('cancelled')) {
-        developer.log('Sign-in was cancelled by user');
+        debugPrint('❌ [GOOGLE_AUTH] Sign-in kullanıcı tarafından iptal edildi');
       } else if (errorMessage.contains('network')) {
-        developer.log('Network error during sign-in');
+        debugPrint('❌ [GOOGLE_AUTH] Network error during sign-in');
       } else if (errorMessage.contains('failed')) {
-        developer.log('Sign-in failed due to unknown reason');
+        debugPrint('❌ [GOOGLE_AUTH] Sign-in failed due to unknown reason');
       } else {
-        developer.log('Unknown Google Sign-In error: $error');
+        debugPrint('❌ [GOOGLE_AUTH] Unknown Google Sign-In error: $error');
       }
 
       return null;
@@ -63,12 +65,19 @@ class GoogleAuthService {
 
   static Future<bool> signOut() async {
     try {
+      // Sign out from Google
       await _googleSignIn.signOut();
+
+      // Also disconnect to remove all permissions
+      await _googleSignIn.disconnect();
+
       currentUser = null;
-      developer.log('Google Sign-Out successful');
+      debugPrint('🔐 [GOOGLE_AUTH] Google Sign-Out and disconnect başarılı');
       return true;
     } catch (error) {
-      developer.log('Google Sign-Out Error: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Google Sign-Out Error: $error');
+      // Still clear local state even if Google sign-out fails
+      currentUser = null;
       return false;
     }
   }
@@ -77,10 +86,10 @@ class GoogleAuthService {
     try {
       await _googleSignIn.disconnect();
       currentUser = null;
-      developer.log('Google account disconnected');
+      debugPrint('🔐 [GOOGLE_AUTH] Google account disconnected');
       return true;
     } catch (error) {
-      developer.log('Google disconnect error: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Google disconnect error: $error');
       return false;
     }
   }
@@ -93,24 +102,14 @@ class GoogleAuthService {
         await initialize();
       }
 
-      if (currentUser != null) {
-        developer.log('User already signed in: ${currentUser!.email}');
-        return true;
-      }
-
-      final restoredUser =
-          await _googleSignIn.attemptLightweightAuthentication();
-
-      if (restoredUser != null) {
-        currentUser = restoredUser;
-        developer.log('User session restored: ${restoredUser.email}');
-        return true;
-      }
-
-      developer.log('No user session found');
+      // Never restore sessions automatically
+      // User must manually sign in through the login screen
+      debugPrint(
+        '🔐 [GOOGLE_AUTH] No automatic session restoration - manual sign-in required',
+      );
       return false;
     } catch (error) {
-      developer.log('Error checking/restoring user session: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Error checking Google user session: $error');
       return false;
     }
   }
@@ -119,14 +118,14 @@ class GoogleAuthService {
     try {
       final GoogleSignInAccount? user = currentUser;
       if (user == null) {
-        developer.log('No user signed in');
+        debugPrint('❌ [GOOGLE_AUTH] No user signed in');
         return null;
       }
 
       final GoogleSignInAuthentication auth = user.authentication;
       return auth;
     } catch (error) {
-      developer.log('Error getting auth tokens: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Error getting auth tokens: $error');
       return null;
     }
   }
@@ -134,38 +133,36 @@ class GoogleAuthService {
   static Future<void> initialize() async {
     try {
       if (_isInitialized) {
-        developer.log('Google Sign-In already initialized, skipping...');
+        debugPrint(
+          '🔐 [GOOGLE_AUTH] Google Sign-In already initialized, skipping...',
+        );
         return;
       }
 
-      developer.log('Initializing Google Sign-In...');
+      debugPrint('🔐 [GOOGLE_AUTH] Initializing Google Sign-In...');
 
       await _googleSignIn.initialize();
 
+      // Listen to authentication events
       _googleSignIn.authenticationEvents.listen((event) {
         if (event is GoogleSignInAuthenticationEventSignIn) {
           currentUser = event.user;
-          developer.log('User signed in: ${event.user.email}');
+          debugPrint('🔐 [GOOGLE_AUTH] User signed in: ${event.user.email}');
         } else if (event is GoogleSignInAuthenticationEventSignOut) {
           currentUser = null;
-          developer.log('User signed out');
+          debugPrint('🔐 [GOOGLE_AUTH] User signed out');
         }
       });
 
-      final GoogleSignInAccount? user =
-          await _googleSignIn.attemptLightweightAuthentication();
-
-      if (user != null) {
-        currentUser = user;
-        developer.log('User restored from previous session: ${user.email}');
-      } else {
-        developer.log('No previous user session found');
-      }
+      // No automatic session restoration - user must manually sign in
+      debugPrint(
+        '🔐 [GOOGLE_AUTH] No automatic session restoration - manual sign-in required',
+      );
 
       _isInitialized = true;
-      developer.log('Google Sign-In initialization completed');
+      debugPrint('🔐 [GOOGLE_AUTH] Google Sign-In initialization completed');
     } catch (error) {
-      developer.log('Google Sign-In initialization error: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Google Sign-In initialization error: $error');
     }
   }
 
@@ -195,13 +192,15 @@ class GoogleAuthService {
         },
       };
 
-      developer.log('=== GOOGLE USER PROFILE DATA ===');
-      developer.log(_formatJson(extendedProfile));
-      developer.log('=== END GOOGLE USER PROFILE DATA ===');
+      debugPrint('🔐 [GOOGLE_AUTH] === GOOGLE USER PROFILE DATA ===');
+      debugPrint('🔐 [GOOGLE_AUTH] ${_formatJson(extendedProfile)}');
+      debugPrint('🔐 [GOOGLE_AUTH] === END GOOGLE USER PROFILE DATA ===');
 
       return extendedProfile;
     } catch (error) {
-      developer.log('Error getting comprehensive user profile: $error');
+      debugPrint(
+        '❌ [GOOGLE_AUTH] Error getting comprehensive user profile: $error',
+      );
       return null;
     }
   }
@@ -218,7 +217,7 @@ class GoogleAuthService {
         photoUrl: user.photoUrl,
       );
     } catch (error) {
-      developer.log('Error creating user model: $error');
+      debugPrint('❌ [GOOGLE_AUTH] Error creating user model: $error');
       return null;
     }
   }

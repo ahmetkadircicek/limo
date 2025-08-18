@@ -42,9 +42,7 @@ class _MultipleVehicleRequirementsFormState
   void _showAddVehicleRequirement() {
     if (!widget.enabled) return;
 
-    debugPrint(
-      "Navigation to Vehicle Requirements (Add) from Multiple Requirements Form",
-    );
+
     context.push(
       '/vehicle-requirements',
       extra: {
@@ -62,9 +60,7 @@ class _MultipleVehicleRequirementsFormState
   void _showEditVehicleRequirement(int index) {
     if (!widget.enabled) return;
 
-    debugPrint(
-      "Navigation to Vehicle Requirements (Edit) from Multiple Requirements Form",
-    );
+
     context.push(
       '/vehicle-requirements',
       extra: {

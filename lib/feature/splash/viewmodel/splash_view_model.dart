@@ -1,70 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/services/google_auth_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 
 class SplashViewModel extends ChangeNotifier {
   bool _isLoading = true;
-  bool _isInitialized = false;
+  bool _isUserAuthenticated = false;
 
+  /// Returns the current loading state
   bool get isLoading => _isLoading;
-  bool get isInitialized => _isInitialized;
 
+  /// Returns the current authentication state
+  bool get isUserAuthenticated => _isUserAuthenticated;
+
+  /// Initializes the splash view
   Future<bool> initialize() async {
     try {
       _setLoading(true);
 
-      final minimumSplashDuration = const Duration(seconds: 3);
-      final startTime = DateTime.now();
-      final isUserSignedIn = await _checkUserAuthentication();
-      final elapsedTime = DateTime.now().difference(startTime);
-      if (elapsedTime < minimumSplashDuration) {
-        final remainingTime = minimumSplashDuration - elapsedTime;
-        await Future.delayed(remainingTime);
-      }
+      await Future.delayed(const Duration(seconds: 3));
 
-      _setInitialized(true);
-      _setLoading(false);
+      // Authentication check not implemented yet
+      _isUserAuthenticated = false;
 
-      return isUserSignedIn;
+      return false; // Always require login for now
     } catch (error) {
-      debugPrint('Splash initialization error: $error');
-
-      final startTime = DateTime.now();
-      final elapsedTime = DateTime.now().difference(startTime);
-      if (elapsedTime < const Duration(seconds: 3)) {
-        final remainingTime = const Duration(seconds: 3) - elapsedTime;
-        await Future.delayed(remainingTime);
-      }
-
-      _setLoading(false);
+      LoggerService.error(
+        'Splash initialization error',
+        error: error,
+        tag: 'SPLASH_VM',
+      );
+      _isUserAuthenticated = false;
       return false;
     }
   }
 
-  Future<bool> _checkUserAuthentication() async {
-    try {
-      final isUserSignedIn = await GoogleAuthService.checkAndRestoreSession();
-
-      if (isUserSignedIn) {
-        final userModel = await GoogleAuthService.getUserModel();
-        if (userModel != null) {
-          debugPrint('User authenticated: ${userModel.displayName}');
-        }
-      }
-
-      return isUserSignedIn;
-    } catch (error) {
-      debugPrint('Error checking user authentication: $error');
-      return false;
-    }
-  }
-
+  /// Updates the loading state and notifies listeners
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
   }
 
-  void _setInitialized(bool initialized) {
-    _isInitialized = initialized;
-    notifyListeners();
+  /// Stops loading state - called after navigation decision
+  void stopLoading() {
+    _setLoading(false);
   }
 }

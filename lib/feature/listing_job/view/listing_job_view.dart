@@ -11,7 +11,7 @@ import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/location_data_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:limo/feature/listing_job/services/job_creation_service.dart';
+
 import 'package:limo/feature/listing_job/widgets/multiple_vehicle_requirements_form.dart';
 import 'package:limo/feature/map/models/location_model.dart';
 import 'package:limo/shared/app_components.dart';
@@ -608,7 +608,7 @@ class _ListingJobViewState extends State<ListingJobView> {
     required String title,
     required Function(LocationModel) onLocationSelected,
   }) async {
-    debugPrint("Navigation to Location Picker from Listing Job");
+    
 
     // Navigate to location picker and get the result
     final result = await context.push(
@@ -631,19 +631,10 @@ class _ListingJobViewState extends State<ListingJobView> {
 
     try {
       _showLoadingDialog();
-      final response = await JobCreationService.createJob(job);
-      Navigator.of(context).pop();
-
-      if (response['success'] == true) {
-        JobCreationService.logDebugInfo(job);
-        _showSuccessSnackbar('Job posted successfully!');
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-      } else {
-        _showErrorSnackbar(
-          'Error creating job: ${response['error']['message']}',
-        );
+      // TODO: Implement job creation
+      _showSuccessSnackbar('Job creation henüz implement edilmedi');
+      if (context.mounted) {
+        Navigator.of(context).pop();
       }
     } catch (error) {
       Navigator.of(context).pop();

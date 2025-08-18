@@ -128,7 +128,6 @@ class VehicleRegistrationViewModel with ChangeNotifier {
 
   /// Constructor initializes all text controllers
   VehicleRegistrationViewModel(BuildContext context) {
-    debugPrint('VehicleRegistrationViewModel created');
     licencePlateController = TextEditingController();
     brandController = TextEditingController();
     modelController = TextEditingController();
@@ -323,14 +322,7 @@ class VehicleRegistrationViewModel with ChangeNotifier {
 
   /// Logs vehicle data for debugging purposes
   void _logVehicleData(VehicleModel vehicle) {
-    debugPrint('Vehicle Registration Data:');
-    debugPrint('Licence Plate: ${vehicle.licencePlate}');
-    debugPrint('Brand: ${vehicle.brand}');
-    debugPrint('Model: ${vehicle.model}');
-    debugPrint('Year: ${vehicle.year}');
-    debugPrint('Capacity: ${vehicle.capacity}');
-    debugPrint('Vehicle Type: ${vehicle.vehicleType}');
-    debugPrint('Category: ${vehicle.category.displayName}');
+
   }
 
   /// Clears all form data and resets to initial state

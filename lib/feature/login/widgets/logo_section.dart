@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/image_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_components.dart';
 
@@ -9,34 +10,21 @@ class LogoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        _buildAppLogo(context),
-        SizedBox(height: context.spacingM),
-        _buildWelcomeMessage(context),
-      ],
+      spacing: context.spacingS,
+      children: [_buildAppLogo(context), _buildWelcomeMessage(context)],
     );
   }
 
+  /// Builds the app logo with proper sizing and color filtering
   Widget _buildAppLogo(BuildContext context) {
     return ColorFiltered(
-      colorFilter: const ColorFilter.mode(
-        Colors.white,
-        BlendMode.srcIn,
-      ),
-      child: Image.asset(
-        'assets/png/image/image_logo.png',
-        width: context.width * 0.7,
-        fit: BoxFit.cover,
-      ),
+      colorFilter: ColorFilter.mode(context.onPrimary, BlendMode.srcIn),
+      child: Image.asset(ImageAssets.logo, width: context.width * 0.7),
     );
   }
 
+  /// Builds the welcome message text below the logo
   Widget _buildWelcomeMessage(BuildContext context) {
-    return AppText.body(
-      'Fast and secure journeys await you.',
-      color: Colors.white.withValues(alpha: 0.85),
-      textAlign: TextAlign.center,
-      maxLines: 2,
-    );
+    return AppText.body('Fast and secure work.', color: context.onPrimary);
   }
 }

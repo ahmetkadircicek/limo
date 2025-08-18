@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_components.dart';
 
@@ -28,88 +29,62 @@ class OAuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color transparentColor = Colors.transparent;
+    final double indicatorSize = 24;
+    final double iconSize = 24;
+
+    BoxDecoration buttonDecoration = BoxDecoration(
+      borderRadius: context.radiusMedium,
+      boxShadow: context.shadowMedium,
+      border: Border.all(color: borderColor),
+    );
+
+    ButtonStyle buttonStyle = TextButton.styleFrom(
+      backgroundColor: backgroundColor,
+      foregroundColor: textColor,
+      disabledBackgroundColor: backgroundColor,
+      padding: context.horizontalL,
+      shape: RoundedRectangleBorder(
+        borderRadius: GeneralConstants.borderRadius,
+      ),
+      elevation: 0,
+      shadowColor: transparentColor,
+    );
+
+    Widget buttonContent;
+    if (isLoading) {
+      buttonContent = Center(
+        child: SizedBox(
+          width: indicatorSize,
+          height: indicatorSize,
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(textColor),
+          ),
+        ),
+      );
+    } else {
+      buttonContent = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(icon, size: iconSize, color: iconColor),
+          SizedBox(width: context.spacingM),
+          AppText.body(text, color: textColor, fontWeight: FontWeight.w500),
+        ],
+      );
+    }
+
     return SizedBox(
       width: double.infinity,
       height: context.buttonHeight,
       child: Container(
-        decoration: _buildButtonDecoration(),
+        decoration: buttonDecoration,
         child: TextButton(
           onPressed: isLoading ? null : onPressed,
-          style: _buildButtonStyle(context),
-          child: _buildButtonContent(context),
+          style: buttonStyle,
+          child: buttonContent,
         ),
       ),
-    );
-  }
-
-  BoxDecoration _buildButtonDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
-      border: Border.all(
-        color: borderColor,
-        width: 1,
-      ),
-    );
-  }
-
-  ButtonStyle _buildButtonStyle(BuildContext context) {
-    return TextButton.styleFrom(
-      backgroundColor: backgroundColor,
-      foregroundColor: textColor,
-      disabledBackgroundColor: backgroundColor.withValues(alpha: 0.7),
-      padding: context.horizontalL,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 0,
-      shadowColor: Colors.transparent,
-    );
-  }
-
-  Widget _buildButtonContent(BuildContext context) {
-    if (isLoading) {
-      return _buildLoadingIndicator();
-    }
-    return _buildButtonContentWithIcon(context);
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Center(
-      child: SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation(iconColor),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButtonContentWithIcon(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FaIcon(
-          icon,
-          size: 24,
-          color: iconColor,
-        ),
-        SizedBox(width: context.spacingM),
-        AppText.body(
-          text,
-          color: textColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ],
     );
   }
 }

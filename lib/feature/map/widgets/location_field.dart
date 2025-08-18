@@ -30,7 +30,7 @@ class LocationField extends StatelessWidget {
   void _openLocationPicker(BuildContext context) async {
     if (!enabled) return;
 
-    debugPrint("Navigation to Location Picker from Location Field");
+    
 
     // Navigate to location picker and get the result
     final result = await context.push(
