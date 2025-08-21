@@ -1,29 +1,27 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
-import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/location_data_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
-
-import 'package:limo/feature/listing_job/widgets/multiple_vehicle_requirements_form.dart';
+import 'package:limo/feature/job_listing/widgets/multiple_vehicle_requirements_form.dart';
 import 'package:limo/feature/map/models/location_model.dart';
 import 'package:limo/shared/app_components.dart';
 
-class ListingJobView extends StatefulWidget {
-  const ListingJobView({super.key});
+class JobListingView extends StatefulWidget {
+  const JobListingView({super.key});
 
   @override
-  State<ListingJobView> createState() => _ListingJobViewState();
+  State<JobListingView> createState() => _JobListingViewState();
 }
 
-class _ListingJobViewState extends State<ListingJobView> {
+class _JobListingViewState extends State<JobListingView> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -608,8 +606,6 @@ class _ListingJobViewState extends State<ListingJobView> {
     required String title,
     required Function(LocationModel) onLocationSelected,
   }) async {
-    
-
     // TODO: Navigate to location picker page
     // For now, just show a message or handle differently
   }
@@ -681,7 +677,7 @@ class _ListingJobViewState extends State<ListingJobView> {
     for (int i = 0; i < _vehicleRequirements.length; i++) {
       final requirement = _vehicleRequirements[i];
       if (requirement.specificBrand != null ||
-          requirement.specificVehicleType != null) {
+          requirement.specificModel != null) {
         if (requirement.minimumCategory == null) {
           _showErrorSnackbar(
             'Please select minimum category for vehicle requirement ${i + 1}',

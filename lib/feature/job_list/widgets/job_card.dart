@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
-import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/shared/app_components.dart';
@@ -198,6 +198,8 @@ class JobCard extends StatelessWidget {
         return 'FULL DAY';
       case JobType.hourly:
         return 'HOURLY';
+      case JobType.custom:
+        return 'CUSTOM';
     }
   }
 }

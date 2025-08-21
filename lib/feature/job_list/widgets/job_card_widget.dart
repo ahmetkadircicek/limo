@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/shared/app_text.dart';
@@ -298,6 +298,8 @@ class JobCardWidget extends StatelessWidget {
         return _JobTypeChipData('Full Day', context.success);
       case JobType.hourly:
         return _JobTypeChipData('Hourly', context.warning);
+      case JobType.custom:
+        return _JobTypeChipData('Custom', context.secondary);
       case null:
         return _JobTypeChipData('Unknown', context.textSecondary);
     }

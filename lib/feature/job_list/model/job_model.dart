@@ -1,9 +1,10 @@
-import 'package:limo/core/enums/pickup_type_enum.dart';
+import 'package:limo/core/enums/application_status_enum.dart';
+import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/feature/job_list/model/job_application_model.dart';
 import 'package:limo/feature/job_list/model/location_data_model.dart';
 import 'package:limo/feature/job_list/model/pricing_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/feature/job_vehicle_registration/model/vehicle_model.dart';
 
 class JobModel {
   final String id;

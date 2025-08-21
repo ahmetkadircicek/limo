@@ -1,248 +1,145 @@
 import 'package:limo/core/enums/vehicle_category_enum.dart';
-import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 
+/// Model for vehicle requirements in jobs
 class VehicleRequirement {
-  final String id; // Unique identifier for each requirement
-  final String? specificBrand; // null = "Any brand"
-  final String? specificModel; // null = "Any model"
-  final String? specificVehicleType; // null = "Any type"
-
-  final int? capacity; // null = "Any capacity"
-  final int? year; // null = "Any year"
-  final int?
-  minimumCategory; // null = "Any category" - using integer ID from JSON
-
-  final String? notes; // Additional notes about the requirement
-
-  // Pricing for this specific vehicle requirement
+  final String id;
+  final VehicleCategory category;
+  final int count;
+  final String? description;
+  final Map<String, dynamic>? specifications;
+  final VehicleCategory? minimumCategory;
+  final String? specificBrand;
+  final String? specificModel;
+  final int? capacity;
+  final int? year;
+  final String? notes;
   final double? hourlyRate;
   final double? pricePerMile;
 
   const VehicleRequirement({
     required this.id,
+    required this.category,
+    required this.count,
+    this.description,
+    this.specifications,
+    this.minimumCategory,
     this.specificBrand,
     this.specificModel,
-    this.specificVehicleType,
     this.capacity,
     this.year,
-    this.minimumCategory,
-
     this.notes,
     this.hourlyRate,
     this.pricePerMile,
   });
 
-  /// Factory constructor for completely flexible requirements
+  /// Create a default vehicle requirement for any vehicle
   factory VehicleRequirement.anyVehicle() {
-    return const VehicleRequirement(id: 'any_vehicle');
+    return const VehicleRequirement(
+      id: 'any',
+      category: VehicleCategory.standardSedan,
+      count: 1,
+      description: 'Any vehicle type accepted',
+    );
   }
 
-  /// Factory constructor for specific requirements
-  factory VehicleRequirement.specific({
-    required String id,
-    String? brand,
-    String? model,
-    String? vehicleType,
+  /// Check if a vehicle matches this requirement
+  bool matchesVehicle(dynamic vehicle) {
+    // TODO: Implement vehicle matching logic
+    // For now, return true for any vehicle
+    return true;
+  }
 
+  /// Create a copy with updated values
+  VehicleRequirement copyWith({
+    String? id,
+    VehicleCategory? category,
+    int? count,
+    String? description,
+    Map<String, dynamic>? specifications,
+    VehicleCategory? minimumCategory,
+    String? specificBrand,
+    String? specificModel,
     int? capacity,
     int? year,
-    int? minCategory,
     String? notes,
     double? hourlyRate,
     double? pricePerMile,
   }) {
     return VehicleRequirement(
-      id: id,
-      specificBrand: brand,
-      specificModel: model,
-      specificVehicleType: vehicleType,
-
-      capacity: capacity,
-      year: year,
-      minimumCategory: minCategory,
-
-      notes: notes,
-      hourlyRate: hourlyRate,
-      pricePerMile: pricePerMile,
+      id: id ?? this.id,
+      category: category ?? this.category,
+      count: count ?? this.count,
+      description: description ?? this.description,
+      specifications: specifications ?? this.specifications,
+      minimumCategory: minimumCategory ?? this.minimumCategory,
+      specificBrand: specificBrand ?? this.specificBrand,
+      specificModel: specificModel ?? this.specificModel,
+      capacity: capacity ?? this.capacity,
+      year: year ?? this.year,
+      notes: notes ?? this.notes,
+      hourlyRate: hourlyRate ?? this.hourlyRate,
+      pricePerMile: pricePerMile ?? this.pricePerMile,
     );
-  }
-
-  /// Check if a vehicle matches this requirement
-  bool matchesVehicle(VehicleModel vehicle) {
-    // Check capacity requirement
-    if (capacity != null && vehicle.capacity < capacity!) {
-      return false;
-    }
-
-    // Check category requirement
-    if (minimumCategory != null) {
-      // Convert integer category to VehicleCategory enum for comparison
-      final category = VehicleCategory.fromId(minimumCategory!);
-      if (!vehicle.canHandleJob(category)) {
-        return false;
-      }
-    }
-
-    // Check brand requirement
-    if (specificBrand != null && vehicle.brand != specificBrand) {
-      return false;
-    }
-
-    // Check model requirement
-    if (specificModel != null && vehicle.model != specificModel) {
-      return false;
-    }
-
-    // Check vehicle type requirement
-    if (specificVehicleType != null &&
-        vehicle.vehicleType != specificVehicleType) {
-      return false;
-    }
-
-    // Check year requirement
-    if (year != null && vehicle.year < year!) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /// Get a human-readable description of this requirement
-  String getDescription() {
-    final parts = <String>[];
-
-    if (specificBrand != null) {
-      parts.add('Brand: $specificBrand');
-    }
-    if (specificModel != null) {
-      parts.add('Model: $specificModel');
-    }
-    if (minimumCategory != null) {
-      // Convert integer category to VehicleCategory enum for display
-      final category = VehicleCategory.fromId(minimumCategory!);
-      parts.add('Category: ${category.displayName}');
-    }
-    if (capacity != null) {
-      parts.add('Capacity: $capacity+ people');
-    }
-    if (year != null) {
-      parts.add('Year: $year+');
-    }
-    if (specificVehicleType != null) {
-      parts.add('Type: $specificVehicleType');
-    }
-
-    if (parts.isEmpty) {
-      return 'Any vehicle';
-    }
-
-    return parts.join(', ');
-  }
-
-  /// Get pricing summary for this vehicle requirement
-  String getPricingSummary() {
-    List<String> pricing = [];
-
-    if (hourlyRate != null) {
-      pricing.add('\$${hourlyRate!.toStringAsFixed(2)}/hour');
-    }
-    if (pricePerMile != null) {
-      pricing.add('\$${pricePerMile!.toStringAsFixed(2)}/mile');
-    }
-
-    if (pricing.isEmpty) return 'No pricing specified';
-    return pricing.join(', ');
   }
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'specificBrand': specificBrand,
-      'specificModel': specificModel,
-      'specificVehicleType': specificVehicleType,
-
+      'category': category.name,
+      'count': count,
+      'description': description,
+      'specifications': specifications,
+      'minimum_category': minimumCategory?.name,
+      'specific_brand': specificBrand,
+      'specific_model': specificModel,
       'capacity': capacity,
       'year': year,
-      'minimumCategory': minimumCategory,
-
       'notes': notes,
-      'hourlyRate': hourlyRate,
-      'pricePerMile': pricePerMile,
+      'hourly_rate': hourlyRate,
+      'price_per_mile': pricePerMile,
     };
   }
 
   /// Create from JSON
   factory VehicleRequirement.fromJson(Map<String, dynamic> json) {
     return VehicleRequirement(
-      id: json['id'] ?? '',
-      specificBrand: json['specificBrand'],
-      specificModel: json['specificModel'],
-      specificVehicleType: _migrateVehicleTypeFromJson(
-        json['specificVehicleType'],
+      id: json['id'] as String,
+      category: VehicleCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => VehicleCategory.standardSedan,
       ),
-
-      capacity: json['capacity'],
-      year: json['year'],
-      minimumCategory: json['minimumCategory'],
-
-      notes: json['notes'],
-      hourlyRate: json['hourlyRate']?.toDouble(),
-      pricePerMile: json['pricePerMile']?.toDouble(),
+      count: json['count'] as int,
+      description: json['description'] as String?,
+      specifications: json['specifications'] as Map<String, dynamic>?,
+      minimumCategory:
+          json['minimum_category'] != null
+              ? VehicleCategory.values.firstWhere(
+                (e) => e.name == json['minimum_category'],
+                orElse: () => VehicleCategory.standardSedan,
+              )
+              : null,
+      specificBrand: json['specific_brand'] as String?,
+      specificModel: json['specific_model'] as String?,
+      capacity: json['capacity'] as int?,
+      year: json['year'] as int?,
+      notes: json['notes'] as String?,
+      hourlyRate: json['hourly_rate'] as double?,
+      pricePerMile: json['price_per_mile'] as double?,
     );
   }
 
-  /// Migrate old Turkish vehicle types to new English ones when loading from JSON
-  static String? _migrateVehicleTypeFromJson(String? oldType) {
-    if (oldType == null) return null;
-
-    // Map old Turkish values to new English ones
-    switch (oldType) {
-      case 'Truck':
-        return 'Truck';
-      case 'Semi-Truck':
-        return 'Semi-Truck';
-      case 'Pickup Truck':
-        return 'Pickup Truck';
-      case 'Tractor':
-        return 'Tractor';
-      case 'Minibus':
-        return 'Minibus';
-      case 'Bus':
-        return 'Bus';
-      default:
-        // If it's already in English or unknown, return as is
-        return oldType;
-    }
+  @override
+  String toString() {
+    return 'VehicleRequirement(id: $id, category: $category, count: $count)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is VehicleRequirement &&
-        other.id == id &&
-        other.specificBrand == specificBrand &&
-        other.specificModel == specificModel &&
-        other.specificVehicleType == specificVehicleType &&
-        other.capacity == capacity &&
-        other.year == year &&
-        other.minimumCategory == minimumCategory &&
-
-        other.hourlyRate == hourlyRate &&
-        other.pricePerMile == pricePerMile;
+    return other is VehicleRequirement && other.id == id;
   }
 
   @override
-  int get hashCode {
-    return id.hashCode ^
-        specificBrand.hashCode ^
-        specificModel.hashCode ^
-        specificVehicleType.hashCode ^
-        capacity.hashCode ^
-        year.hashCode ^
-        minimumCategory.hashCode ^
-
-        hourlyRate.hashCode ^
-        pricePerMile.hashCode;
-  }
+  int get hashCode => id.hashCode;
 }

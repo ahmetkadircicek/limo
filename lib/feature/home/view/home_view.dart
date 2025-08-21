@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
+import 'package:limo/core/services/shared_preferences_service.dart';
 import 'package:limo/feature/debug/debug_view.dart';
 import 'package:limo/feature/empty/view/empty_view.dart';
+import 'package:limo/feature/fleet_management/view/fleet_management_view.dart';
 import 'package:limo/feature/home/viewmodel/home_view_model.dart';
 import 'package:limo/feature/home/widgets/bottom_navigation_bar.dart';
 import 'package:limo/feature/job_list/view/job_list_view.dart';
+import 'package:limo/feature/job_listing/view/job_listing_view.dart';
 import 'package:limo/feature/job_tracking/view/job_tracking_view.dart';
-import 'package:limo/feature/listing_job/view/listing_job_view.dart';
+import 'package:limo/feature/login/view/login_view.dart';
 import 'package:limo/feature/profile/view/profile_view.dart';
-import 'package:limo/feature/vehicle_registration/view/vehicle_management_view.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:limo/shared/app_drawer.dart';
 import 'package:provider/provider.dart';
@@ -156,9 +158,9 @@ class _HomeViewState extends State<HomeView> {
         JobListView(
           onRefresh: () => homePageViewModel.onJobCreated(),
         ), // Jobs - Index 0
-        const ListingJobView(), // Post job - Index 1
+        const JobListingView(), // Post job - Index 1
         const JobTrackingView(), // Job tracking - Index 2
-        const VehicleManagementView(), // Vehicle Management - Index 3
+        const FleetManagementView(), // Fleet Management - Index 3
         const ProfileView(), // Profile - Index 4
         // Drawer pages - accessible only from drawer
         const DebugView(), // Debug Components - Index 5
@@ -192,10 +194,16 @@ class _HomeViewState extends State<HomeView> {
     // Sign out from Google and clear local state
     await appStateProvider.signOut();
 
-    // Navigate to login
+    // SharedPreferences'tan OAuth data'yı temizle
+    await SharedPreferencesService.clearOAuthData();
+
+    // Drawer'ı kapat
     if (mounted) {
-      // TODO: Navigate to login screen
-      // For now, just close the app or show a message
+      Navigator.of(context).pop();
+      // Mevcut sayfayı login sayfası ile replace et
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginView()));
     }
   }
 }

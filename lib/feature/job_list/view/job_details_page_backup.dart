@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
-import 'package:limo/core/enums/pickup_type_enum.dart';
-import 'package:limo/core/enums/vehicle_category_enum.dart';
+import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
@@ -534,10 +533,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     VehicleRequirement requirement,
     BuildContext context,
   ) {
-    final category =
-        requirement.minimumCategory != null
-            ? VehicleCategory.fromId(requirement.minimumCategory!)
-            : null;
+    final category = requirement.minimumCategory;
 
     return Container(
       margin: EdgeInsets.only(bottom: PaddingConstants.spacingM),
@@ -639,6 +635,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   }
 
   Widget _buildContent(VehicleRequirement requirement, BuildContext context) {
+    final category = requirement.minimumCategory;
     return Padding(
       padding: EdgeInsets.all(PaddingConstants.spacingM),
       child: Column(
@@ -656,19 +653,11 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 ),
                 decoration: BoxDecoration(
                   color:
-                      (requirement.minimumCategory != null
-                          ? VehicleCategory.fromId(
-                            requirement.minimumCategory!,
-                          ).color.withValues(alpha: 0.1)
-                          : context.primary.withValues(alpha: 0.1)),
+                      (category?.color.withValues(alpha: 0.1) ??
+                          context.primary.withValues(alpha: 0.1)),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color:
-                        (requirement.minimumCategory != null
-                            ? VehicleCategory.fromId(
-                              requirement.minimumCategory!,
-                            ).color
-                            : context.primary),
+                    color: (category?.color ?? context.primary),
                     width: 1,
                   ),
                 ),
@@ -676,32 +665,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      (requirement.minimumCategory != null
-                          ? VehicleCategory.fromId(
-                            requirement.minimumCategory!,
-                          ).icon
-                          : Icons.directions_car),
+                      (category?.icon ?? Icons.directions_car),
                       size: 30,
-                      color:
-                          (requirement.minimumCategory != null
-                              ? VehicleCategory.fromId(
-                                requirement.minimumCategory!,
-                              ).color
-                              : context.primary),
+                      color: (category?.color ?? context.primary),
                     ),
                     SizedBox(width: PaddingConstants.spacingS),
                     AppText.caption(
-                      (requirement.minimumCategory != null
-                          ? VehicleCategory.fromId(
-                            requirement.minimumCategory!,
-                          ).displayName
-                          : 'Vehicle'),
-                      color:
-                          (requirement.minimumCategory != null
-                              ? VehicleCategory.fromId(
-                                requirement.minimumCategory!,
-                              ).color
-                              : context.primary),
+                      (category?.displayName ?? 'Vehicle'),
+                      color: (category?.color ?? context.primary),
                     ),
                   ],
                 ),

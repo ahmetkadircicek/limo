@@ -74,13 +74,10 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     if (widget.initialRequirement != null) {
       final req = widget.initialRequirement!;
       _selectedBrand = req.specificBrand;
-      _selectedVehicleType = _migrateVehicleType(req.specificVehicleType);
+      _selectedVehicleType = _migrateVehicleType(req.specificModel);
       _minCapacity = req.capacity;
       _minYear = req.year;
-      _selectedCategory =
-          req.minimumCategory != null
-              ? VehicleCategory.fromId(req.minimumCategory!)
-              : null;
+      _selectedCategory = req.minimumCategory;
 
       // Update controllers
       _minCapacityController.text = _minCapacity?.toString() ?? '';
@@ -357,17 +354,20 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       id:
           widget.initialRequirement?.id ??
           'req_${DateTime.now().millisecondsSinceEpoch}',
+      category: _selectedCategory ?? VehicleCategory.standardSedan,
+      count: 1,
       specificBrand: _selectedBrand,
-      specificVehicleType: _selectedVehicleType,
+      specificModel: _selectedVehicleType,
       capacity: _minCapacity,
       year: _minYear,
-      minimumCategory: _selectedCategory?.id,
-      notes:
-          'Mile: ${_pricePerMile ?? 0}, Hour: ${_pricePerHour ?? 0}', // Store pricing info in notes field
+      minimumCategory: _selectedCategory,
+      notes: 'Mile: ${_pricePerMile ?? 0}, Hour: ${_pricePerHour ?? 0}',
+      pricePerMile: _pricePerMile,
+      hourlyRate: _pricePerHour,
     );
 
     widget.onSave(requirement);
-          Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   // Reset form to initial state

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/init/navigation/navigation_service.dart';
 import 'package:limo/core/init/theme/app_theme.dart';
-import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/core/services/encryption_service.dart';
 import 'package:limo/core/services/environment_service.dart';
 import 'package:limo/feature/login/services/google_auth_service.dart';
@@ -54,20 +53,7 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
       navigatorKey: NavigationService.instance.navigatorKey,
-      home: _buildInitialRoute(),
-    );
-  }
-
-  /// Build initial route based on authentication state
-  Widget _buildInitialRoute() {
-    return Consumer<AppStateProvider>(
-      builder: (context, appState, child) {
-        if (appState.isAuthenticated) {
-          return const SplashView();
-        } else {
-          return const SplashView();
-        }
-      },
+      home: const SplashView(),
     );
   }
 }

@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
 import 'package:limo/core/constants/image_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
@@ -34,9 +31,6 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   Widget build(BuildContext context) {
     return Consumer2<LoginViewModel, AppStateProvider>(
       builder: (context, loginViewModel, appStateProvider, child) {
-        // Re-enable authentication state change handling
-        _handleAuthenticationStateChange(loginViewModel);
-
         return Scaffold(
           body: Stack(
             fit: StackFit.expand,
@@ -50,19 +44,10 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
     );
   }
 
-  /// Handles authentication state changes and navigates accordingly
-  void _handleAuthenticationStateChange(LoginViewModel viewModel) {
-    if (viewModel.isAuthenticated) {
-      // TODO: Navigate to home when authenticated
-      // For now, just show a message or handle differently
-    }
-  }
-
   /// Build the background section with image, blur and overlay
   Widget _buildBackgroundSection(BuildContext context) {
     return Positioned.fill(
       child: Stack(
-        fit: StackFit.expand,
         children: [
           _buildBackgroundImage(),
           _buildBlurOverlay(context),
@@ -74,24 +59,22 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
 
   /// Build the background image
   Widget _buildBackgroundImage() {
-    return Image.asset(ImageAssets.loginImage, fit: BoxFit.cover);
+    return Image.asset(
+      ImageAssets.loginImage,
+      fit: BoxFit.fitHeight, // Ekranı tamamen kapla
+      width: double.infinity,
+      height: double.infinity,
+    );
   }
 
-  /// Build the blur effect overlay
+  /// Build the blur overlay
   Widget _buildBlurOverlay(BuildContext context) {
-    return Positioned.fill(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Container(color: context.onSurface.withValues(alpha: 0.4)),
-      ),
-    );
+    return Container(color: Colors.black.withValues(alpha: 0.6));
   }
 
-  /// Build the extra dark overlay
+  /// Build the dark overlay
   Widget _buildDarkOverlay(BuildContext context) {
-    return Positioned.fill(
-      child: Container(color: context.onSurface.withValues(alpha: 0.4)),
-    );
+    return Container(color: Colors.black.withValues(alpha: 0.6));
   }
 
   /// Build the foreground content with SafeArea and padding

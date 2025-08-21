@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/feature/job_vehicle_registration/model/vehicle_model.dart';
 import 'package:limo/shared/app_text.dart';
 
 /// Widget displaying upgrade suggestions for ineligible vehicles
 class UpgradeSuggestionsWidget extends StatelessWidget {
   final List<Map<String, dynamic>> ineligibleVehicles;
 
-  const UpgradeSuggestionsWidget({
-    super.key,
-    required this.ineligibleVehicles,
-  });
+  const UpgradeSuggestionsWidget({super.key, required this.ineligibleVehicles});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +28,7 @@ class UpgradeSuggestionsWidget extends StatelessWidget {
 
   /// Build the title for upgrade suggestions
   Widget _buildTitle(BuildContext context) {
-    return AppText.body(
-      'Category Upgrade Suggestions:',
-      color: context.error,
-    );
+    return AppText.body('Category Upgrade Suggestions:', color: context.error);
   }
 
   /// Build individual vehicle upgrade card
@@ -73,9 +67,7 @@ class UpgradeSuggestionsWidget extends StatelessWidget {
   Widget _buildVehicleHeader(BuildContext context, VehicleModel vehicle) {
     return Row(
       children: [
-        AppText.bodySmall(
-          '${vehicle.brand} ${vehicle.model}',
-        ),
+        AppText.bodySmall('${vehicle.brand} ${vehicle.model}'),
         const SizedBox(width: 8),
         _buildCategoryBadge(vehicle),
       ],
@@ -89,10 +81,7 @@ class UpgradeSuggestionsWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: vehicle.category.backgroundColor,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: vehicle.category.borderColorV2,
-          width: 1,
-        ),
+        border: Border.all(color: vehicle.category.borderColorV2, width: 1),
       ),
       child: AppText.caption(
         vehicle.category.displayName,
@@ -103,7 +92,9 @@ class UpgradeSuggestionsWidget extends StatelessWidget {
 
   /// Build required category information
   Widget _buildRequiredCategory(
-      BuildContext context, Map<String, dynamic> eligibility) {
+    BuildContext context,
+    Map<String, dynamic> eligibility,
+  ) {
     return AppText.caption(
       'Required: ${eligibility['requiredCategory']}',
       color: context.onSurface.withValues(alpha: 0.7),
@@ -112,7 +103,9 @@ class UpgradeSuggestionsWidget extends StatelessWidget {
 
   /// Build upgrade information section
   Widget _buildUpgradeInfo(
-      BuildContext context, Map<String, dynamic> eligibility) {
+    BuildContext context,
+    Map<String, dynamic> eligibility,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -129,23 +122,18 @@ class UpgradeSuggestionsWidget extends StatelessWidget {
   Widget _buildUpgradePossibleRow() {
     return Row(
       children: [
-        Icon(
-          Icons.trending_up,
-          color: const Color(0xFF10B981),
-          size: 16,
-        ),
+        Icon(Icons.trending_up, color: const Color(0xFF10B981), size: 16),
         const SizedBox(width: 4),
-        AppText.caption(
-          'Upgrade possible',
-          color: const Color(0xFF10B981),
-        ),
+        AppText.caption('Upgrade possible', color: const Color(0xFF10B981)),
       ],
     );
   }
 
   /// Build estimated cost display
   Widget _buildEstimatedCost(
-      BuildContext context, Map<String, dynamic> eligibility) {
+    BuildContext context,
+    Map<String, dynamic> eligibility,
+  ) {
     return AppText.caption(
       'Estimated cost: \$${eligibility['estimatedCost'].toStringAsFixed(0)}',
       color: context.onSurface.withValues(alpha: 0.6),

@@ -4,8 +4,4 @@ enum PickupType {
   both,
 }
 
-enum JobType {
-  pointToPoint,
-  fullDay,
-  hourly,
-}
+// JobType moved to job_type_enum.dart to avoid conflicts

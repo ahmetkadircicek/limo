@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
+import 'package:limo/feature/job_vehicle_registration/model/vehicle_model.dart';
 import 'package:limo/shared/app_text.dart';
 
 /// Individual vehicle card widget for vehicle selection
@@ -48,9 +48,10 @@ class VehicleCardWidget extends StatelessWidget {
       color: isSelected ? context.primary.withValues(alpha: 0.1) : Colors.white,
       borderRadius: BorderRadius.circular(12),
       border: Border.all(
-        color: isSelected
-            ? context.primary
-            : context.onSurface.withValues(alpha: 0.2),
+        color:
+            isSelected
+                ? context.primary
+                : context.onSurface.withValues(alpha: 0.2),
         width: isSelected ? 2 : 1,
       ),
       boxShadow: [
@@ -69,9 +70,7 @@ class VehicleCardWidget extends StatelessWidget {
       children: [
         _buildVehicleIcon(context),
         const SizedBox(width: 12),
-        Expanded(
-          child: _buildVehicleInfo(context),
-        ),
+        Expanded(child: _buildVehicleInfo(context)),
         _buildSelectionIndicator(context),
       ],
     );
@@ -85,11 +84,7 @@ class VehicleCardWidget extends StatelessWidget {
         color: context.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        Icons.directions_car,
-        color: context.primary,
-        size: 24,
-      ),
+      child: Icon(Icons.directions_car, color: context.primary, size: 24),
     );
   }
 
@@ -115,10 +110,7 @@ class VehicleCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: vehicle.category.backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: vehicle.category.borderColorV2,
-          width: 1,
-        ),
+        border: Border.all(color: vehicle.category.borderColorV2, width: 1),
       ),
       child: AppText.caption(
         vehicle.category.displayName,
@@ -136,19 +128,15 @@ class VehicleCardWidget extends StatelessWidget {
         shape: BoxShape.circle,
         color: isSelected ? context.primary : Colors.transparent,
         border: Border.all(
-          color: isSelected
-              ? context.primary
-              : context.onSurface.withValues(alpha: 0.3),
+          color:
+              isSelected
+                  ? context.primary
+                  : context.onSurface.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
-      child: isSelected
-          ? Icon(
-              Icons.check,
-              color: Colors.white,
-              size: 14,
-            )
-          : null,
+      child:
+          isSelected ? Icon(Icons.check, color: Colors.white, size: 14) : null,
     );
   }
 
@@ -157,12 +145,18 @@ class VehicleCardWidget extends StatelessWidget {
     return Row(
       children: [
         _buildDetailItem(
-            context, Icons.confirmation_number, vehicle.licencePlate),
+          context,
+          Icons.confirmation_number,
+          vehicle.licencePlate,
+        ),
         const SizedBox(width: 16),
         _buildDetailItem(context, Icons.palette, 'Color not specified'),
         const SizedBox(width: 16),
         _buildDetailItem(
-            context, Icons.calendar_today, vehicle.year.toString()),
+          context,
+          Icons.calendar_today,
+          vehicle.year.toString(),
+        ),
       ],
     );
   }
@@ -171,16 +165,9 @@ class VehicleCardWidget extends StatelessWidget {
   Widget _buildDetailItem(BuildContext context, IconData icon, String text) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: context.onSecondary,
-          size: 16,
-        ),
+        Icon(icon, color: context.onSecondary, size: 16),
         const SizedBox(width: 4),
-        AppText.caption(
-          text,
-          color: context.onSurface.withValues(alpha: 0.8),
-        ),
+        AppText.caption(text, color: context.onSurface.withValues(alpha: 0.8)),
       ],
     );
   }
@@ -199,11 +186,7 @@ class VehicleCardWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            color: context.secondary,
-            size: 16,
-          ),
+          Icon(Icons.info_outline, color: context.secondary, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: AppText.caption(

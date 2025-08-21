@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../viewmodel/profile_view_model.dart';
 import '../widgets/profile_info_card.dart';
-import '../widgets/section_header.dart';
+import 'profile_view_mixin.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -20,236 +20,122 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
-  final _phoneController = TextEditingController();
-  final _companyNameController = TextEditingController();
-
-  bool _isEditing = false;
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _companyNameController.dispose();
-    super.dispose();
-  }
-
+class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer2<AppStateProvider, ProfileViewModel>(
       builder: (context, appState, viewModel, child) {
-        // Initialize controllers with current user data
-        final user = appState.currentUser;
-        if (user != null && !_isEditing) {
-          _phoneController.text = user.phone ?? '';
-          _companyNameController.text = user.companyName ?? '';
-        }
-
-        // Show AppSnackbar messages when they change
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (viewModel.errorMessage != null) {
-            context.showErrorTopSnackbar(viewModel.errorMessage!);
-            viewModel.clearError();
-          }
-
-          if (viewModel.successMessage != null) {
-            context.showSuccessTopSnackbar(viewModel.successMessage!);
-            viewModel.clearSuccess();
-          }
-        });
-
-        return Scaffold(
-          backgroundColor: context.surfaceContainer,
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Profile Header
-                _buildProfileHeader(context, appState),
-                const SizedBox(height: 24),
-
-                // User Information Section
-                _buildUserInfoSection(context, user),
-
-                const SizedBox(height: 24),
-
-                // Action Buttons
-                _buildActionButtons(context, viewModel, user),
-
-                // Bottom Spacing
-                _buildBottomSpacing(),
-              ],
-            ),
-          ),
-        );
+        return _buildScaffold(context, appState, viewModel);
       },
     );
   }
 
-  /// Builds the profile header section with avatar and user info
+  /// Build main scaffold with profile content
+  Widget _buildScaffold(
+    BuildContext context,
+    AppStateProvider appState,
+    ProfileViewModel viewModel,
+  ) {
+    return Scaffold(
+      backgroundColor: context.surfaceContainer,
+      body: _buildBody(context, appState, viewModel),
+    );
+  }
+
+  /// Build main body content
+  Widget _buildBody(
+    BuildContext context,
+    AppStateProvider appState,
+    ProfileViewModel viewModel,
+  ) {
+    return SingleChildScrollView(
+      padding: context.horizontalL,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 24,
+        children: [
+          _buildProfileHeader(context, appState),
+          _buildUserInfoSection(context, appState.currentUser),
+          buildActionButtons(viewModel, appState.currentUser),
+          _buildBottomSpacing(),
+        ],
+      ),
+    );
+  }
+
+  /// Build profile header section with avatar and user info
   Widget _buildProfileHeader(BuildContext context, AppStateProvider appState) {
     return Container(
       padding: PaddingConstants.allXl,
-      decoration: BoxDecoration(
-        color: context.surface,
-        borderRadius: GeneralConstants.borderRadius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: _buildHeaderDecoration(context),
       child: Row(
         children: [
-          // Profile Picture
-          Consumer<AppStateProvider>(
-            builder: (context, appState, child) {
-              return AppProfileImage(
-                imageBase64: appState.currentUser?.userPhoto,
-                size: 70,
-                onTap:
-                    _isEditing
-                        ? () {
-                          // Open image picker for profile photo selection
-                          final viewModel = Provider.of<ProfileViewModel>(
-                            context,
-                            listen: false,
-                          );
-                          viewModel.updateProfileImageFromGallery(appState);
-                        }
-                        : null,
-                showEditIcon: _isEditing,
-              );
-            },
-          ),
+          _buildProfilePicture(context, appState),
           const SizedBox(width: 20),
+          _buildProfileInfo(context, appState),
+        ],
+      ),
+    );
+  }
 
-          // Profile Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppText.heading(
-                  appState.currentUser?.userName ?? 'Not specified',
-                  color: context.onSurface,
-                ),
-                AppText.body(
-                  appState.currentUser?.email ?? 'Not specified',
-                  color: context.onSurface.withValues(alpha: 0.6),
-                ),
-              ],
-            ),
+  /// Build header decoration with shadow
+  BoxDecoration _buildHeaderDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: context.surface,
+      borderRadius: GeneralConstants.borderRadius,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    );
+  }
+
+  /// Build profile picture with edit functionality
+  Widget _buildProfilePicture(BuildContext context, AppStateProvider appState) {
+    return AppProfileImage(
+      imageBase64: appState.currentUser?.userPhoto,
+      size: 70,
+      onTap: isEditing ? () => updateProfileImageFromGallery(appState) : null,
+      showEditIcon: isEditing,
+    );
+  }
+
+  /// Build profile info text section
+  Widget _buildProfileInfo(BuildContext context, AppStateProvider appState) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText.heading(
+            appState.currentUser?.userName ?? 'Not specified',
+            color: context.onSurface,
+          ),
+          AppText.body(
+            appState.currentUser?.email ?? 'Not specified',
+            color: context.onSurface.withValues(alpha: 0.6),
           ),
         ],
       ),
     );
   }
 
-  /// Builds the user information section with editable fields
+  /// Build user information section with editable fields
   Widget _buildUserInfoSection(BuildContext context, user) {
     return Container(
-      decoration: BoxDecoration(
-        color: context.surface,
-        borderRadius: GeneralConstants.borderRadius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: _buildUserInfoDecoration(context),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 16,
           children: [
-            // Section header
-            const SectionHeader(
-              icon: Icons.person,
-              title: 'Personal Information',
-            ),
-            const SizedBox(height: 20),
-
-            // Display Name (Read-only from Google)
-            ProfileInfoCard(
-              icon: Icons.person,
-              label: 'Full Name',
-              value: user?.userName ?? 'Not specified',
-              badgeText: 'Google',
-            ),
-            const SizedBox(height: 16),
-
-            // Email (Read-only from Google)
-            ProfileInfoCard(
-              icon: Icons.email,
-              label: 'Email',
-              value: user?.email ?? 'Not specified',
-              badgeText: 'Google',
-            ),
-            const SizedBox(height: 16),
-
-            // Phone Number (Editable)
-            AppInput.primary(
-              controller: _phoneController,
-              labelText: 'Phone',
-              hintText: 'Enter your phone number',
-              keyboardType: TextInputType.phone,
-              enabled: _isEditing,
-              inputFormatters:
-                  _isEditing
-                      ? [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'[0-9+\-\(\)\s]'),
-                        ),
-                      ]
-                      : null,
-            ),
-            const SizedBox(height: 16),
-
-            // Company Name (Editable)
-            AppInput.primary(
-              controller: _companyNameController,
-              labelText: 'Company Name',
-              hintText: 'Enter your company name',
-              enabled: _isEditing,
-            ),
-            const SizedBox(height: 16),
-
-            // Driver License Status
-            Consumer<AppStateProvider>(
-              builder: (context, appState, child) {
-                final currentUser = appState.currentUser;
-                return AppInfoCard(
-                  icon: Icons.drive_eta,
-                  label: 'Driver License',
-                  value: _getDriverLicenseStatus(currentUser),
-                  iconColor:
-                      _canUploadDriverLicense(currentUser)
-                          ? context.primary
-                          : context.onSurface.withValues(alpha: 0.5),
-                  valueColor: _getDriverLicenseStatusColor(currentUser),
-                  onTap:
-                      _canUploadDriverLicense(currentUser)
-                          ? () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => DocumentUploadView(
-                                      purpose:
-                                          DocumentUploadPurpose.driverLicense,
-                                    ),
-                              ),
-                            );
-                          }
-                          : null,
-                );
-              },
-            ),
-
-            // Driver License Info Box
+            _buildSectionHeader(context),
+            _buildReadOnlyFields(user),
+            _buildEditableFields(),
+            _buildDriverLicenseSection(context, user),
             const SizedBox(height: 12),
             _buildDriverLicenseInfoBox(user),
           ],
@@ -258,56 +144,116 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  /// Builds the action buttons section for saving/canceling changes
-  Widget _buildActionButtons(
-    BuildContext context,
-    ProfileViewModel viewModel,
-    user,
-  ) {
-    if (_isEditing) {
-      // Edit mode: Show Cancel and Save buttons
-      return Row(
-        children: [
-          Expanded(
-            child: AppButton.secondary(
-              'Cancel',
-              onPressed: () {
-                setState(() {
-                  _isEditing = false;
-                  // Reset controllers to original values
-                  if (user != null) {
-                    _phoneController.text = user.phone ?? '';
-                    _companyNameController.text = user.companyName ?? '';
-                  }
-                });
-                viewModel.clearError();
-              },
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: AppButton.primary(
-              'Save Changes',
-              onPressed: () => _saveProfile(viewModel, user),
-              isLoading: viewModel.isLoading,
-            ),
-          ),
-        ],
-      );
-    } else {
-      // View mode: Show only Edit button
-      return SizedBox(
-        width: double.infinity,
-        child: AppButton.primary(
-          'Edit Profile',
-          onPressed: () {
-            setState(() {
-              _isEditing = true;
-            });
-          },
+  /// Build user info container decoration
+  BoxDecoration _buildUserInfoDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: context.surface,
+      borderRadius: GeneralConstants.borderRadius,
+    );
+  }
+
+  /// Build section header
+  Widget _buildSectionHeader(BuildContext context) {
+    return AppText.heading('Personal Information', color: context.onSurface);
+  }
+
+  /// Build read-only fields from Google
+  Widget _buildReadOnlyFields(dynamic user) {
+    return Column(
+      spacing: 16,
+      children: [
+        ProfileInfoCard(
+          icon: Icons.person,
+          label: 'Full Name',
+          value: user?.userName ?? 'Not specified',
+          badgeText: 'Google',
         ),
-      );
-    }
+        ProfileInfoCard(
+          icon: Icons.email,
+          label: 'Email',
+          value: user?.email ?? 'Not specified',
+          badgeText: 'Google',
+        ),
+      ],
+    );
+  }
+
+  /// Build editable input fields
+  Widget _buildEditableFields() {
+    return Column(
+      spacing: 16,
+      children: [_buildPhoneInput(), _buildCompanyNameInput()],
+    );
+  }
+
+  /// Build phone number input field
+  Widget _buildPhoneInput() {
+    return AppInput.primary(
+      controller: phoneController,
+      labelText: 'Phone',
+      hintText: 'Enter your phone number',
+      keyboardType: TextInputType.phone,
+      enabled: isEditing,
+      inputFormatters: isEditing ? _buildPhoneInputFormatters() : null,
+    );
+  }
+
+  /// Build phone input formatters
+  List<TextInputFormatter> _buildPhoneInputFormatters() {
+    return [FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-\(\)\s]'))];
+  }
+
+  /// Build company name input field
+  Widget _buildCompanyNameInput() {
+    return AppInput.primary(
+      controller: companyNameController,
+      labelText: 'Company Name',
+      hintText: 'Enter your company name',
+      enabled: isEditing,
+    );
+  }
+
+  /// Build driver license section
+  Widget _buildDriverLicenseSection(BuildContext context, user) {
+    return Consumer<AppStateProvider>(
+      builder: (context, appState, child) {
+        final currentUser = appState.currentUser;
+        return AppInfoCard(
+          icon: Icons.drive_eta,
+          label: 'Driver License',
+          value: _getDriverLicenseStatus(currentUser),
+          iconColor: _getDriverLicenseIconColor(context, currentUser),
+          valueColor: _getDriverLicenseStatusColor(currentUser),
+          onTap: _buildDriverLicenseOnTap(context, currentUser),
+        );
+      },
+    );
+  }
+
+  /// Get driver license icon color
+  Color _getDriverLicenseIconColor(BuildContext context, user) {
+    return _canUploadDriverLicense(user)
+        ? context.primary
+        : context.onSurface.withValues(alpha: 0.5);
+  }
+
+  /// Build driver license onTap handler
+  VoidCallback? _buildDriverLicenseOnTap(BuildContext context, user) {
+    return _canUploadDriverLicense(user)
+        ? () => _navigateToDriverLicenseUpload(context)
+        : null;
+  }
+
+  /// Navigate to driver license upload
+  void _navigateToDriverLicenseUpload(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => DocumentUploadView(
+              purpose: DocumentUploadPurpose.driverLicense,
+            ),
+      ),
+    );
   }
 
   /// Build driver license info box
@@ -421,33 +367,7 @@ class _ProfileViewState extends State<ProfileView> {
     return Colors.red;
   }
 
-  /// Save profile with updated UserModel
-  void _saveProfile(ProfileViewModel viewModel, user) {
-    if (user == null) return;
-
-    final updatedUser = user.copyWith(
-      phone: _phoneController.text.trim(),
-      companyName: _companyNameController.text.trim(),
-      // Preserve driver license and approval status - these should only be updated via document upload
-      driverLicense: user.driverLicense,
-      approved: user.approved,
-      // Include profile photo if it exists
-      userPhoto: user.userPhoto,
-    );
-
-    // Get AppStateProvider to update user data
-    final appState = Provider.of<AppStateProvider>(context, listen: false);
-
-    viewModel.updateUser(updatedUser, appState).then((_) {
-      if (viewModel.successMessage != null) {
-        setState(() {
-          _isEditing = false;
-        });
-      }
-    });
-  }
-
-  /// Builds bottom spacing for better layout
+  /// Build bottom spacing for better layout
   Widget _buildBottomSpacing() {
     return const SizedBox(height: 100);
   }

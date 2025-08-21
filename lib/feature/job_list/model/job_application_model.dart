@@ -1,284 +1,114 @@
-import 'dart:math' as math;
+import 'package:limo/core/enums/application_status_enum.dart';
+import 'package:limo/feature/job_vehicle_registration/model/vehicle_model.dart';
 
-import 'package:limo/core/enums/pickup_type_enum.dart';
-import 'package:limo/core/enums/vehicle_category_enum.dart';
-import 'package:limo/feature/job_list/model/job_model.dart';
-import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
-import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
-
-/// Job Application Model - Separate application for each vehicle requirement
+/// Model for job applications
 class JobApplication {
   final String id;
   final String jobId;
-  final String vehicleRequirementId; // Which vehicle requirement is being applied for
   final String driverId;
-  final String driverName;
-  final String driverEmail;
-  final String driverPhone;
-  final VehicleModel appliedVehicle;
-  final DateTime applicationDate;
+  final VehicleModel vehicle;
   final ApplicationStatus status;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
   final String? notes;
-  final String? rejectionReason;
-
-  // Pricing information
-  final double? proposedHourlyRate; // Hourly rate
-  final double? proposedPricePerMile; // Price per mile
-  final double? totalProposedPrice; // Total proposed price
-
-  // Vehicle compatibility check
-  final bool vehicleMeetsRequirements;
-  final String? vehicleCompatibilityNotes;
+  final double? proposedPrice;
+  final bool isAccepted;
 
   const JobApplication({
     required this.id,
     required this.jobId,
-    required this.vehicleRequirementId,
     required this.driverId,
-    required this.driverName,
-    required this.driverEmail,
-    required this.driverPhone,
-    required this.appliedVehicle,
-    required this.applicationDate,
-    this.status = ApplicationStatus.pending,
+    required this.vehicle,
+    required this.status,
+    required this.createdAt,
+    this.updatedAt,
     this.notes,
-    this.rejectionReason,
-    this.proposedHourlyRate,
-    this.proposedPricePerMile,
-    this.totalProposedPrice,
-    this.vehicleMeetsRequirements = false,
-    this.vehicleCompatibilityNotes,
+    this.proposedPrice,
+    this.isAccepted = false,
   });
 
-  /// Check if this application meets the specific vehicle requirement
-  bool meetsVehicleRequirement(VehicleRequirement requirement) {
-    return requirement.matchesVehicle(appliedVehicle);
+  /// Get priority score for vehicle requirement matching
+  double getPriorityScore(dynamic requirement) {
+    // TODO: Implement priority scoring logic
+    // For now, return a default score
+    return 1.0;
   }
 
-  /// Calculate the total proposed price based on job type and requirements
-  double calculateTotalProposedPrice(
-    JobModel job,
-    VehicleRequirement requirement,
-  ) {
-    // Use if already calculated
-    if (totalProposedPrice != null) {
-      return totalProposedPrice!;
-    }
-
-    double totalPrice = 0.0;
-
-    if (job.jobType == JobType.hourly) {
-      // For hourly jobs
-      if (proposedHourlyRate != null) {
-        totalPrice = proposedHourlyRate!;
-      } else if (requirement.hourlyRate != null) {
-        totalPrice = requirement.hourlyRate!;
-      }
-    } else if (job.jobType == JobType.pointToPoint) {
-      // For point-to-point jobs
-      if (proposedPricePerMile != null &&
-          job.toLocation != null &&
-          job.fromLocation != null) {
-        final distance = _calculateDistance(
-          job.fromLocation!.latitude,
-          job.fromLocation!.longitude,
-          job.toLocation!.latitude,
-          job.toLocation!.longitude,
-        );
-        totalPrice = distance * proposedPricePerMile!;
-      } else if (requirement.pricePerMile != null &&
-          job.toLocation != null &&
-          job.fromLocation != null) {
-        final distance = _calculateDistance(
-          job.fromLocation!.latitude,
-          job.fromLocation!.longitude,
-          job.toLocation!.latitude,
-          job.toLocation!.longitude,
-        );
-        totalPrice = distance * requirement.pricePerMile!;
-      }
-    }
-
-    return totalPrice;
-  }
-
-  /// Get pricing summary for this application
-  String getPricingSummary(JobModel job, VehicleRequirement requirement) {
-    final totalPrice = calculateTotalProposedPrice(job, requirement);
-
-    List<String> pricing = [];
-
-    if (proposedHourlyRate != null) {
-      pricing.add('Hourly: \$${proposedHourlyRate!.toStringAsFixed(2)}');
-    } else if (requirement.hourlyRate != null) {
-      pricing.add('Hourly: \$${requirement.hourlyRate!.toStringAsFixed(2)}');
-    }
-
-    if (proposedPricePerMile != null) {
-      pricing.add('Per Mile: \$${proposedPricePerMile!.toStringAsFixed(2)}');
-    } else if (requirement.pricePerMile != null) {
-      pricing.add('Per Mile: \$${requirement.pricePerMile!.toStringAsFixed(2)}');
-    }
-
-    if (totalPrice > 0) {
-      pricing.add('Total: \$${totalPrice.toStringAsFixed(2)}');
-    }
-
-    if (pricing.isEmpty) return 'Price not specified';
-    return pricing.join(', ');
-  }
-
-  /// Check if driver has higher hierarchy vehicle for this requirement
-  bool hasHigherHierarchyVehicle(VehicleRequirement requirement) {
-    if (requirement.minimumCategory == null) return true;
-
-    // Araç kategorisini kontrol et - int'i VehicleCategory'ye çevir
-    final category = VehicleCategory.fromId(requirement.minimumCategory!);
-    return appliedVehicle.canHandleJob(category);
-  }
-
-  /// Get application priority score (higher is better)
-  double getPriorityScore(VehicleRequirement requirement) {
-    double score = 0.0;
-
-    // Araç uygunluğu
-    if (vehicleMeetsRequirements) score += 10.0;
-
-    // Kategori uygunluğu
-    if (requirement.minimumCategory != null) {
-      final vehicleCategory = appliedVehicle.getHighestCategory();
-      score +=
-          vehicleCategory.id * 2.0; // Daha yüksek kategori = daha yüksek puan
-    }
-
-    // Fiyat uygunluğu (daha düşük fiyat = daha yüksek puan)
-    if (totalProposedPrice != null && totalProposedPrice! > 0) {
-      score += 100.0 / totalProposedPrice!; // Ters orantı
-    }
-
-    return score;
-  }
-
-  double _calculateDistance(
-    double lat1,
-    double lon1,
-    double lat2,
-    double lon2,
-  ) {
-    const double earthRadius = 3959; // miles
-    final dLat = _toRadians(lat2 - lat1);
-    final dLon = _toRadians(lon2 - lon1);
-    final a =
-        math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_toRadians(lat1)) *
-            math.cos(_toRadians(lat2)) *
-            math.sin(dLon / 2) *
-            math.sin(dLon / 2);
-    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return earthRadius * c;
-  }
-
-  double _toRadians(double degrees) => degrees * math.pi / 180;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'jobId': jobId,
-      'vehicleRequirementId': vehicleRequirementId,
-      'driverId': driverId,
-      'driverName': driverName,
-      'driverEmail': driverEmail,
-      'driverPhone': driverPhone,
-      'appliedVehicle': appliedVehicle.toJson(),
-      'applicationDate': applicationDate.toIso8601String(),
-      'status': status.name,
-      'notes': notes,
-      'rejectionReason': rejectionReason,
-      'proposedHourlyRate': proposedHourlyRate,
-      'proposedPricePerMile': proposedPricePerMile,
-      'totalProposedPrice': totalProposedPrice,
-      'vehicleMeetsRequirements': vehicleMeetsRequirements,
-      'vehicleCompatibilityNotes': vehicleCompatibilityNotes,
-    };
-  }
-
-  factory JobApplication.fromJson(Map<String, dynamic> json) {
-    return JobApplication(
-      id: json['id'] ?? '',
-      jobId: json['jobId'] ?? '',
-      vehicleRequirementId: json['vehicleRequirementId'] ?? '',
-      driverId: json['driverId'] ?? '',
-      driverName: json['driverName'] ?? '',
-      driverEmail: json['driverEmail'] ?? '',
-      driverPhone: json['driverPhone'] ?? '',
-      appliedVehicle: VehicleModel.fromJson(json['appliedVehicle']),
-      applicationDate: DateTime.parse(json['applicationDate']),
-      status: ApplicationStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => ApplicationStatus.pending,
-      ),
-      notes: json['notes'],
-      rejectionReason: json['rejectionReason'],
-      proposedHourlyRate: json['proposedHourlyRate']?.toDouble(),
-      proposedPricePerMile: json['proposedPricePerMile']?.toDouble(),
-      totalProposedPrice: json['totalProposedPrice']?.toDouble(),
-      vehicleMeetsRequirements: json['vehicleMeetsRequirements'] ?? false,
-      vehicleCompatibilityNotes: json['vehicleCompatibilityNotes'],
-    );
-  }
-
+  /// Create a copy with updated values
   JobApplication copyWith({
     String? id,
     String? jobId,
-    String? vehicleRequirementId,
     String? driverId,
-    String? driverName,
-    String? driverEmail,
-    String? driverPhone,
-    VehicleModel? appliedVehicle,
-    DateTime? applicationDate,
+    VehicleModel? vehicle,
     ApplicationStatus? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     String? notes,
-    String? rejectionReason,
-    double? proposedHourlyRate,
-    double? proposedPricePerMile,
-    double? totalProposedPrice,
-    bool? vehicleMeetsRequirements,
-    String? vehicleCompatibilityNotes,
+    double? proposedPrice,
+    bool? isAccepted,
   }) {
     return JobApplication(
       id: id ?? this.id,
       jobId: jobId ?? this.jobId,
-      vehicleRequirementId: vehicleRequirementId ?? this.vehicleRequirementId,
       driverId: driverId ?? this.driverId,
-      driverName: driverName ?? this.driverName,
-      driverEmail: driverEmail ?? this.driverEmail,
-      driverPhone: driverPhone ?? this.driverPhone,
-      appliedVehicle: appliedVehicle ?? this.appliedVehicle,
-      applicationDate: applicationDate ?? this.applicationDate,
+      vehicle: vehicle ?? this.vehicle,
       status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       notes: notes ?? this.notes,
-      rejectionReason: rejectionReason ?? this.rejectionReason,
-      proposedHourlyRate: proposedHourlyRate ?? this.proposedHourlyRate,
-      proposedPricePerMile: proposedPricePerMile ?? this.proposedPricePerMile,
-      totalProposedPrice: totalProposedPrice ?? this.totalProposedPrice,
-      vehicleMeetsRequirements:
-          vehicleMeetsRequirements ?? this.vehicleMeetsRequirements,
-      vehicleCompatibilityNotes:
-          vehicleCompatibilityNotes ?? this.vehicleCompatibilityNotes,
+      proposedPrice: proposedPrice ?? this.proposedPrice,
+      isAccepted: isAccepted ?? this.isAccepted,
     );
   }
-}
 
-/// Application Status Enum
-enum ApplicationStatus {
-  pending('Pending'),
-  accepted('Accepted'),
-  rejected('Rejected'),
-  withdrawn('Withdrawn'),
-  underReview('Under Review'),
-  shortlisted('Shortlisted');
+  /// Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'job_id': jobId,
+      'driver_id': driverId,
+      'vehicle': vehicle.toJson(),
+      'status': status.name,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+      'notes': notes,
+      'proposed_price': proposedPrice,
+      'is_accepted': isAccepted,
+    };
+  }
 
-  const ApplicationStatus(this.displayName);
-  final String displayName;
+  /// Create from JSON
+  factory JobApplication.fromJson(Map<String, dynamic> json) {
+    return JobApplication(
+      id: json['id'] as String,
+      jobId: json['job_id'] as String,
+      driverId: json['driver_id'] as String,
+      vehicle: VehicleModel.fromJson(json['vehicle'] as Map<String, dynamic>),
+      status: ApplicationStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => ApplicationStatus.pending,
+      ),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
+      notes: json['notes'] as String?,
+      proposedPrice: json['proposed_price'] as double?,
+      isAccepted: json['is_accepted'] as bool? ?? false,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'JobApplication(id: $id, jobId: $jobId, status: $status)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is JobApplication && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }
