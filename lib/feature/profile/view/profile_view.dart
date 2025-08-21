@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
@@ -49,10 +47,10 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
     ProfileViewModel viewModel,
   ) {
     return SingleChildScrollView(
-      padding: context.horizontalL,
+      padding: context.paddingL,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 24,
+        spacing: context.spacingXl,
         children: [
           _buildProfileHeader(context, appState),
           _buildUserInfoSection(context, appState.currentUser),
@@ -66,12 +64,12 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
   /// Build profile header section with avatar and user info
   Widget _buildProfileHeader(BuildContext context, AppStateProvider appState) {
     return Container(
-      padding: PaddingConstants.allXl,
+      padding: context.paddingL,
       decoration: _buildHeaderDecoration(context),
       child: Row(
+        spacing: context.spacingXl,
         children: [
           _buildProfilePicture(context, appState),
-          const SizedBox(width: 20),
           _buildProfileInfo(context, appState),
         ],
       ),
@@ -82,14 +80,7 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
   BoxDecoration _buildHeaderDecoration(BuildContext context) {
     return BoxDecoration(
       color: context.surface,
-      borderRadius: GeneralConstants.borderRadius,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.04),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
+      borderRadius: context.radiusMedium,
     );
   }
 
@@ -127,16 +118,15 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
     return Container(
       decoration: _buildUserInfoDecoration(context),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: context.paddingL,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16,
+          spacing: context.spacingL,
           children: [
             _buildSectionHeader(context),
             _buildReadOnlyFields(user),
             _buildEditableFields(),
             _buildDriverLicenseSection(context, user),
-            const SizedBox(height: 12),
             _buildDriverLicenseInfoBox(user),
           ],
         ),
@@ -148,7 +138,7 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
   BoxDecoration _buildUserInfoDecoration(BuildContext context) {
     return BoxDecoration(
       color: context.surface,
-      borderRadius: GeneralConstants.borderRadius,
+      borderRadius: context.radiusMedium,
     );
   }
 
@@ -160,7 +150,7 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
   /// Build read-only fields from Google
   Widget _buildReadOnlyFields(dynamic user) {
     return Column(
-      spacing: 16,
+      spacing: context.spacingL,
       children: [
         ProfileInfoCard(
           icon: Icons.person,
@@ -181,7 +171,7 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
   /// Build editable input fields
   Widget _buildEditableFields() {
     return Column(
-      spacing: 16,
+      spacing: context.spacingL,
       children: [_buildPhoneInput(), _buildCompanyNameInput()],
     );
   }
@@ -263,16 +253,16 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
     Color infoColor = _getDriverLicenseStatusColor(user);
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: context.paddingL,
       decoration: BoxDecoration(
         color: infoColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: context.radiusMedium,
         border: Border.all(color: infoColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         children: [
-          Icon(infoIcon, color: infoColor, size: 16),
-          const SizedBox(width: 8),
+          Icon(infoIcon, color: infoColor, size: context.iconMedium),
+          SizedBox(width: context.spacingM),
           Expanded(child: AppText.caption(infoText, color: infoColor)),
         ],
       ),

@@ -16,27 +16,8 @@ import 'package:limo/shared/app_drawer.dart';
 import 'package:provider/provider.dart';
 
 /// Main home view that displays jobs, posting, tracking, and profile sections
-class HomeView extends StatefulWidget {
+class HomeView extends StatelessWidget {
   const HomeView({super.key});
-
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  @override
-  void initState() {
-    super.initState();
-    _handleInitialPageNavigation();
-  }
-
-  /// Handle initial page navigation based on query parameters
-  void _handleInitialPageNavigation() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // For now, we'll handle this through the ViewModel
-      // In the future, this can be enhanced with URL parameter handling
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +25,7 @@ class _HomeViewState extends State<HomeView> {
       builder: (context, homePageViewModel, child) {
         return Scaffold(
           key: homePageViewModel.scaffoldKey,
-          drawer: _buildAppDrawer(homePageViewModel),
+          drawer: _buildAppDrawer(homePageViewModel, context),
           appBar: _buildAppBar(homePageViewModel),
           body: _buildScaffoldBody(homePageViewModel),
         );
@@ -53,15 +34,18 @@ class _HomeViewState extends State<HomeView> {
   }
 
   /// Build the app drawer with navigation options
-  Widget _buildAppDrawer(HomeViewModel homePageViewModel) {
+  Widget _buildAppDrawer(
+    HomeViewModel homePageViewModel,
+    BuildContext context,
+  ) {
     return AppDrawer(
       onProfileTap: () {
         Navigator.of(context).pop(); // Close drawer
         homePageViewModel.navigateToProfile();
       },
       onLogoutTap: () async {
-        await _handleLogout();
-        if (mounted) {
+        await _handleLogout(context);
+        if (context.mounted) {
           Navigator.of(context).pop(); // Close drawer
         }
       },
@@ -184,7 +168,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   /// Handle user logout and navigation to login
-  Future<void> _handleLogout() async {
+  Future<void> _handleLogout(BuildContext context) async {
     // Get the AppStateProvider and sign out
     final appStateProvider = Provider.of<AppStateProvider>(
       context,
@@ -198,7 +182,7 @@ class _HomeViewState extends State<HomeView> {
     await SharedPreferencesService.clearOAuthData();
 
     // Drawer'ı kapat
-    if (mounted) {
+    if (context.mounted) {
       Navigator.of(context).pop();
       // Mevcut sayfayı login sayfası ile replace et
       Navigator.of(

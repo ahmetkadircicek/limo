@@ -215,7 +215,16 @@ class LoginViewModel extends ChangeNotifier {
             _showSuccessSnackbar('Login successful! Welcome!');
 
             // Navigate to home page after successful login
-            NavigationService.instance.navigateToScreen(const HomeView());
+            if (_context != null && _context!.mounted) {
+              NavigationService.instance.navigateToScreen(const HomeView());
+            } else {
+              LoggerService.warning(
+                'Context not available for navigation, using NavigationService',
+                tag: 'LOGIN_VM',
+              );
+              // Fallback to NavigationService if context is not available
+              NavigationService.instance.navigateToScreen(const HomeView());
+            }
           } else {
             // Backend authentication failed
             String detailedError = 'Backend authentication failed';

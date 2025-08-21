@@ -5,7 +5,7 @@ import 'dart:math' as math;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:limo/core/constants/constants.dart';
+import 'package:limo/core/services/environment_service.dart';
 import 'package:limo/feature/map/models/location_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -210,7 +210,7 @@ class LocationService {
       final String url =
           '$_placesBaseUrl/textsearch/json'
           '?query=${Uri.encodeComponent(query)}'
-          '&key=${Constants.googleMapsApiKey}'
+          '&key=${EnvironmentService.googleMapsApiKey}'
           '&language=en' // Universal dil
           '&maxresults=20';
 
@@ -225,7 +225,8 @@ class LocationService {
         name: _tag,
       );
 
-      if (responseData['status'] == 'OK' || responseData['status'] == 'ZERO_RESULTS') {
+      if (responseData['status'] == 'OK' ||
+          responseData['status'] == 'ZERO_RESULTS') {
         final List results = responseData['results'] ?? [];
         developer.log(
           '✅ Universal Places API: ${results.length} results found',
@@ -266,7 +267,7 @@ class LocationService {
           '?location=${currentLocation.latitude},${currentLocation.longitude}'
           '&radius=50000' // 50km yarıçap
           '&keyword=${Uri.encodeComponent(query)}'
-          '&key=${Constants.googleMapsApiKey}'
+          '&key=${EnvironmentService.googleMapsApiKey}'
           '&maxresults=20';
 
       developer.log('🌐 Nearby Search API çağrısı: $url', name: _tag);
@@ -281,7 +282,8 @@ class LocationService {
           name: _tag,
         );
 
-        if (responseData['status'] == 'OK' || responseData['status'] == 'ZERO_RESULTS') {
+        if (responseData['status'] == 'OK' ||
+            responseData['status'] == 'ZERO_RESULTS') {
           final List results = responseData['results'] ?? [];
           developer.log(
             '✅ Nearby Search: ${results.length} results found',
@@ -315,7 +317,7 @@ class LocationService {
       final String url =
           '$_geocodingBaseUrl/json'
           '?address=${Uri.encodeComponent(query)}'
-          '?key=${Constants.googleMapsApiKey}'
+          '?key=${EnvironmentService.googleMapsApiKey}'
           '&language=en'; // Universal dil
 
       developer.log('🌐 Universal Geocoding API çağrısı: $url', name: _tag);
@@ -330,7 +332,8 @@ class LocationService {
           name: _tag,
         );
 
-        if (responseData['status'] == 'OK' || responseData['status'] == 'ZERO_RESULTS') {
+        if (responseData['status'] == 'OK' ||
+            responseData['status'] == 'ZERO_RESULTS') {
           final List results = responseData['results'] ?? [];
           developer.log(
             '✅ Universal Geocoding API: ${results.length} results found',
@@ -476,7 +479,7 @@ class LocationService {
       final String url =
           '$_placesBaseUrl/details/json'
           '?place_id=$placeId'
-          '&key=${Constants.googleMapsApiKey}'
+          '&key=${EnvironmentService.googleMapsApiKey}'
           '&language=en';
 
       final response = await http.get(Uri.parse(url));

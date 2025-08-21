@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
@@ -27,21 +25,10 @@ class JobDetailsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: GeneralConstants.borderRadiusLarge,
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: context.radiusMedium,
       ),
       child: Padding(
-        padding: PaddingConstants.allL,
+        padding: context.paddingL,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -104,7 +91,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     return Row(
       children: [
         Icon(icon, size: 16, color: context.onSurface.withValues(alpha: 0.6)),
-        SizedBox(width: PaddingConstants.spacingS),
+        SizedBox(width: context.spacingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,10 +372,10 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     final category = requirement.minimumCategory;
 
     return Container(
-      margin: EdgeInsets.only(bottom: PaddingConstants.spacingM),
+      margin: EdgeInsets.only(bottom: context.spacingM),
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: GeneralConstants.borderRadiusLarge, // 16.0
+        borderRadius: context.radiusLarge, // 16.0
         border: Border.all(
           color:
               (category?.color.withValues(alpha: 0.2) ??
@@ -407,7 +394,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         children: [
           // Header with category badge and apply button
           Container(
-            padding: EdgeInsets.all(PaddingConstants.spacingM),
+            padding: EdgeInsets.all(context.spacingM),
             decoration: BoxDecoration(
               color:
                   (category?.color.withValues(alpha: 0.05) ??
@@ -422,8 +409,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 // Category badge
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: PaddingConstants.spacingM,
-                    vertical: PaddingConstants.spacingS,
+                    horizontal: context.spacingM,
+                    vertical: context.spacingS,
                   ),
                   decoration: BoxDecoration(
                     color:
@@ -443,7 +430,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         size: 20,
                         color: (category?.color ?? context.primary),
                       ),
-                      SizedBox(width: PaddingConstants.spacingS),
+                      SizedBox(width: context.spacingS),
                       AppText.bodySmall(
                         category?.displayName ?? 'Vehicle',
                         color: (category?.color ?? context.primary),
@@ -460,8 +447,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: PaddingConstants.spacingM,
-                        vertical: PaddingConstants.spacingS,
+                        horizontal: context.spacingM,
+                        vertical: context.spacingS,
                       ),
                       decoration: BoxDecoration(
                         color: context.primary,
@@ -480,7 +467,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
 
           // Content
           Padding(
-            padding: EdgeInsets.all(PaddingConstants.spacingM),
+            padding: EdgeInsets.all(context.spacingM),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -492,7 +479,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     value: requirement.specificBrand!,
                     color: context.onSurface,
                   ),
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                 ],
                 if (requirement.specificModel != null) ...[
                   _buildInfoRowCompact(
@@ -501,7 +488,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     value: requirement.specificModel!,
                     color: context.onSurface,
                   ),
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                 ],
                 if (requirement.capacity != null) ...[
                   _buildInfoRowCompact(
@@ -510,7 +497,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     value: '${requirement.capacity}+ people',
                     color: context.primary,
                   ),
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                 ],
                 if (requirement.year != null) ...[
                   _buildInfoRowCompact(
@@ -519,12 +506,12 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     value: '${requirement.year}+',
                     color: context.onSurface,
                   ),
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                 ],
 
                 if (requirement.notes != null &&
                     requirement.notes!.isNotEmpty) ...[
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                   _buildInfoRowCompact(
                     icon: Icons.notes,
                     label: 'Notes',
@@ -535,7 +522,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 // Divider before pricing section
                 if (requirement.hourlyRate != null ||
                     requirement.pricePerMile != null) ...[
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                   Container(
                     height: 1,
                     decoration: BoxDecoration(
@@ -548,7 +535,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: PaddingConstants.spacingM),
+                  SizedBox(height: context.spacingM),
                 ],
                 // Pricing information at the bottom
                 if (requirement.hourlyRate != null ||
@@ -562,7 +549,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         0xFF8B5CF6,
                       ), // Purple color for pricing icons
                     ),
-                    SizedBox(height: PaddingConstants.spacingS),
+                    SizedBox(height: context.spacingS),
                   ],
                   if (requirement.pricePerMile != null) ...[
                     _buildInfoRowCompact(
@@ -645,7 +632,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             },
             icon: Icons.phone,
             width: double.infinity,
-            height: 52,
           ),
         ),
         const SizedBox(height: 12),
@@ -661,7 +647,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             },
             icon: Icons.share,
             width: double.infinity,
-            height: 52,
           ),
         ),
       ],

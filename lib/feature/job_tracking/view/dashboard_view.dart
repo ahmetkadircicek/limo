@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_components.dart';
 
@@ -19,7 +18,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
       backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
         child: Padding(
-          padding: PaddingConstants.allL,
+          padding: context.paddingL,
           child: Column(
             children: [
               // Segment Control
@@ -91,7 +90,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
       itemCount: 3,
       itemBuilder: (context, index) {
         return Padding(
-          padding: PaddingConstants.onlyBottomM,
+          padding: context.verticalM,
           child: AppCard.primary(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +122,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
       itemCount: 5,
       itemBuilder: (context, index) {
         return Padding(
-          padding: PaddingConstants.onlyBottomM,
+          padding: context.verticalM,
           child: AppCard.primary(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +167,7 @@ class _JobTrackingViewState extends State<JobTrackingView> {
       itemCount: 4,
       itemBuilder: (context, index) {
         return Padding(
-          padding: PaddingConstants.onlyBottomM,
+          padding: context.verticalM,
           child: AppCard.primary(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

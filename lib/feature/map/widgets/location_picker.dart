@@ -732,12 +732,10 @@ class _LocationPickerState extends State<LocationPicker> {
   Widget _buildConfirmButton() {
     return SizedBox(
       width: double.infinity,
-      height: 52,
       child: AppButton.primary(
         'Confirm Location',
         onPressed: _confirmSelection,
         width: double.infinity,
-        height: 52,
       ),
     );
   }

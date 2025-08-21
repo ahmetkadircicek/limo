@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
@@ -83,7 +82,7 @@ class _MultipleVehicleRequirementsFormState
           ...List.generate(_requirements.length, (index) {
             final requirement = _requirements[index];
             return Container(
-              margin: EdgeInsets.only(bottom: PaddingConstants.spacingM),
+              margin: context.verticalM,
               child: _buildRequirementCard(requirement, index),
             );
           }),
@@ -177,7 +176,6 @@ class _MultipleVehicleRequirementsFormState
         onPressed: _showAddVehicleRequirement,
         icon: Icons.add,
         width: double.infinity,
-        height: 48,
       ),
     );
   }

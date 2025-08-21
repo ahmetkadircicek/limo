@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/constants/design_tokens.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
@@ -168,7 +166,7 @@ class AppInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: PaddingConstants.onlyBottomXs,
+          padding: context.verticalXs,
           child: AppText.caption(labelText, color: _getLabelColor(context)),
         ),
         isDropdown ? _buildDropdown(context) : _buildTextField(context),
@@ -196,8 +194,8 @@ class AppInput extends StatelessWidget {
       hintText: hintText,
       hintStyle: GoogleFonts.montserrat(
         color: _getHintColor(context),
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
+        fontSize: DesignTokens.bodySmall.fontSize,
+        fontWeight: DesignTokens.bodySmall.fontWeight,
       ),
       suffixIcon:
           suffixIcon != null
@@ -208,37 +206,7 @@ class AppInput extends StatelessWidget {
               : null,
       filled: true,
       fillColor: _getBackgroundColor(context),
-      contentPadding: PaddingConstants.horizontalL,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(color: borderColor, width: 1.2),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(
-          color: context.primary.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(
-          color: Colors.red.withValues(alpha: 0.7),
-          width: 1,
-        ),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(color: Colors.red, width: 1),
-      ),
-      border: OutlineInputBorder(
-        borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(color: borderColor, width: 1),
-      ),
-      disabledBorder: OutlineInputBorder(
-        borderRadius: GeneralConstants.borderRadius, // kenar yumusatma
-        borderSide: BorderSide(color: context.surfaceContainer, width: 1),
-      ),
+      contentPadding: context.horizontalL,
     );
   }
 
@@ -251,10 +219,11 @@ class AppInput extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       onChanged: onChanged,
-      maxLines: 1, // Always single line
+      maxLines: 1,
       style: GoogleFonts.montserrat(
         color: _getTextColor(context),
-        fontSize: 16,
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: DesignTokens.bodyLarge.fontWeight,
       ),
       decoration: _baseDecoration(context),
     );

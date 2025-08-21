@@ -13,7 +13,7 @@ class TermsSection extends StatelessWidget {
       child: Column(
         children: [
           _buildTermsText(context),
-          SizedBox(height: context.spacingM),
+          SizedBox(height: context.spacingL),
           _buildTermsButtons(context),
         ],
       ),
@@ -26,7 +26,6 @@ class TermsSection extends StatelessWidget {
       'By continuing, you accept the Terms of Service and Privacy Policy.',
       color: context.onPrimary.withValues(alpha: 0.7),
       textAlign: TextAlign.center,
-      maxLines: 3,
     );
   }
 
@@ -54,7 +53,7 @@ class TermsSection extends StatelessWidget {
   Widget _buildDivider(BuildContext context) {
     return Container(
       width: 1,
-      height: 12,
+      height: 16,
       color: context.onPrimary.withValues(alpha: 0.3),
     );
   }

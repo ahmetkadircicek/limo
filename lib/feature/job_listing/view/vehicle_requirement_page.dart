@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
@@ -124,10 +123,10 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   // Build main body content
   Widget _buildBody() {
     return SingleChildScrollView(
-      padding: PaddingConstants.allXl,
+      padding: context.paddingL,
       child: SafeArea(
         child: Column(
-          spacing: PaddingConstants.spacingL,
+          spacing: context.spacingL,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildVehicleSpecsSection(),
@@ -145,7 +144,6 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
       'Save',
       onPressed: _saveRequirement,
       width: double.infinity,
-      height: 52,
     );
   }
 
@@ -169,7 +167,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
           },
           icon: Icons.category,
         ),
-        SizedBox(height: PaddingConstants.spacingL),
+        SizedBox(height: context.spacingL),
         _buildDropdownField(
           label: 'Brand',
           hint: 'Select brand (optional)',
@@ -182,7 +180,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
           },
           icon: Icons.branding_watermark,
         ),
-        SizedBox(height: PaddingConstants.spacingL),
+        SizedBox(height: context.spacingL),
         _buildDropdownField(
           label: 'Type',
           hint: 'Select vehicle type (optional)',
@@ -215,7 +213,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
           },
           icon: Icons.people,
         ),
-        SizedBox(height: PaddingConstants.spacingL),
+        SizedBox(height: context.spacingL),
         _buildNumberInputField(
           label: 'Min Year',
           hint: 'Min year (e.g., 2010)',
@@ -234,12 +232,12 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
   // Build pricing section
   Widget _buildPricingSection() {
     return AppCard.primary(
-      padding: PaddingConstants.allXl,
+      padding: context.paddingL,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionHeader('Pricing'),
-          SizedBox(height: PaddingConstants.spacingXl),
+          SizedBox(height: context.spacingXl),
           _buildPriceInputField(
             label: 'Price per Mile',
             hint: 'Price per mile (e.g., 2.50)',
@@ -251,7 +249,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
             },
             icon: Icons.route,
           ),
-          SizedBox(height: PaddingConstants.spacingL),
+          SizedBox(height: context.spacingL),
           _buildPriceInputField(
             label: 'Price per Hour',
             hint: 'Price per hour (e.g., 25.00)',
@@ -274,12 +272,12 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     required List<Widget> children,
   }) {
     return AppCard.primary(
-      padding: PaddingConstants.allXl,
+      padding: context.paddingL,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionHeader(title),
-          SizedBox(height: PaddingConstants.spacingXl),
+          SizedBox(height: context.spacingXl),
           ...children,
         ],
       ),

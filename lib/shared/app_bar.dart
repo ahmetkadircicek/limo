@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 
 /// Modern unified app bar for the entire application
@@ -13,12 +12,12 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
-        boxShadow: DesignTokens.elevationLow,
+        boxShadow: context.shadowLarge,
       ),
       child: SafeArea(
         child: Container(
           height: kToolbarHeight,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: context.horizontalL,
           child: Stack(
             alignment: Alignment.center,
             children: [

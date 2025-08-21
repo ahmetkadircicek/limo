@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
@@ -22,10 +20,10 @@ class JobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: PaddingConstants.verticalS,
+      padding: context.verticalS,
       child: AppCard.primary(
         padding: EdgeInsets.zero, // No internal padding for row layout
-        height: GeneralConstants.heightLarge * 1.8, // Uber-style height
+        height: 200, // TODO: Uber-style height
         child: Row(
           children: [
             Expanded(flex: 3, child: _buildLocationSection(context)),
@@ -40,7 +38,7 @@ class JobCard extends StatelessWidget {
   /// Build the location section showing from/to provinces
   Widget _buildLocationSection(BuildContext context) {
     return Padding(
-      padding: PaddingConstants.horizontalL, // Uber-style padding
+      padding: context.horizontalL, // Uber-style padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -50,11 +48,11 @@ class JobCard extends StatelessWidget {
             color: context.onSurface,
           ),
           Padding(
-            padding: PaddingConstants.verticalXs,
+            padding: context.verticalXs,
             child: Icon(
               Icons.south,
               color: context.secondary, // Uber green
-              size: GeneralConstants.iconSizeSmall,
+              size: context.iconMedium,
             ),
           ),
           AppText.body(
@@ -70,7 +68,7 @@ class JobCard extends StatelessWidget {
   Widget _buildInformationSection(BuildContext context) {
     return Row(
       children: [
-        _buildSeparator(),
+        _buildSeparator(context),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +93,7 @@ class JobCard extends StatelessWidget {
         Icon(
           Icons.local_shipping,
           color: context.onSecondary,
-          size: GeneralConstants.fontSizeExtraSmall,
+          size: context.iconMedium,
         ),
         AppText.caption(
           _getJobTypeText(job.jobType!),
@@ -112,7 +110,7 @@ class JobCard extends StatelessWidget {
         Icon(
           Icons.directions_car,
           color: context.onSecondary,
-          size: GeneralConstants.fontSizeExtraSmall,
+          size: context.iconMedium,
         ),
         AppText.caption(
           '${job.vehicleCount} Vehicles',
@@ -129,7 +127,7 @@ class JobCard extends StatelessWidget {
         Icon(
           Icons.local_offer,
           color: context.onSecondary,
-          size: GeneralConstants.fontSizeExtraSmall,
+          size: context.iconMedium,
         ),
         AppText.caption('QUOTE BASED', color: context.onSurface),
       ],
@@ -143,7 +141,7 @@ class JobCard extends StatelessWidget {
         Icon(
           Icons.monetization_on,
           color: context.onSecondary,
-          size: GeneralConstants.fontSizeExtraSmall,
+          size: context.iconMedium,
         ),
         AppText.caption(
           '\$${job.price!.toStringAsFixed(0)}',
@@ -167,7 +165,7 @@ class JobCard extends StatelessWidget {
       height: double.infinity,
       child: TextButton(
         style: TextButton.styleFrom(
-          padding: PaddingConstants.allM,
+          padding: context.paddingS,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(8.0),
@@ -182,11 +180,8 @@ class JobCard extends StatelessWidget {
   }
 
   /// Build the separator line between sections
-  Widget _buildSeparator() {
-    return Padding(
-      padding: PaddingConstants.symmetricVerticalSmall,
-      child: const SizedBox(width: 1),
-    );
+  Widget _buildSeparator(BuildContext context) {
+    return Padding(padding: context.verticalS, child: const SizedBox(width: 1));
   }
 
   /// Get the display text for job type enum

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
@@ -39,7 +37,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     return Row(
       children: [
         Icon(icon, size: 16, color: context.onSurface.withValues(alpha: 0.7)),
-        SizedBox(width: PaddingConstants.spacingS),
+        SizedBox(width: context.spacingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +78,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
       ),
       backgroundColor: context.surfaceContainer,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: context.paddingL,
         child: Column(
           children: [
             _buildCompanyCard(context),
@@ -112,7 +110,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: context.radiusMedium,
         boxShadow: [
           BoxShadow(
             color: context.surface,
@@ -122,7 +120,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
       child: Padding(
-        padding: PaddingConstants.allM,
+        padding: context.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,7 +130,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: context.primary.withValues(alpha: 0.1),
-                    borderRadius: GeneralConstants.borderRadius,
+                    borderRadius: context.radiusMedium,
                   ),
                   child: Icon(Icons.business, color: context.primary, size: 20),
                 ),
@@ -177,7 +175,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
       child: Padding(
-        padding: PaddingConstants.allM,
+        padding: context.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -267,7 +265,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
       child: Padding(
-        padding: PaddingConstants.allM,
+        padding: context.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -343,7 +341,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
       child: Padding(
-        padding: PaddingConstants.allM,
+        padding: context.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -406,7 +404,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
       child: Padding(
-        padding: PaddingConstants.allM,
+        padding: context.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -453,7 +451,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         ],
       ),
       child: Padding(
-        padding: PaddingConstants.allM,
+        padding: context.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -536,7 +534,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     final category = requirement.minimumCategory;
 
     return Container(
-      margin: EdgeInsets.only(bottom: PaddingConstants.spacingM),
+      margin: EdgeInsets.only(bottom: context.spacingM),
       decoration: BoxDecoration(
         color: context.surface,
         borderRadius: BorderRadius.circular(16),
@@ -558,7 +556,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         children: [
           // Header with category badge and apply button
           Container(
-            padding: EdgeInsets.all(PaddingConstants.spacingM),
+            padding: EdgeInsets.all(context.spacingM),
             decoration: BoxDecoration(
               color:
                   (category?.color.withValues(alpha: 0.05) ??
@@ -573,8 +571,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 // Category badge
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: PaddingConstants.spacingM,
-                    vertical: PaddingConstants.spacingS,
+                    horizontal: context.spacingM,
+                    vertical: context.spacingS,
                   ),
                   decoration: BoxDecoration(
                     color:
@@ -594,7 +592,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         size: 20,
                         color: (category?.color ?? context.primary),
                       ),
-                      SizedBox(width: PaddingConstants.spacingS),
+                      SizedBox(width: context.spacingS),
                       AppText.bodySmall(
                         category?.displayName ?? 'Vehicle',
                         color: (category?.color ?? context.primary),
@@ -611,8 +609,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: PaddingConstants.spacingM,
-                        vertical: PaddingConstants.spacingS,
+                        horizontal: context.spacingM,
+                        vertical: context.spacingS,
                       ),
                       decoration: BoxDecoration(
                         color: context.primary,
@@ -637,7 +635,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   Widget _buildContent(VehicleRequirement requirement, BuildContext context) {
     final category = requirement.minimumCategory;
     return Padding(
-      padding: EdgeInsets.all(PaddingConstants.spacingM),
+      padding: EdgeInsets.all(context.spacingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -647,9 +645,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
               // Category badge
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal:
-                      PaddingConstants.spacingS + PaddingConstants.spacingXs,
-                  vertical: PaddingConstants.spacingXs,
+                  horizontal: context.spacingS + context.spacingXs,
+                  vertical: context.spacingXs,
                 ),
                 decoration: BoxDecoration(
                   color:
@@ -669,7 +666,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                       size: 30,
                       color: (category?.color ?? context.primary),
                     ),
-                    SizedBox(width: PaddingConstants.spacingS),
+                    SizedBox(width: context.spacingS),
                     AppText.caption(
                       (category?.displayName ?? 'Vehicle'),
                       color: (category?.color ?? context.primary),
@@ -689,8 +686,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: PaddingConstants.spacingM,
-                          vertical: PaddingConstants.spacingS,
+                          horizontal: context.spacingM,
+                          vertical: context.spacingS,
                         ),
                         decoration: BoxDecoration(
                           color: context.primary.withValues(alpha: 0.1),
@@ -709,7 +706,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             ],
           ),
 
-          SizedBox(height: PaddingConstants.spacingL),
+          SizedBox(height: context.spacingL),
 
           // Vehicle information grid
           Row(
@@ -727,7 +724,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         color: context.onSurface,
                       ),
                     if (requirement.specificBrand != null)
-                      SizedBox(height: PaddingConstants.spacingM),
+                      SizedBox(height: context.spacingM),
                     if (requirement.specificModel != null)
                       _buildInfoRowCompact(
                         icon: Icons.directions_car,
@@ -736,7 +733,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         color: context.onSurface,
                       ),
                     if (requirement.specificModel != null)
-                      SizedBox(height: PaddingConstants.spacingM),
+                      SizedBox(height: context.spacingL),
                   ],
                 ),
               ),
@@ -754,7 +751,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         color: context.primary,
                       ),
                     if (requirement.capacity != null)
-                      SizedBox(height: PaddingConstants.spacingM),
+                      SizedBox(height: context.spacingL),
                     if (requirement.year != null)
                       _buildInfoRowCompact(
                         icon: Icons.calendar_today,
@@ -763,7 +760,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         color: context.onSurface,
                       ),
                     if (requirement.year != null)
-                      SizedBox(height: PaddingConstants.spacingM),
+                      SizedBox(height: context.spacingL),
                   ],
                 ),
               ),
@@ -771,7 +768,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           ),
 
           if (requirement.notes != null && requirement.notes!.isNotEmpty) ...[
-            SizedBox(height: PaddingConstants.spacingM),
+            SizedBox(height: context.spacingM),
             _buildInfoRowCompact(
               icon: Icons.notes,
               label: 'Notes',
@@ -846,7 +843,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             },
             icon: Icons.phone,
             width: double.infinity,
-            height: 52,
           ),
         ),
         const SizedBox(height: 12),
@@ -862,7 +858,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
             },
             icon: Icons.share,
             width: double.infinity,
-            height: 52,
           ),
         ),
       ],

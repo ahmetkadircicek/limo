@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:limo/core/constants/design_tokens.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 
 /// MERKEZI TEMA SİSTEMİ - Tüm tema özellikleri burada!
 extension ThemeExtensions on BuildContext {
@@ -57,36 +56,36 @@ extension ThemeExtensions on BuildContext {
   // =============================================================================
 
   /// Base Spacing Values
-  double get spacingXs => PaddingConstants.spacingXs; // 4
-  double get spacingS => PaddingConstants.spacingS; // 8
-  double get spacingM => PaddingConstants.spacingM; // 12
-  double get spacingL => PaddingConstants.spacingL; // 16
-  double get spacingXl => PaddingConstants.spacingXl; // 24
-  double get spacingXxl => PaddingConstants.spacingXxl; // 32
-  double get spacingXxxl => PaddingConstants.spacingXxxl; // 40
+  double get spacingXs => DesignTokens.spacing1; // 4
+  double get spacingS => DesignTokens.spacing2; // 8
+  double get spacingM => DesignTokens.spacing3; // 12
+  double get spacingL => DesignTokens.spacing4; // 16
+  double get spacingXl => DesignTokens.spacing5; // 24
+  double get spacingXxl => DesignTokens.spacing6; // 32
+  double get spacingXxxl => DesignTokens.spacing8; // 40
 
   /// EdgeInsets Shortcuts
-  EdgeInsets get paddingXs => PaddingConstants.allXs;
-  EdgeInsets get paddingS => PaddingConstants.allS;
-  EdgeInsets get paddingM => PaddingConstants.allM;
-  EdgeInsets get paddingL => PaddingConstants.allL;
-  EdgeInsets get paddingXl => PaddingConstants.allXl;
-  EdgeInsets get paddingXxl => PaddingConstants.allXxl;
-  EdgeInsets get paddingXxxl => PaddingConstants.allXxxl;
+  EdgeInsets get paddingXs => EdgeInsets.all(spacingXs);
+  EdgeInsets get paddingS => EdgeInsets.all(spacingS);
+  EdgeInsets get paddingM => EdgeInsets.all(spacingM);
+  EdgeInsets get paddingL => EdgeInsets.all(spacingL);
+  EdgeInsets get paddingXl => EdgeInsets.all(spacingXl);
+  EdgeInsets get paddingXxl => EdgeInsets.all(spacingXxl);
+  EdgeInsets get paddingXxxl => EdgeInsets.all(spacingXxxl);
 
-  EdgeInsets get horizontalXs => PaddingConstants.horizontalXs;
-  EdgeInsets get horizontalS => PaddingConstants.horizontalS;
-  EdgeInsets get horizontalM => PaddingConstants.horizontalM;
-  EdgeInsets get horizontalL => PaddingConstants.horizontalL;
-  EdgeInsets get horizontalXl => PaddingConstants.horizontalXl;
-  EdgeInsets get horizontalXxl => PaddingConstants.horizontalXxl;
+  EdgeInsets get horizontalXs => EdgeInsets.symmetric(horizontal: spacingXs);
+  EdgeInsets get horizontalS => EdgeInsets.symmetric(horizontal: spacingS);
+  EdgeInsets get horizontalM => EdgeInsets.symmetric(horizontal: spacingM);
+  EdgeInsets get horizontalL => EdgeInsets.symmetric(horizontal: spacingL);
+  EdgeInsets get horizontalXl => EdgeInsets.symmetric(horizontal: spacingXl);
+  EdgeInsets get horizontalXxl => EdgeInsets.symmetric(horizontal: spacingXxl);
 
-  EdgeInsets get verticalXs => PaddingConstants.verticalXs;
-  EdgeInsets get verticalS => PaddingConstants.verticalS;
-  EdgeInsets get verticalM => PaddingConstants.verticalM;
-  EdgeInsets get verticalL => PaddingConstants.verticalL;
-  EdgeInsets get verticalXl => PaddingConstants.verticalXl;
-  EdgeInsets get verticalXxl => PaddingConstants.verticalXxl;
+  EdgeInsets get verticalXs => EdgeInsets.symmetric(vertical: spacingXs);
+  EdgeInsets get verticalS => EdgeInsets.symmetric(vertical: spacingS);
+  EdgeInsets get verticalM => EdgeInsets.symmetric(vertical: spacingM);
+  EdgeInsets get verticalL => EdgeInsets.symmetric(vertical: spacingL);
+  EdgeInsets get verticalXl => EdgeInsets.symmetric(vertical: spacingXl);
+  EdgeInsets get verticalXxl => EdgeInsets.symmetric(vertical: spacingXxl);
 
   // =============================================================================
   // BORDER RADIUS - Tüm radius'lar context üzerinden

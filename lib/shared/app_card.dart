@@ -60,17 +60,13 @@ class AppCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _getBackgroundColor(context),
         borderRadius: context.radiusMedium, // Context'ten alınıyor
-        border: _getBorder(context),
         boxShadow: _getShadow(context), // Context'ten shadow
       ),
       child: child,
     );
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: widget,
-      );
+      return GestureDetector(onTap: onTap, child: widget);
     }
 
     return widget;
@@ -84,23 +80,6 @@ class AppCard extends StatelessWidget {
         return context.surfaceContainer; // Light gray - Context'ten
       case CardVariant.tertiary:
         return context.secondary.withValues(alpha: 0.05); // Subtle tint
-    }
-  }
-
-  Border? _getBorder(BuildContext context) {
-    switch (variant) {
-      case CardVariant.primary:
-        return null; // No border, just shadow
-      case CardVariant.secondary:
-        return Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-          width: 1.0,
-        );
-      case CardVariant.tertiary:
-        return Border.all(
-          color: context.secondary.withValues(alpha: 0.2),
-          width: 1.0,
-        );
     }
   }
 
@@ -149,23 +128,19 @@ class AppInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardContent = Container(
-      padding: const EdgeInsets.all(16),
+      padding: context.paddingL,
       decoration: BoxDecoration(
         color: backgroundColor ?? context.surfaceContainer,
         borderRadius: context.radiusMedium,
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-          width: 1,
-        ),
       ),
       child: Row(
         children: [
           Icon(
             icon,
             color: iconColor ?? context.primary,
-            size: 20,
+            size: context.iconMedium,
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: context.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,15 +149,14 @@ class AppInfoCard extends StatelessWidget {
                   label,
                   color: labelColor ?? context.onSurface.withValues(alpha: 0.6),
                 ),
-                AppText.caption(
-                  value,
-                  color: valueColor ?? context.onSurface,
-                ),
+                AppText.caption(value, color: valueColor ?? context.onSurface),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.spacingS),
                   AppText.caption(
                     subtitle!,
-                    color: subtitleColor ?? context.onSurface.withValues(alpha: 0.5),
+                    color:
+                        subtitleColor ??
+                        context.onSurface.withValues(alpha: 0.5),
                   ),
                 ],
               ],
@@ -192,17 +166,14 @@ class AppInfoCard extends StatelessWidget {
               Icon(
                 Icons.chevron_right,
                 color: context.onSurface.withValues(alpha: 0.6),
-                size: 20,
+                size: context.iconMedium,
               ),
         ],
       ),
     );
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: cardContent,
-      );
+      return GestureDetector(onTap: onTap, child: cardContent);
     }
 
     return cardContent;

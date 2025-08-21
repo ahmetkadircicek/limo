@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/shared/app_profile_image.dart';
@@ -59,15 +58,7 @@ class AppDrawer extends StatelessWidget {
       builder: (context, appState, child) {
         return Container(
           padding: context.paddingXl,
-          decoration: BoxDecoration(
-            color: context.surface,
-            border: Border(
-              bottom: BorderSide(
-                color: context.onSurface.withValues(alpha: 0.1),
-                width: 1,
-              ),
-            ),
-          ),
+          decoration: BoxDecoration(color: context.surface),
           child: Column(
             children: [
               _buildUserAvatar(context, appState),
@@ -115,6 +106,8 @@ class AppDrawer extends StatelessWidget {
   Widget _buildNavigationSection(BuildContext context) {
     return Expanded(
       child: ListView(
+        shrinkWrap: true,
+        physics: const ClampingScrollPhysics(),
         padding: EdgeInsets.zero,
         children: [
           // Main Navigation Group
@@ -157,9 +150,6 @@ class AppDrawer extends StatelessWidget {
             context: context,
           ),
 
-          // Divider
-          _buildDivider(context),
-
           // Information Group
           _buildDrawerItem(
             icon: Icons.info_outline,
@@ -180,9 +170,6 @@ class AppDrawer extends StatelessWidget {
             context: context,
           ),
 
-          // Divider
-          _buildDivider(context),
-
           // Debug Group
           _buildDrawerItem(
             icon: Icons.bug_report,
@@ -195,7 +182,6 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  /// Builds individual navigation menu items
   Widget _buildDrawerItem({
     required IconData icon,
     required String title,
@@ -203,60 +189,32 @@ class AppDrawer extends StatelessWidget {
     required BuildContext context,
   }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: PaddingConstants.spacingS),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: context.radiusMedium,
-        border: Border(
-          top: BorderSide(
-            color: context.onSurface.withValues(alpha: 0.05),
-            width: 0.5,
-          ),
-          bottom: BorderSide(
-            color: context.onSurface.withValues(alpha: 0.05),
-            width: 0.5,
-          ),
-        ),
-      ),
+      margin: EdgeInsets.symmetric(horizontal: context.spacingS),
+      decoration: const BoxDecoration(color: Colors.transparent),
       child: ListTile(
         leading: _buildItemIcon(icon, context),
         title: AppText.bodySmall(title, color: context.onSurface),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: context.onSurface.withValues(alpha: 0.1),
+          size: context.iconMedium,
+        ),
         onTap: onTap,
-        contentPadding: PaddingConstants.horizontalL,
+        contentPadding: context.horizontalM,
         shape: RoundedRectangleBorder(borderRadius: context.radiusMedium),
       ),
     );
   }
 
-  /// Builds a divider for the drawer items
-  Widget _buildDivider(BuildContext context) {
-    return Divider(
-      color: context.onSurface.withValues(alpha: 0.1),
-      height: 1,
-      thickness: 1,
-    );
-  }
-
   /// Builds the icon container for navigation items
   Widget _buildItemIcon(IconData icon, BuildContext context) {
-    return Container(
-      padding: context.paddingS,
-      child: Icon(icon, size: 24, color: context.onSurface),
-    );
+    return Icon(icon, size: context.iconMedium, color: context.onSurface);
   }
 
   /// Builds the logout section at the bottom of the drawer
   Widget _buildLogoutSection(BuildContext context) {
     return Container(
-      padding: context.horizontalL,
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: context.onSurface.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
-      ),
+      padding: context.horizontalXxl,
       child: ListTile(
         leading: _buildItemIcon(Icons.logout, context),
         title: AppText.bodySmall('Logout', color: context.onSurface),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_components.dart';
 
@@ -8,44 +7,39 @@ extension AppDialogExtension on BuildContext {
   void showSuccessDialog(String message) {
     showDialog(
       context: this,
-      builder: (context) => _AppDialog(
-        title: 'Success',
-        message: message,
-        isSuccess: true,
-      ),
+      builder:
+          (context) =>
+              _AppDialog(title: 'Success', message: message, isSuccess: true),
     );
   }
 
   void showErrorDialog(String message) {
     showDialog(
       context: this,
-      builder: (context) => _AppDialog(
-        title: 'Error',
-        message: message,
-        isSuccess: false,
-      ),
+      builder:
+          (context) =>
+              _AppDialog(title: 'Error', message: message, isSuccess: false),
     );
   }
 
   static void showError(BuildContext context, String title, String message) {
     showDialog(
       context: context,
-      builder: (context) => _AppDialog(
-        title: title,
-        message: message,
-        isSuccess: false,
-      ),
+      builder:
+          (context) =>
+              _AppDialog(title: title, message: message, isSuccess: false),
     );
   }
 
   static void showInfo(BuildContext context, String title, String message) {
     showDialog(
       context: context,
-      builder: (context) => _AppDialog(
-        title: title,
-        message: message,
-        isSuccess: true, // Info dialog uses success styling
-      ),
+      builder:
+          (context) => _AppDialog(
+            title: title,
+            message: message,
+            isSuccess: true, // Info dialog uses success styling
+          ),
     );
   }
 }
@@ -65,29 +59,26 @@ class _AppDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: context.radiusMedium),
       child: AppCard.primary(
-        padding: PaddingConstants.allXxl,
+        padding: context.paddingXxl,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               isSuccess ? Icons.check_circle : Icons.error,
-              color:
-                  isSuccess ? const Color(0xFF00B14F) : const Color(0xFFD72638),
-              size: 48,
+              color: isSuccess ? context.success : context.error,
+              size: context.iconLarge,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.spacingL),
             AppText.title(title),
-            const SizedBox(height: 8),
+            SizedBox(height: context.spacingM),
             AppText.body(
               message,
               textAlign: TextAlign.center,
               color: context.onSurface.withValues(alpha: 0.7),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: context.spacingL),
             AppButton.primary(
               'OK',
               onPressed: () => Navigator.of(context).pop(),

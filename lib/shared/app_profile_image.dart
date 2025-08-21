@@ -2,42 +2,9 @@ import 'dart:io'; // Added for File
 
 import 'package:flutter/material.dart';
 import 'package:limo/core/constants/design_tokens.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/utils/image_helper.dart';
 
-/// App Profile Image component for displaying user profile pictures
-///
-/// This component automatically handles:
-/// - Google authentication profile images from network URLs
-/// - Local uploaded profile images (when implemented)
-/// - Placeholder user icon when no image is available
-/// - Loading states while images are being fetched
-/// - Error fallbacks if network images fail to load
-///
-/// Usage examples:
-/// ```dart
-/// // Basic usage with Google profile image
-/// AppProfileImage(
-///   imageUrl: user.profileImageUrl,
-///   size: 70,
-/// )
-///
-/// // With edit functionality
-/// AppProfileImage(
-///   imageUrl: user.profileImageUrl,
-///   size: 70,
-///   showEditIcon: true,
-///   onTap: () => _pickImage(),
-/// )
-///
-/// // Custom styling
-/// AppProfileImage(
-///   imageUrl: user.profileImageUrl,
-///   size: 100,
-///   backgroundColor: Colors.blue.shade100,
-///   borderColor: Colors.blue.shade300,
-///   borderWidth: 2,
-/// )
-/// ```
 class AppProfileImage extends StatelessWidget {
   final String? imageUrl;
   final String? imageBase64;
@@ -62,17 +29,15 @@ class AppProfileImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final defaultBgColor =
-        backgroundColor ?? theme.colorScheme.primary.withValues(alpha: 0.1);
+        backgroundColor ?? context.primary.withValues(alpha: 0.1);
     final defaultBorderColor =
-        borderColor ?? theme.colorScheme.outline.withValues(alpha: 0.2);
+        borderColor ?? context.onSurface.withValues(alpha: 0.2);
 
     return GestureDetector(
       onTap: onTap,
       child: Stack(
         children: [
-          // Main profile image container
           Container(
             width: size,
             height: size,
@@ -87,7 +52,7 @@ class AppProfileImage extends StatelessWidget {
                       )
                       : null,
             ),
-            child: ClipOval(child: _buildImageContent(theme)),
+            child: ClipOval(child: _buildImageContent(context)),
           ),
 
           // Edit icon positioned outside the circle
@@ -98,12 +63,9 @@ class AppProfileImage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(DesignTokens.spacing1),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
+                  color: context.primary,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: theme.colorScheme.surface,
-                    width: 2,
-                  ),
+                  border: Border.all(color: context.surface, width: 2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.2),
@@ -115,7 +77,7 @@ class AppProfileImage extends StatelessWidget {
                 child: Icon(
                   Icons.edit,
                   size: size * 0.25,
-                  color: theme.colorScheme.onPrimary,
+                  color: context.onPrimary,
                 ),
               ),
             ),
@@ -124,99 +86,97 @@ class AppProfileImage extends StatelessWidget {
     );
   }
 
-  Widget _buildImageContent(ThemeData theme) {
+  Widget _buildImageContent(BuildContext context) {
     // If no image URL or base64, show placeholder icon
     if ((imageUrl == null || imageUrl!.isEmpty) &&
         (imageBase64 == null || imageBase64!.isEmpty)) {
-      return _buildPlaceholderIcon(theme);
+      return _buildPlaceholderIcon(context);
     }
 
     // Priority 1: Show base64 image if available
     if (imageBase64 != null && imageBase64!.isNotEmpty) {
-      return _buildBase64Image(theme);
+      return _buildBase64Image(context);
     }
 
     // Priority 2: Try to load network image
     if (imageUrl != null &&
         imageUrl!.isNotEmpty &&
         (imageUrl!.startsWith('http://') || imageUrl!.startsWith('https://'))) {
-      return _buildNetworkImage(theme);
+      return _buildNetworkImage(context);
     }
 
     // Priority 3: Handle local file paths (for images selected from gallery)
     if (imageUrl != null &&
         imageUrl!.isNotEmpty &&
         (imageUrl!.startsWith('/') || imageUrl!.contains('\\'))) {
-      return _buildLocalImage(theme);
+      return _buildLocalImage(context);
     }
 
     // Fallback to placeholder
-    return _buildPlaceholderIcon(theme);
+    return _buildPlaceholderIcon(context);
   }
 
   /// Build base64 image
-  Widget _buildBase64Image(ThemeData theme) {
+  Widget _buildBase64Image(BuildContext context) {
     return ImageHelper.base64ToImage(
       base64String: imageBase64,
       width: size,
       height: size,
       fit: BoxFit.cover,
-      errorWidget: _buildPlaceholderIcon(theme),
-      placeholder: _buildLoadingPlaceholder(theme),
+      errorWidget: _buildPlaceholderIcon(context),
+      placeholder: _buildLoadingPlaceholder(context),
     );
   }
 
-  Widget _buildNetworkImage(ThemeData theme) {
+  Widget _buildNetworkImage(BuildContext context) {
     return Image.network(
       imageUrl!,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
         // Fallback to placeholder if network image fails
-        return _buildPlaceholderIcon(theme);
+        return _buildPlaceholderIcon(context);
       },
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
-        return _buildLoadingPlaceholder(theme);
+        return _buildLoadingPlaceholder(context);
       },
     );
   }
 
-  Widget _buildLocalImage(ThemeData theme) {
+  Widget _buildLocalImage(BuildContext context) {
     try {
       return Image.file(
         File(imageUrl!),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           // Fallback to placeholder if local image fails
-          return _buildPlaceholderIcon(theme);
+          return _buildPlaceholderIcon(context);
         },
       );
     } catch (e) {
       // Fallback to placeholder if file doesn't exist
-      return _buildPlaceholderIcon(theme);
+      return _buildPlaceholderIcon(context);
     }
   }
 
-  Widget _buildPlaceholderIcon(ThemeData theme) {
+  Widget _buildPlaceholderIcon(BuildContext context) {
     return Icon(
       Icons.person,
       size: size * 0.4,
-      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+      color: context.onSurface.withValues(alpha: 0.6),
     );
   }
 
-  Widget _buildLoadingPlaceholder(ThemeData theme) {
+  Widget _buildLoadingPlaceholder(BuildContext context) {
     return Container(
-      color: theme.colorScheme.surface,
+      color: context.surface,
       child: Center(
         child: SizedBox(
           width: size * 0.3,
           height: size * 0.3,
           child: CircularProgressIndicator(
             strokeWidth: 2.0,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              theme.colorScheme.primary,
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(context.primary),
           ),
         ),
       ),

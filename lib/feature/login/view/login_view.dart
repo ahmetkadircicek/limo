@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:limo/core/constants/image_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
@@ -61,7 +63,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   Widget _buildBackgroundImage() {
     return Image.asset(
       ImageAssets.loginImage,
-      fit: BoxFit.fitHeight, // Ekranı tamamen kapla
+      fit: BoxFit.fitHeight,
       width: double.infinity,
       height: double.infinity,
     );
@@ -69,12 +71,23 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
 
   /// Build the blur overlay
   Widget _buildBlurOverlay(BuildContext context) {
-    return Container(color: Colors.black.withValues(alpha: 0.6));
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      child: Container(color: context.primary.withValues(alpha: 0.6)),
+    );
   }
 
-  /// Build the dark overlay
+  /// Build the dark gradient overlay
   Widget _buildDarkOverlay(BuildContext context) {
-    return Container(color: Colors.black.withValues(alpha: 0.6));
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.transparent, context.primary],
+        ),
+      ),
+    );
   }
 
   /// Build the foreground content with SafeArea and padding
@@ -85,6 +98,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
         child: Column(
           spacing: context.spacingXl,
           children: [
+            const Spacer(),
             const LogoSection(),
             const Spacer(),
             const OAuthButtonsSection(),

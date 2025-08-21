@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/core/utils/logger_service.dart';
 import 'package:limo/feature/login/services/apple_auth_service.dart';
 import 'package:limo/feature/login/viewmodel/login_view_model.dart';
@@ -26,14 +25,8 @@ class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
   Widget build(BuildContext context) {
     const googleRed = Color(0xFFEA4335);
 
-    return Consumer2<LoginViewModel, AppStateProvider>(
-      builder: (context, viewModel, appStateProvider, child) {
-        // Set the AppStateProvider in the LoginViewModel
-        viewModel.setAppStateProvider(appStateProvider);
-
-        // Set the BuildContext in the LoginViewModel for snackbars
-        viewModel.setContext(context);
-
+    return Consumer<LoginViewModel>(
+      builder: (context, viewModel, child) {
         return Column(
           spacing: context.spacingL,
           children: [
@@ -107,7 +100,7 @@ class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
       );
 
       // Show user-friendly error message
-      if (mounted) {
+      if (context.mounted) {
         final currentContext = context;
         AppSnackbar.showError(
           currentContext,
@@ -131,7 +124,7 @@ class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
 
       if (isAvailable) {
         await viewModel.signInWithApple();
-      } else if (mounted) {
+      } else if (context.mounted) {
         final currentContext = context;
         AppSnackbar.showError(
           currentContext,

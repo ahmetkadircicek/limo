@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/constants/design_tokens.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_vehicle_registration/model/vehicle_model.dart';
 import 'package:limo/shared/app_components.dart';
@@ -45,9 +44,9 @@ class _FleetManagementViewState extends State<FleetManagementView>
   /// Build empty state
   Widget _buildEmptyState() {
     return Padding(
-      padding: PaddingConstants.allL,
+      padding: context.paddingL,
       child: Column(
-        spacing: PaddingConstants.spacingXs,
+        spacing: context.spacingXs,
         children: [
           Icon(
             Icons.directions_car_outlined,
@@ -96,7 +95,7 @@ class _FleetManagementViewState extends State<FleetManagementView>
   /// Build add vehicle section
   Widget _buildAddVehicleSection() {
     return Container(
-      margin: PaddingConstants.allL,
+      margin: context.paddingL,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

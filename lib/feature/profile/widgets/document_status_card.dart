@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
@@ -29,30 +28,26 @@ class DocumentStatusCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: context.paddingL,
         decoration: BoxDecoration(
           color: context.surfaceContainer,
-          borderRadius: GeneralConstants.borderRadius,
-          border: Border.all(
-            color: context.onSurface.withValues(alpha: 0.1),
-            width: 1,
-          ),
+          borderRadius: context.radiusMedium,
         ),
         child: Row(
           children: [
             Icon(
               icon,
               color: iconColor ?? context.primary,
-              size: 20,
+              size: context.iconMedium,
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: context.spacingL),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText.caption(
                     label,
-                    color: labelColor ?? context.onSurface.withValues(alpha: 0.6),
+                    color: labelColor ?? context.onSurface,
                   ),
                   AppText.caption(
                     value,
@@ -64,7 +59,7 @@ class DocumentStatusCard extends StatelessWidget {
             Icon(
               Icons.chevron_right,
               color: context.onSurface.withValues(alpha: 0.6),
-              size: 20,
+              size: context.iconMedium,
             ),
           ],
         ),

@@ -1,6 +1,6 @@
 /// Unified authentication result for all providers
 class AuthResult {
-  final String providerUserId; // Provider'dan gelen ID (Google ID, Apple ID)
+  final String providerUserId;
   final String? email;
   final String? displayName;
   final String? photoUrl;
@@ -11,7 +11,7 @@ class AuthResult {
   final Map<String, dynamic>? additionalData;
 
   const AuthResult({
-    required this.providerUserId, // Provider'dan gelen ID
+    required this.providerUserId,
     this.email,
     this.displayName,
     this.photoUrl,

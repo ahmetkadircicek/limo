@@ -3,8 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/constants/design_tokens.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/job_type_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
@@ -60,26 +58,24 @@ class _JobListingViewState extends State<JobListingView> {
                     child: Form(
                       key: _formKey,
                       child: Padding(
-                        padding: PaddingConstants.allL,
+                        padding: context.paddingL,
                         child: Column(
                           children: [
                             _buildCompanySection(),
-                            SizedBox(height: PaddingConstants.spacingXl),
+                            SizedBox(height: context.spacingXl),
                             _buildJobTypeSection(),
-                            SizedBox(height: PaddingConstants.spacingXl),
+                            SizedBox(height: context.spacingXl),
                             _buildDateTimeSection(),
-                            SizedBox(height: PaddingConstants.spacingXl),
+                            SizedBox(height: context.spacingXl),
                             _buildLocationSection(),
-                            SizedBox(height: PaddingConstants.spacingXl),
+                            SizedBox(height: context.spacingXl),
                             _buildVehicleSection(),
-                            SizedBox(height: PaddingConstants.spacingXl),
+                            SizedBox(height: context.spacingXl),
                             _buildDescriptionSection(),
-                            SizedBox(height: PaddingConstants.spacingXxl),
+                            SizedBox(height: context.spacingXxl),
                             _buildActionButtons(),
                             SizedBox(
-                              height:
-                                  PaddingConstants.spacingXxl +
-                                  PaddingConstants.spacingL,
+                              height: context.spacingXxl + context.spacingL,
                             ),
                           ],
                         ),
@@ -405,7 +401,7 @@ class _JobListingViewState extends State<JobListingView> {
     return Container(
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: context.radiusMedium,
         boxShadow: [
           BoxShadow(
             color: context.onSurface.withValues(alpha: 0.04),
@@ -415,7 +411,7 @@ class _JobListingViewState extends State<JobListingView> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: context.paddingL,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -449,10 +445,10 @@ class _JobListingViewState extends State<JobListingView> {
     final distanceKm = distanceMiles * 1.60934;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: context.paddingL,
       decoration: BoxDecoration(
         color: context.surfaceContainer,
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: context.radiusMedium,
         border: Border.all(
           color: context.onSurface.withValues(alpha: 0.1),
           width: 1.0,
@@ -513,10 +509,10 @@ class _JobListingViewState extends State<JobListingView> {
   // Build individual metric card
   Widget _buildMetricCard(String label, String value) {
     return Container(
-      padding: PaddingConstants.allS,
+      padding: context.paddingS,
       decoration: BoxDecoration(
         color: context.surface,
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: context.radiusMedium,
         border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
       ),
       child: Column(
@@ -550,7 +546,7 @@ class _JobListingViewState extends State<JobListingView> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: context.paddingS,
           decoration: BoxDecoration(
             color: context.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
@@ -587,7 +583,6 @@ class _JobListingViewState extends State<JobListingView> {
         await _createJob();
       },
       width: double.infinity,
-      height: 52,
     );
   }
 
@@ -597,7 +592,6 @@ class _JobListingViewState extends State<JobListingView> {
       'Clear',
       onPressed: _clearForm,
       width: double.infinity,
-      height: 52,
     );
   }
 

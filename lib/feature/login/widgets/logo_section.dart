@@ -11,11 +11,7 @@ class LogoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       spacing: context.spacingS,
-      children: [
-        SizedBox(height: context.spacingXxxl),
-        _buildAppLogo(context),
-        _buildWelcomeMessage(context),
-      ],
+      children: [_buildAppLogo(context), _buildWelcomeMessage(context)],
     );
   }
 
@@ -23,7 +19,7 @@ class LogoSection extends StatelessWidget {
   Widget _buildAppLogo(BuildContext context) {
     return ColorFiltered(
       colorFilter: ColorFilter.mode(context.onPrimary, BlendMode.srcIn),
-      child: Image.asset(ImageAssets.logo, width: context.width * 0.7),
+      child: Image.asset(ImageAssets.logo, width: context.width * 0.8),
     );
   }
 

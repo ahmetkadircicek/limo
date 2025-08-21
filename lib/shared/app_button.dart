@@ -10,7 +10,6 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
   final double? width;
-  final double? height;
   final bool isLoading;
 
   const AppButton(
@@ -20,7 +19,6 @@ class AppButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
-    this.height,
     this.isLoading = false,
   });
 
@@ -30,7 +28,6 @@ class AppButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
-    this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.primary;
 
@@ -40,7 +37,6 @@ class AppButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
-    this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.secondary;
 
@@ -50,7 +46,6 @@ class AppButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
-    this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.tertiary;
 
@@ -60,7 +55,6 @@ class AppButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
-    this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.error;
 
@@ -70,13 +64,12 @@ class AppButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
-    this.height,
     this.isLoading = false,
   }) : variant = ButtonVariant.success;
 
   @override
   Widget build(BuildContext context) {
-    final buttonHeight = height ?? _getButtonHeight(context);
+    final buttonHeight = context.buttonHeight;
     final isEnabled = onPressed != null && !isLoading;
 
     return SizedBox(
@@ -92,33 +85,33 @@ class AppButton extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: _getBackgroundColor(context),
             foregroundColor: _getForegroundColor(context),
-            disabledBackgroundColor:
-                _getBackgroundColor(context).withValues(alpha: 0.5),
+            disabledBackgroundColor: _getBackgroundColor(
+              context,
+            ).withValues(alpha: 0.5),
             side: _getBorder(context),
-            shape: RoundedRectangleBorder(
-              borderRadius: context.radiusMedium,
-            ),
-            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: context.radiusMedium),
             shadowColor: Colors.transparent,
             minimumSize: Size(0, buttonHeight),
           ),
-          icon: isLoading
-              ? SizedBox(
-                  width: context.iconMedium,
-                  height: context.iconMedium,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                        AlwaysStoppedAnimation(_getForegroundColor(context)),
-                  ),
-                )
-              : (icon != null
-                  ? Icon(
-                      icon,
-                      size: context.iconLarge,
-                      color: _getForegroundColor(context),
-                    )
-                  : null),
+          icon:
+              isLoading
+                  ? SizedBox(
+                    width: context.iconMedium,
+                    height: context.iconMedium,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(
+                        _getForegroundColor(context),
+                      ),
+                    ),
+                  )
+                  : (icon != null
+                      ? Icon(
+                        icon,
+                        size: context.iconLarge,
+                        color: _getForegroundColor(context),
+                      )
+                      : null),
           label: AppText.body(
             text,
             color: _getForegroundColor(context),
@@ -128,11 +121,6 @@ class AppButton extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  double _getButtonHeight(BuildContext context) {
-    // Tüm buton çeşitleri için tutarlı height değeri
-    return context.buttonHeight; // 48.0 - primary button height
   }
 
   Color _getBackgroundColor(BuildContext context) {

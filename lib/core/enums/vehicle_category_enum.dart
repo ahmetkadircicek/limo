@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/vehicle_category_colors.dart';
+
+// TODO: Move hex color values to theme/design tokens for global use.
 
 enum VehicleCategory {
   // Ultra Premium/Luxury Vehicles (ID: 10)
@@ -7,7 +8,7 @@ enum VehicleCategory {
     10,
     'Ultra Luxury',
     'Top-tier luxury vehicles',
-    VehicleCategoryColors.ultraLuxury,
+    Color(0xFFBFAEDE), // TODO: Replace with theme color
     Icons.diamond,
     'Ultra Premium',
   ),
@@ -17,7 +18,7 @@ enum VehicleCategory {
     9,
     'Luxury Sedan',
     'Premium luxury sedan vehicles',
-    VehicleCategoryColors.luxury,
+    Color(0xFFD4AF37), // TODO: Replace with theme color
     Icons.star,
     'Luxury',
   ),
@@ -25,7 +26,7 @@ enum VehicleCategory {
     9,
     'Luxury SUV',
     'Premium luxury SUV vehicles',
-    VehicleCategoryColors.luxury,
+    Color(0xFFD4AF37), // TODO: Replace with theme color
     Icons.terrain,
     'Luxury',
   ),
@@ -35,7 +36,7 @@ enum VehicleCategory {
     8,
     'Premium Sedan',
     'High-quality sedan vehicles',
-    VehicleCategoryColors.premium,
+    Color(0xFFB0BEC5), // TODO: Replace with theme color
     Icons.directions_car,
     'Premium',
   ),
@@ -43,7 +44,7 @@ enum VehicleCategory {
     8,
     'Premium SUV',
     'High-quality SUV vehicles',
-    VehicleCategoryColors.premium,
+    Color(0xFFB0BEC5), // TODO: Replace with theme color
     Icons.airport_shuttle,
     'Premium',
   ),
@@ -53,7 +54,7 @@ enum VehicleCategory {
     7,
     'Executive Sedan',
     'Business-oriented sedan vehicles',
-    VehicleCategoryColors.executive,
+    Color(0xFF90A4AE), // TODO: Replace with theme color
     Icons.business,
     'Executive',
   ),
@@ -61,7 +62,7 @@ enum VehicleCategory {
     7,
     'Executive SUV',
     'Business-oriented SUV vehicles',
-    VehicleCategoryColors.executive,
+    Color(0xFF90A4AE), // TODO: Replace with theme color
     Icons.work,
     'Executive',
   ),
@@ -71,7 +72,7 @@ enum VehicleCategory {
     6,
     'Standard Sedan',
     'Mid-range sedan vehicles',
-    VehicleCategoryColors.standard,
+    Color(0xFF78909C), // TODO: Replace with theme color
     Icons.directions_car,
     'Standard',
   ),
@@ -79,7 +80,7 @@ enum VehicleCategory {
     6,
     'Standard SUV',
     'Mid-range SUV vehicles',
-    VehicleCategoryColors.standard,
+    Color(0xFF78909C), // TODO: Replace with theme color
     Icons.airport_shuttle,
     'Standard',
   ),
@@ -89,7 +90,7 @@ enum VehicleCategory {
     5,
     'Economy Sedan',
     'Economy sedan vehicles',
-    VehicleCategoryColors.economy,
+    Color(0xFF80CBC4), // TODO: Replace with theme color
     Icons.directions_car,
     'Economy',
   ),
@@ -97,7 +98,7 @@ enum VehicleCategory {
     5,
     'Economy SUV',
     'Economy SUV vehicles',
-    VehicleCategoryColors.economy,
+    Color(0xFF80CBC4), // TODO: Replace with theme color
     Icons.airport_shuttle,
     'Economy',
   ),
@@ -107,7 +108,7 @@ enum VehicleCategory {
     4,
     'Compact Sedan',
     'Compact sedan vehicles',
-    Color(0xFFE2E8F0),
+    Color(0xFFB2DFDB), // TODO: Replace with theme color
     Icons.directions_car,
     'Compact',
   ),
@@ -115,7 +116,7 @@ enum VehicleCategory {
     4,
     'Compact SUV',
     'Compact SUV vehicles',
-    VehicleCategoryColors.compact,
+    Color(0xFFB2DFDB), // TODO: Replace with theme color
     Icons.airport_shuttle,
     'Compact',
   ),
@@ -125,7 +126,7 @@ enum VehicleCategory {
     3,
     'Economy Hatchback',
     'Economy hatchback vehicles',
-    VehicleCategoryColors.small,
+    Color(0xFFB3E5FC), // TODO: Replace with theme color
     Icons.directions_car,
     'Small',
   ),
@@ -133,7 +134,7 @@ enum VehicleCategory {
     3,
     'Compact Hatchback',
     'Compact hatchback vehicles',
-    VehicleCategoryColors.small,
+    Color(0xFFB3E5FC), // TODO: Replace with theme color
     Icons.directions_car,
     'Small',
   ),
@@ -143,7 +144,7 @@ enum VehicleCategory {
     2,
     'Micro Car',
     'Micro vehicles',
-    VehicleCategoryColors.micro,
+    Color(0xFFE1F5FE), // TODO: Replace with theme color
     Icons.directions_car,
     'Micro',
   ),
@@ -151,7 +152,7 @@ enum VehicleCategory {
     2,
     'City Car',
     'Urban use vehicles',
-    VehicleCategoryColors.micro,
+    Color(0xFFE1F5FE), // TODO: Replace with theme color
     Icons.location_city,
     'City',
   ),
@@ -161,7 +162,7 @@ enum VehicleCategory {
     1,
     'Utility Vehicle',
     'Basic utility vehicles',
-    VehicleCategoryColors.utility,
+    Color(0xFFCFD8DC), // TODO: Replace with theme color
     Icons.local_shipping,
     'Basic',
   );
@@ -191,19 +192,16 @@ enum VehicleCategory {
   }
 
   /// Check if this category can be upgraded to another category
-  /// Higher ID means higher category level
   bool canUpgradeTo(VehicleCategory other) {
     return id >= other.id;
   }
 
   /// Check if this category can apply to a job requiring the specified category
-  /// A vehicle can apply to jobs requiring equal or lower category levels
   bool canApplyToJob(VehicleCategory requiredCategory) {
     return id >= requiredCategory.id;
   }
 
   /// Get all categories that this vehicle can upgrade to
-  /// Returns categories with equal or lower ID (higher level)
   List<VehicleCategory> getUpgradeOptions() {
     return VehicleCategory.values
         .where((category) => category.id <= id)
@@ -211,7 +209,6 @@ enum VehicleCategory {
   }
 
   /// Get all categories that this vehicle can apply to
-  /// Returns categories with equal or lower ID (higher level)
   List<VehicleCategory> getApplicableJobCategories() {
     return VehicleCategory.values
         .where((category) => id >= category.id)
@@ -297,42 +294,44 @@ enum VehicleCategory {
   }
 
   /// Get category color with opacity
-  Color get colorWithOpacity => color.withValues(alpha: 0.8);
+  Color get colorWithOpacity => color.withOpacity(0.8);
 
   /// Get category light color
-  Color get lightColor => color.withValues(alpha: 0.1);
+  Color get lightColor => color.withOpacity(0.1);
 
   /// Get category border color
-  Color get borderColor => color.withValues(alpha: 0.3);
+  Color get borderColor => color.withOpacity(0.3);
 
   /// Get primary color for this category
-  Color get primaryColor => VehicleCategoryColors.getPrimaryColor(id);
+  Color get primaryColor => color;
 
   /// Get light color for this category
-  Color get lightColorV2 => VehicleCategoryColors.getLightColor(id);
+  Color get lightColorV2 => color.withOpacity(0.15);
 
   /// Get accent color for this category
-  Color get accentColor => VehicleCategoryColors.getAccentColor(id);
+  Color get accentColor => color;
 
   /// Get background color for this category (very low opacity)
-  Color get backgroundColor => VehicleCategoryColors.getBackgroundColor(id);
+  Color get backgroundColor => color.withOpacity(0.05);
 
   /// Get medium background color for this category (medium opacity)
-  Color get mediumBackgroundColor =>
-      VehicleCategoryColors.getMediumBackgroundColor(id);
+  Color get mediumBackgroundColor => color.withOpacity(0.15);
 
   /// Get strong background color for this category (high opacity)
-  Color get strongBackgroundColor =>
-      VehicleCategoryColors.getStrongBackgroundColor(id);
+  Color get strongBackgroundColor => color.withOpacity(0.25);
 
   /// Get border color for this category
-  Color get borderColorV2 => VehicleCategoryColors.getBorderColor(id);
+  Color get borderColorV2 => color.withOpacity(0.3);
 
   /// Get text color for this category (ensuring good contrast)
-  Color get textColor => VehicleCategoryColors.getTextColor(id);
+  Color get textColor =>
+      id >= 6 ? Colors.black87 : Colors.white; // TODO: Move to theme
 
   /// Get gradient colors for this category
-  List<Color> get gradientColors => VehicleCategoryColors.getGradient(id);
+  List<Color> get gradientColors => [
+    color.withOpacity(0.9),
+    color.withOpacity(0.6),
+  ];
 
   /// Get upgrade cost estimate (placeholder for future implementation)
   double? getUpgradeCostEstimate() {

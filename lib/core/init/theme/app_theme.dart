@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/constants/design_tokens.dart';
-import 'package:limo/core/constants/general_constants.dart';
 
 class AppTheme {
   static ThemeData theme = ThemeData(
@@ -187,7 +186,7 @@ class AppTheme {
     datePickerTheme: DatePickerThemeData(
       backgroundColor: DesignTokens.surface100,
       shape: RoundedRectangleBorder(
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         side: const BorderSide(color: DesignTokens.surface200, width: 1.0),
       ),
       headerBackgroundColor: DesignTokens.primary900,
@@ -226,7 +225,7 @@ class AppTheme {
       backgroundColor: DesignTokens.surface200,
       elevation: DesignTokens.spacing2,
       shape: RoundedRectangleBorder(
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       confirmButtonStyle: ElevatedButton.styleFrom(
         backgroundColor: DesignTokens.primary900,
@@ -234,7 +233,7 @@ class AppTheme {
         elevation: 0,
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: GeneralConstants.borderRadius,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         ),
       ),
       cancelButtonStyle: ElevatedButton.styleFrom(
@@ -243,7 +242,7 @@ class AppTheme {
         elevation: 0,
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: GeneralConstants.borderRadius,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         ),
       ),
       hourMinuteTextStyle: GoogleFonts.montserrat(
@@ -254,7 +253,7 @@ class AppTheme {
       ),
       hourMinuteColor: DesignTokens.accent500, // Seçili saat background'ı mavi
       hourMinuteShape: RoundedRectangleBorder(
-        borderRadius: GeneralConstants.borderRadius,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       dayPeriodTextStyle: GoogleFonts.montserrat(
         fontSize: DesignTokens.bodyLarge.fontSize,

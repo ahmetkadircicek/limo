@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_components.dart';
 
@@ -33,20 +32,12 @@ class OAuthButton extends StatelessWidget {
     final double indicatorSize = 24;
     final double iconSize = 24;
 
-    BoxDecoration buttonDecoration = BoxDecoration(
-      borderRadius: context.radiusMedium,
-      boxShadow: context.shadowMedium,
-      border: Border.all(color: borderColor),
-    );
-
     ButtonStyle buttonStyle = TextButton.styleFrom(
       backgroundColor: backgroundColor,
       foregroundColor: textColor,
       disabledBackgroundColor: backgroundColor,
       padding: context.horizontalL,
-      shape: RoundedRectangleBorder(
-        borderRadius: GeneralConstants.borderRadius,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: context.radiusMedium),
       elevation: 0,
       shadowColor: transparentColor,
     );
@@ -78,7 +69,7 @@ class OAuthButton extends StatelessWidget {
       width: double.infinity,
       height: context.buttonHeight,
       child: Container(
-        decoration: buttonDecoration,
+        decoration: BoxDecoration(borderRadius: context.radiusMedium),
         child: TextButton(
           onPressed: isLoading ? null : onPressed,
           style: buttonStyle,

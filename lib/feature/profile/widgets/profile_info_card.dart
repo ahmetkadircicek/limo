@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/general_constants.dart';
-import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
@@ -30,19 +28,19 @@ class ProfileInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = Container(
-      padding: const EdgeInsets.all(16),
+      padding: context.paddingL,
       decoration: BoxDecoration(
         color: context.surfaceContainer,
-        borderRadius: GeneralConstants.borderRadius,
-        border: Border.all(
-          color: context.onSurface.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        borderRadius: context.radiusMedium,
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor ?? context.primary, size: 20),
-          const SizedBox(width: 12),
+          Icon(
+            icon,
+            color: iconColor ?? context.primary,
+            size: context.iconMedium,
+          ),
+          SizedBox(width: context.spacingL),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,20 +55,19 @@ class ProfileInfoCard extends StatelessWidget {
           ),
           if (badgeText != null)
             Container(
-              padding:
-                  PaddingConstants.horizontalS + PaddingConstants.verticalXs,
+              padding: context.paddingS,
               decoration: BoxDecoration(
                 color: context.primary.withValues(alpha: 0.1),
-                borderRadius: GeneralConstants.borderRadiusRound,
+                borderRadius: context.radiusRound,
               ),
               child: AppText.caption(badgeText!, color: context.primary),
             ),
           if (onTap != null) ...[
-            const SizedBox(width: 8),
+            SizedBox(width: context.spacingM),
             Icon(
               Icons.chevron_right,
               color: context.onSurface.withValues(alpha: 0.6),
-              size: 20,
+              size: context.iconMedium,
             ),
           ],
         ],
@@ -81,7 +78,7 @@ class ProfileInfoCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: GeneralConstants.borderRadius,
+      borderRadius: context.radiusMedium,
       child: card,
     );
   }

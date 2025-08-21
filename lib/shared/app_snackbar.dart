@@ -3,7 +3,6 @@ import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
 class AppSnackbar {
-  /// Üstten kayan snackbar (custom overlay)
   static void show(
     BuildContext context, {
     required String message,
@@ -16,9 +15,9 @@ class AppSnackbar {
     entry = OverlayEntry(
       builder: (context) {
         return Positioned(
-          top: MediaQuery.of(context).padding.top + 12,
-          left: 16,
-          right: 16,
+          top: context.spacingM,
+          left: context.spacingM,
+          right: context.spacingM,
           child: Material(
             color: Colors.transparent,
             child: TweenAnimationBuilder<double>(
@@ -36,24 +35,17 @@ class AppSnackbar {
                   if (entry.mounted) entry.remove();
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: context.paddingL,
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    borderRadius: context.radiusMedium,
                   ),
                   child: Row(
                     children: [
                       Expanded(
                         child: AppText.body(
                           message,
-                          color: Colors.white,
+                          color: context.onSurface,
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -87,7 +79,6 @@ class AppSnackbar {
     );
   }
 
-  /// Yukarıdan kayan error snackbar
   static void showError(
     BuildContext context, {
     required String message,
@@ -96,12 +87,11 @@ class AppSnackbar {
     show(
       context,
       message: message,
-      backgroundColor: const Color(0xFFD72638),
+      backgroundColor: context.error,
       duration: duration,
     );
   }
 
-  /// Yukarıdan kayan info snackbar
   static void showInfo(
     BuildContext context, {
     required String message,
@@ -110,12 +100,11 @@ class AppSnackbar {
     show(
       context,
       message: message,
-      backgroundColor: const Color(0xFF3B82F6),
+      backgroundColor: context.secondary,
       duration: duration,
     );
   }
 
-  /// Yukarıdan kayan warning snackbar
   static void showWarning(
     BuildContext context, {
     required String message,
@@ -124,13 +113,12 @@ class AppSnackbar {
     show(
       context,
       message: message,
-      backgroundColor: const Color(0xFFF59E0B),
+      backgroundColor: context.warning,
       duration: duration,
     );
   }
 }
 
-/// Extension ile kolay kullanım
 extension AppSnackbarTopExtension on BuildContext {
   void showSuccessTopSnackbar(String message, {Duration? duration}) {
     AppSnackbar.showSuccess(
