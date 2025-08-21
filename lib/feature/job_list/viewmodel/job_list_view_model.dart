@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:limo/feature/job_list/model/job_model.dart';
 
 /// ViewModel for managing job list business logic and state
-class JobListViewModel extends ChangeNotifier {
+class JobListViewModel {
   List<JobModel> _jobs = [];
   List<JobModel> _filteredJobs = [];
   String _selectedJobType = 'All';
@@ -20,71 +19,73 @@ class JobListViewModel extends ChangeNotifier {
   /// Get the current search query
   String get searchQuery => _searchQuery;
 
-  /// Initialize the job list with empty data
+  /// Initialize the job list with empty data and mock data for development
   void initializeJobList() {
     _jobs = [];
     _filteredJobs = [];
 
-    // Add mock data for development/testing
+    // Mock data only available in development mode
     if (!const bool.fromEnvironment('dart.vm.product')) {
-      addMockJobs();
+      _loadMockData();
     }
-
-    notifyListeners();
   }
 
-  /// Filter jobs based on search query and job type
+  /// Filter jobs based on search query and job type selection
   void filterJobs(String query) {
     _searchQuery = query;
     _applyFilters();
   }
 
-  /// Set the job type filter
+  /// Set the job type filter and apply filtering
   void setJobTypeFilter(String jobType) {
     _selectedJobType = jobType;
     _applyFilters();
   }
 
-  /// Apply all active filters to the job list
+  /// Apply search and job type filters to create filtered job list
   void _applyFilters() {
     final query = _searchQuery.toLowerCase();
 
     _filteredJobs =
         _jobs.where((job) {
-          final matchesSearch =
-              query.isEmpty ||
-              (job.fromLocation?.placeName.toLowerCase().contains(query) ??
-                  false) ||
-              (job.toLocation?.placeName.toLowerCase().contains(query) ??
-                  false) ||
-              (job.companyName?.toLowerCase().contains(query) ?? false) ||
-              (job.description?.toLowerCase().contains(query) ?? false);
-
-          final matchesJobType =
-              _selectedJobType == 'All' ||
-              job.jobType.toString().split('.').last == _selectedJobType;
-
+          final matchesSearch = _checkSearchMatch(job, query);
+          final matchesJobType = _checkJobTypeMatch(job);
           return matchesSearch && matchesJobType;
         }).toList();
-
-    notifyListeners();
   }
 
-  /// Refresh the job list from API
+  /// Check if job matches the search query criteria
+  bool _checkSearchMatch(JobModel job, String query) {
+    if (query.isEmpty) return true;
+
+    return (job.fromLocation?.placeName.toLowerCase().contains(query) ??
+            false) ||
+        (job.toLocation?.placeName.toLowerCase().contains(query) ?? false) ||
+        (job.companyName?.toLowerCase().contains(query) ?? false) ||
+        (job.description?.toLowerCase().contains(query) ?? false);
+  }
+
+  /// Check if job matches the selected job type filter
+  bool _checkJobTypeMatch(JobModel job) {
+    return _selectedJobType == 'All' ||
+        job.jobType.toString().split('.').last == _selectedJobType;
+  }
+
+  /// Refresh the job list from API and reset filtered results
   Future<void> refreshJobList() async {
-    // API call not implemented yet
+    // TODO: Implement API call for job list refresh
     _jobs = [];
     _filteredJobs = [];
-    notifyListeners();
   }
 
-  /// Show filter options
+  /// Display filter options modal for job type selection
   void showFilters() {
-    // Filter modal not implemented yet
+    // TODO: Implement filter modal UI
   }
 
-  /// Add mock jobs for testing (only in development)
-  void addMockJobs() {
-    // Mock data not implemented yet
+  /// Load mock data for development and testing purposes
+  void _loadMockData() {
+    // Mock data implementation will be added here
+    // This method is only called in development mode
   }
 }

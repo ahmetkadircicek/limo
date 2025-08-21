@@ -42,12 +42,15 @@ class LocationService {
       // Get current position
       developer.log('📡 Getting GPS position...', name: _tag);
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       developer.log(
-          '✅ GPS position obtained: ${position.latitude}, ${position.longitude}',
-          name: _tag);
+        '✅ GPS position obtained: ${position.latitude}, ${position.longitude}',
+        name: _tag,
+      );
 
       // Get address from coordinates
       List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -103,8 +106,10 @@ class LocationService {
       final List<LocationModel> allResults = <LocationModel>[];
 
       // Strategy 1: Universal Places API search (no region restriction)
-      final placesResults =
-          await _searchPlacesAPIUniversal(query, currentLocation);
+      final placesResults = await _searchPlacesAPIUniversal(
+        query,
+        currentLocation,
+      );
       allResults.addAll(placesResults);
 
       // Strategy 2: Search near user's location
@@ -119,8 +124,10 @@ class LocationService {
 
       // Strategy 4: Split query into parts (e.g., "2 silver kettle" -> "silver kettle")
       if (query.split(' ').length > 2) {
-        final partialResults =
-            await _searchPartialQuery(query, currentLocation);
+        final partialResults = await _searchPartialQuery(
+          query,
+          currentLocation,
+        );
         allResults.addAll(partialResults);
       }
 
@@ -146,28 +153,38 @@ class LocationService {
         }
       }
 
-      developer.log('✅ Total ${uniqueResults.length} unique results found',
-          name: _tag);
+      developer.log(
+        '✅ Total ${uniqueResults.length} unique results found',
+        name: _tag,
+      );
 
       // Sonuçları relevance'e göre sırala
       uniqueResults.sort((a, b) {
         // Query ile tam eşleşenleri önce getir
         final aExactMatch =
             a.placeName.toLowerCase().contains(query.toLowerCase()) ||
-                a.address.toLowerCase().contains(query.toLowerCase());
+            a.address.toLowerCase().contains(query.toLowerCase());
         final bExactMatch =
             b.placeName.toLowerCase().contains(query.toLowerCase()) ||
-                b.address.toLowerCase().contains(query.toLowerCase());
+            b.address.toLowerCase().contains(query.toLowerCase());
 
         if (aExactMatch && !bExactMatch) return -1;
         if (!aExactMatch && bExactMatch) return 1;
 
         // Kullanıcının konumuna yakın olanları önce getir
         if (currentLocation != null) {
-          final aDistance = _calculateDistance(currentLocation.latitude,
-              currentLocation.longitude, a.latitude, a.longitude);
-          final bDistance = _calculateDistance(currentLocation.latitude,
-              currentLocation.longitude, b.latitude, b.longitude);
+          final aDistance = _calculateDistance(
+            currentLocation.latitude,
+            currentLocation.longitude,
+            a.latitude,
+            a.longitude,
+          );
+          final bDistance = _calculateDistance(
+            currentLocation.latitude,
+            currentLocation.longitude,
+            b.latitude,
+            b.longitude,
+          );
 
           if (aDistance < bDistance) return -1;
           if (aDistance > bDistance) return 1;
@@ -185,10 +202,13 @@ class LocationService {
 
   /// Universal Places API arama (region kısıtlaması olmadan)
   static Future<List<LocationModel>> _searchPlacesAPIUniversal(
-      String query, LocationModel? currentLocation) async {
+    String query,
+    LocationModel? currentLocation,
+  ) async {
     try {
       // Region kısıtlaması olmadan arama yap
-      final String url = '$_placesBaseUrl/textsearch/json'
+      final String url =
+          '$_placesBaseUrl/textsearch/json'
           '?query=${Uri.encodeComponent(query)}'
           '&key=${Constants.googleMapsApiKey}'
           '&language=en' // Universal dil
@@ -196,45 +216,37 @@ class LocationService {
 
       developer.log('🌐 Universal Places API call: $url', name: _tag);
 
-      final response = await http.get(Uri.parse(url)).timeout(
-            const Duration(seconds: 10),
-          );
+      final response = await http.get(Uri.parse(url));
+      final responseBody = response.body;
+      final responseData = json.decode(responseBody);
 
       developer.log(
-          '📡 Universal Places API Response Status: ${response.statusCode}',
-          name: _tag);
+        '📡 Universal Places API Response Status: ${responseData['status'] ?? 'unknown'}',
+        name: _tag,
+      );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        developer.log('📊 Universal Places API Response: ${json.encode(data)}',
-            name: _tag);
+      if (responseData['status'] == 'OK' || responseData['status'] == 'ZERO_RESULTS') {
+        final List results = responseData['results'] ?? [];
+        developer.log(
+          '✅ Universal Places API: ${results.length} results found',
+          name: _tag,
+        );
 
-        if (data['status'] == 'OK' || data['status'] == 'ZERO_RESULTS') {
-          final List results = data['results'] ?? [];
-          developer.log(
-              '✅ Universal Places API: ${results.length} results found',
-              name: _tag);
-
-          return results.map<LocationModel>((place) {
-            final geometry = place['geometry']?['location'];
-            return LocationModel(
-              placeName: place['name'] ?? '',
-              address: place['formatted_address'] ?? '',
-              latitude: geometry?['lat']?.toDouble() ?? 0.0,
-              longitude: geometry?['lng']?.toDouble() ?? 0.0,
-              placeId: place['place_id'] ?? '',
-            );
-          }).toList();
-        } else {
-          developer.log(
-              '⚠️ Universal Places API Status: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}',
-              name: _tag);
-          return [];
-        }
+        return results.map<LocationModel>((place) {
+          final geometry = place['geometry']?['location'];
+          return LocationModel(
+            placeName: place['name'] ?? '',
+            address: place['formatted_address'] ?? '',
+            latitude: geometry?['lat']?.toDouble() ?? 0.0,
+            longitude: geometry?['lng']?.toDouble() ?? 0.0,
+            placeId: place['place_id'] ?? '',
+          );
+        }).toList();
       } else {
         developer.log(
-            '❌ Universal Places API HTTP Error: ${response.statusCode}',
-            name: _tag);
+          '⚠️ Universal Places API Status: ${responseData['status']} - ${responseData['error_message'] ?? 'Unknown error'}',
+          name: _tag,
+        );
         return [];
       }
     } catch (e) {
@@ -245,9 +257,12 @@ class LocationService {
 
   /// Kullanıcının konumuna yakın yerlerde arama
   static Future<List<LocationModel>> _searchNearbyPlaces(
-      String query, LocationModel currentLocation) async {
+    String query,
+    LocationModel currentLocation,
+  ) async {
     try {
-      final String url = '$_placesBaseUrl/nearbysearch/json'
+      final String url =
+          '$_placesBaseUrl/nearbysearch/json'
           '?location=${currentLocation.latitude},${currentLocation.longitude}'
           '&radius=50000' // 50km yarıçap
           '&keyword=${Uri.encodeComponent(query)}'
@@ -256,19 +271,22 @@ class LocationService {
 
       developer.log('🌐 Nearby Search API çağrısı: $url', name: _tag);
 
-      final response = await http.get(Uri.parse(url)).timeout(
-            const Duration(seconds: 10),
-          );
+      final response = await http.get(Uri.parse(url));
+      final responseBody = response.body;
+      final responseData = json.decode(responseBody);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        developer.log('📊 Nearby Search Response: ${json.encode(data)}',
-            name: _tag);
+        developer.log(
+          '📊 Nearby Search Response: ${json.encode(responseData)}',
+          name: _tag,
+        );
 
-        if (data['status'] == 'OK' || data['status'] == 'ZERO_RESULTS') {
-          final List results = data['results'] ?? [];
-          developer.log('✅ Nearby Search: ${results.length} results found',
-              name: _tag);
+        if (responseData['status'] == 'OK' || responseData['status'] == 'ZERO_RESULTS') {
+          final List results = responseData['results'] ?? [];
+          developer.log(
+            '✅ Nearby Search: ${results.length} results found',
+            name: _tag,
+          );
 
           return results.map<LocationModel>((place) {
             final geometry = place['geometry']?['location'];
@@ -291,30 +309,33 @@ class LocationService {
 
   /// Universal Geocoding API arama
   static Future<List<LocationModel>> _searchGeocodingAPIUniversal(
-      String query) async {
+    String query,
+  ) async {
     try {
-      final String url = '$_geocodingBaseUrl/json'
+      final String url =
+          '$_geocodingBaseUrl/json'
           '?address=${Uri.encodeComponent(query)}'
           '?key=${Constants.googleMapsApiKey}'
           '&language=en'; // Universal dil
 
       developer.log('🌐 Universal Geocoding API çağrısı: $url', name: _tag);
 
-      final response = await http.get(Uri.parse(url)).timeout(
-            const Duration(seconds: 10),
-          );
+      final response = await http.get(Uri.parse(url));
+      final responseBody = response.body;
+      final responseData = json.decode(responseBody);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
         developer.log(
-            '📊 Universal Geocoding API Response: ${json.encode(data)}',
-            name: _tag);
+          '📊 Universal Geocoding API Response: ${json.encode(responseData)}',
+          name: _tag,
+        );
 
-        if (data['status'] == 'OK' || data['status'] == 'ZERO_RESULTS') {
-          final List results = data['results'] ?? [];
+        if (responseData['status'] == 'OK' || responseData['status'] == 'ZERO_RESULTS') {
+          final List results = responseData['results'] ?? [];
           developer.log(
-              '✅ Universal Geocoding API: ${results.length} results found',
-              name: _tag);
+            '✅ Universal Geocoding API: ${results.length} results found',
+            name: _tag,
+          );
 
           return results.map<LocationModel>((result) {
             final geometry = result['geometry']?['location'];
@@ -352,7 +373,9 @@ class LocationService {
 
   /// Query'yi parçalara bölerek arama
   static Future<List<LocationModel>> _searchPartialQuery(
-      String query, LocationModel? currentLocation) async {
+    String query,
+    LocationModel? currentLocation,
+  ) async {
     try {
       final words = query.split(' ').where((word) => word.length > 2).toList();
       if (words.isEmpty) return [];
@@ -363,10 +386,14 @@ class LocationService {
 
       developer.log('🔍 Partial query search: "$partialQuery"', name: _tag);
 
-      final results =
-          await _searchPlacesAPIUniversal(partialQuery, currentLocation);
-      developer.log('✅ Partial query: ${results.length} results found',
-          name: _tag);
+      final results = await _searchPlacesAPIUniversal(
+        partialQuery,
+        currentLocation,
+      );
+      developer.log(
+        '✅ Partial query: ${results.length} results found',
+        name: _tag,
+      );
 
       return results;
     } catch (e) {
@@ -377,23 +404,32 @@ class LocationService {
 
   /// Sadece anahtar kelimelerle arama
   static Future<List<LocationModel>> _searchByKeywords(
-      String query, LocationModel? currentLocation) async {
+    String query,
+    LocationModel? currentLocation,
+  ) async {
     try {
       // Sayıları ve kısa kelimeleri çıkar
-      final keywords = query
-          .split(' ')
-          .where((word) => word.length > 3 && !RegExp(r'^\d+$').hasMatch(word))
-          .toList();
+      final keywords =
+          query
+              .split(' ')
+              .where(
+                (word) => word.length > 3 && !RegExp(r'^\d+$').hasMatch(word),
+              )
+              .toList();
 
       if (keywords.isEmpty) return [];
 
       final keywordQuery = keywords.join(' ');
       developer.log('🔍 Keyword search: "$keywordQuery"', name: _tag);
 
-      final results =
-          await _searchPlacesAPIUniversal(keywordQuery, currentLocation);
-      developer.log('✅ Keyword search: ${results.length} results found',
-          name: _tag);
+      final results = await _searchPlacesAPIUniversal(
+        keywordQuery,
+        currentLocation,
+      );
+      developer.log(
+        '✅ Keyword search: ${results.length} results found',
+        name: _tag,
+      );
 
       return results;
     } catch (e) {
@@ -404,13 +440,18 @@ class LocationService {
 
   /// İki koordinat arasındaki mesafeyi hesapla (km)
   static double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2) {
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const double earthRadius = 6371; // km
 
     final dLat = _toRadians(lat2 - lat1);
     final dLon = _toRadians(lon2 - lon1);
 
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.sin(_toRadians(lat1)) *
             math.sin(_toRadians(lat2)) *
             math.sin(dLon / 2) *
@@ -432,22 +473,24 @@ class LocationService {
     try {
       developer.log('🔍 Getting place details: $placeId', name: _tag);
 
-      final String url = '$_placesBaseUrl/details/json'
+      final String url =
+          '$_placesBaseUrl/details/json'
           '?place_id=$placeId'
           '&key=${Constants.googleMapsApiKey}'
           '&language=en';
 
-      final response = await http.get(Uri.parse(url)).timeout(
-            const Duration(seconds: 10),
-          );
+      final response = await http.get(Uri.parse(url));
+      final responseBody = response.body;
+      final responseData = json.decode(responseBody);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        developer.log('📊 Place Details Response: ${json.encode(data)}',
-            name: _tag);
+        developer.log(
+          '📊 Place Details Response: ${json.encode(responseData)}',
+          name: _tag,
+        );
 
-        if (data['status'] == 'OK') {
-          final result = data['result'];
+        if (responseData['status'] == 'OK') {
+          final result = responseData['result'];
 
           if (result != null) {
             final geometry = result['geometry']?['location'];
@@ -459,17 +502,23 @@ class LocationService {
               placeId: placeId,
             );
 
-            developer.log('✅ Place details obtained: ${location.placeName}',
-                name: _tag);
+            developer.log(
+              '✅ Place details obtained: ${location.placeName}',
+              name: _tag,
+            );
             return location;
           }
         } else {
-          developer.log('⚠️ Place Details API Status: ${data['status']}',
-              name: _tag);
+          developer.log(
+            '⚠️ Place Details API Status: ${responseData['status']}',
+            name: _tag,
+          );
         }
       } else {
-        developer.log('❌ Place Details HTTP Error: ${response.statusCode}',
-            name: _tag);
+        developer.log(
+          '❌ Place Details HTTP Error: ${response.statusCode}',
+          name: _tag,
+        );
       }
 
       return null;
@@ -481,11 +530,14 @@ class LocationService {
 
   /// Get address from coordinates
   static Future<LocationModel?> getAddressFromCoordinates(
-      double latitude, double longitude) async {
+    double latitude,
+    double longitude,
+  ) async {
     try {
       developer.log(
-          '📍 Getting address from coordinates: $latitude, $longitude',
-          name: _tag);
+        '📍 Getting address from coordinates: $latitude, $longitude',
+        name: _tag,
+      );
 
       List<Placemark> placemarks = await placemarkFromCoordinates(
         latitude,
@@ -521,8 +573,10 @@ class LocationService {
       developer.log('📍 Default location created', name: _tag);
       return location;
     } catch (e) {
-      developer.log('💥 Error getting address from coordinates: $e',
-          name: _tag);
+      developer.log(
+        '💥 Error getting address from coordinates: $e',
+        name: _tag,
+      );
       return null;
     }
   }
@@ -535,11 +589,15 @@ class LocationService {
       final prefs = await SharedPreferences.getInstance();
       final locationJson = location.toJson();
       final success = await prefs.setString(
-          'last_selected_location', json.encode(locationJson));
+        'last_selected_location',
+        json.encode(locationJson),
+      );
 
       if (success) {
-        developer.log('💾 Location saved to storage: ${location.placeName}',
-            name: _tag);
+        developer.log(
+          '💾 Location saved to storage: ${location.placeName}',
+          name: _tag,
+        );
       } else {
         developer.log('❌ Failed to save location to storage', name: _tag);
       }
@@ -562,16 +620,19 @@ class LocationService {
             json.decode(locationString) as Map<String, dynamic>;
         final location = LocationModel.fromJson(locationJson);
         developer.log(
-            '📱 Location retrieved from storage: ${location.placeName}',
-            name: _tag);
+          '📱 Location retrieved from storage: ${location.placeName}',
+          name: _tag,
+        );
         return location;
       }
 
       developer.log('📱 No location found in storage', name: _tag);
       return null;
     } catch (e) {
-      developer.log('💥 Error retrieving location from storage: $e',
-          name: _tag);
+      developer.log(
+        '💥 Error retrieving location from storage: $e',
+        name: _tag,
+      );
       return null;
     }
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class NavigationService {
   static NavigationService? _instance;
@@ -13,76 +12,42 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   /// Go back to previous route
-  dynamic goBack([dynamic popValue]) {
+  void goBack([dynamic popValue]) {
     final context = navigatorKey.currentContext;
     if (context != null) {
       if (popValue != null) {
-        context.pop(popValue);
+        Navigator.of(context).pop(popValue);
       } else {
-        context.pop();
+        Navigator.of(context).pop();
       }
     }
   }
 
-  /// Navigate to a named route
-  Future<dynamic> navigateToScreen(Widget page, {dynamic arguments}) async {
+  /// Navigate to a screen
+  Future<dynamic> navigateToScreen(Widget page) async {
     final context = navigatorKey.currentContext;
     if (context != null) {
-      // For backward compatibility, we'll use push for now
-      // In the future, this can be updated to use go_router methods
-      return Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => page),
-      );
+      return Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => page));
     }
   }
 
   /// Replace current screen
-  Future<dynamic> replaceScreen(Widget page, {dynamic arguments}) async {
+  Future<dynamic> replaceScreen(Widget page) async {
     final context = navigatorKey.currentContext;
     if (context != null) {
-      return Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => page),
-      );
+      return Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => page));
     }
   }
 
   /// Pop to first route
-  Future<dynamic> popToFirst() async {
+  void popToFirst() {
     final context = navigatorKey.currentContext;
     if (context != null) {
-      return Navigator.of(context).popUntil((route) => route.isFirst);
-    }
-  }
-
-  /// Navigate to a named route using go_router
-  void goNamed(String name, {Object? extra, Map<String, String> queryParameters = const {}}) {
-    final context = navigatorKey.currentContext;
-    if (context != null) {
-      context.goNamed(name, extra: extra, queryParameters: queryParameters);
-    }
-  }
-
-  /// Push a named route using go_router
-  void pushNamed(String name, {Object? extra, Map<String, String> queryParameters = const {}}) {
-    final context = navigatorKey.currentContext;
-    if (context != null) {
-      context.pushNamed(name, extra: extra, queryParameters: queryParameters);
-    }
-  }
-
-  /// Go to home route
-  void goHome() {
-    final context = navigatorKey.currentContext;
-    if (context != null) {
-      context.go('/home');
-    }
-  }
-
-  /// Go to login route
-  void goLogin() {
-    final context = navigatorKey.currentContext;
-    if (context != null) {
-      context.go('/login');
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 }

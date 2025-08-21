@@ -13,6 +13,7 @@ class ProfileInfoCard extends StatelessWidget {
   final Color? iconColor;
   final Color? labelColor;
   final Color? valueColor;
+  final VoidCallback? onTap;
 
   const ProfileInfoCard({
     super.key,
@@ -23,11 +24,12 @@ class ProfileInfoCard extends StatelessWidget {
     this.iconColor,
     this.labelColor,
     this.valueColor,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.surfaceContainer,
@@ -39,11 +41,7 @@ class ProfileInfoCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: iconColor ?? context.primary,
-            size: 20,
-          ),
+          Icon(icon, color: iconColor ?? context.primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -53,10 +51,7 @@ class ProfileInfoCard extends StatelessWidget {
                   label,
                   color: labelColor ?? context.onSurface.withValues(alpha: 0.6),
                 ),
-                AppText.caption(
-                  value,
-                  color: valueColor ?? context.onSurface,
-                ),
+                AppText.caption(value, color: valueColor ?? context.onSurface),
               ],
             ),
           ),
@@ -68,19 +63,26 @@ class ProfileInfoCard extends StatelessWidget {
                 color: context.primary.withValues(alpha: 0.1),
                 borderRadius: GeneralConstants.borderRadiusRound,
               ),
-              child: AppText.caption(
-                badgeText!,
-                color: context.primary,
-              ),
+              child: AppText.caption(badgeText!, color: context.primary),
             ),
-          const SizedBox(width: 8),
-          Icon(
-            Icons.chevron_right,
-            color: context.onSurface.withValues(alpha: 0.6),
-            size: 20,
-          ),
+          if (onTap != null) ...[
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              color: context.onSurface.withValues(alpha: 0.6),
+              size: 20,
+            ),
+          ],
         ],
       ),
+    );
+
+    if (onTap == null) return card;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: GeneralConstants.borderRadius,
+      child: card,
     );
   }
 }

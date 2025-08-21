@@ -132,7 +132,7 @@ class AppTheme {
     popupMenuTheme: PopupMenuThemeData(
       color: DesignTokens.surface100,
       elevation: DesignTokens.spacing2,
-      shadowColor: Colors.black.withOpacity(0.08),
+      shadowColor: Colors.black.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         side: const BorderSide(color: DesignTokens.surface200, width: 1.0),
@@ -148,7 +148,9 @@ class AppTheme {
       style: MenuStyle(
         backgroundColor: WidgetStateProperty.all(DesignTokens.surface100),
         elevation: WidgetStateProperty.all(DesignTokens.spacing2),
-        shadowColor: WidgetStateProperty.all(Colors.black.withOpacity(0.08)),
+        shadowColor: WidgetStateProperty.all(
+          Colors.black.withValues(alpha: 0.08),
+        ),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -198,7 +200,7 @@ class AppTheme {
       headerHelpStyle: GoogleFonts.montserrat(
         fontSize: DesignTokens.bodySmall.fontSize,
         fontWeight: FontWeight.w400,
-        color: DesignTokens.textInverse.withOpacity(0.7),
+        color: DesignTokens.textInverse.withValues(alpha: 0.7),
         height: DesignTokens.bodySmall.height,
       ),
       dayStyle: GoogleFonts.montserrat(

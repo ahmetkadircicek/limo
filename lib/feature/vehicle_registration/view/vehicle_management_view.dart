@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/constants/general_constants.dart'
     show GeneralConstants;
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
+import 'package:limo/feature/document_upload/view/document_upload_view.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
-import 'package:limo/feature/vehicle_registration/view/document_upload_view.dart';
 import 'package:limo/shared/app_components.dart';
 
 class VehicleManagementView extends StatefulWidget {
@@ -47,7 +47,6 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
         _vehicles = [];
       });
     } catch (e) {
-
       _showErrorSnackBar('Error loading vehicles: $e');
     } finally {
       setState(() {
@@ -361,8 +360,7 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
                       _buildInfoRow(
                         icon: Icons.palette,
                         label: 'Colors',
-                        value:
-                            'Color not specified',
+                        value: 'Color not specified',
                         color: context.secondary,
                       ),
                     ],
@@ -571,19 +569,13 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
   }
 
   void _addNewVehicle() {
-
-    context.push('/vehicle-registration').then((_) {
-      _loadVehicles();
-    });
+    // TODO: Navigate to vehicle registration page
+    // For now, just show a message or handle differently
   }
 
   void _editVehicle(VehicleModel vehicle) {
-    debugPrint(
-      "Navigation to Vehicle Registration (Edit) from Vehicle Management",
-    );
-    context.push('/vehicle-registration', extra: vehicle).then((_) {
-      _loadVehicles();
-    });
+    // TODO: Navigate to vehicle registration page
+    // For now, just show a message or handle differently
   }
 
   void _deleteVehicle(int index) {
@@ -599,12 +591,12 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
           ),
           actions: [
             TextButton(
-              onPressed: () => context.pop(),
+              onPressed: () => Navigator.of(context).pop(),
               child: const AppText.body('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                context.pop();
+                Navigator.of(context).pop();
                 _confirmDeleteVehicle(index);
               },
               style: TextButton.styleFrom(foregroundColor: context.error),
@@ -640,15 +632,20 @@ class _VehicleManagementViewState extends State<VehicleManagementView> {
   }
 
   void _navigateToDocumentUpload(String documentType, String licencePlate) {
-    debugPrint(
-      "Navigation to Document Upload for $documentType for $licencePlate",
-    );
+    // Map document type to DocumentUploadPurpose
+    DocumentUploadPurpose purpose;
+    if (documentType == 'profile_photo') {
+      purpose = DocumentUploadPurpose.profilePhoto;
+    } else {
+      purpose = DocumentUploadPurpose.driverLicense;
+    }
+    
     Navigator.of(context)
         .push(
           MaterialPageRoute(
             builder:
                 (context) => DocumentUploadView(
-                  documentType: documentType,
+                  purpose: purpose,
                   vehiclePlate: licencePlate,
                 ),
           ),

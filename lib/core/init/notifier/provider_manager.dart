@@ -1,5 +1,8 @@
 import 'package:limo/core/providers/app_state_provider.dart';
+import 'package:limo/feature/document_upload/viewmodel/document_upload_view_model.dart';
 import 'package:limo/feature/home/viewmodel/home_view_model.dart';
+import 'package:limo/feature/job_details/viewmodel/job_details_view_model.dart';
+import 'package:limo/feature/job_list/viewmodel/job_list_view_model.dart';
 import 'package:limo/feature/login/viewmodel/login_view_model.dart';
 import 'package:limo/feature/profile/viewmodel/profile_view_model.dart';
 import 'package:limo/feature/splash/viewmodel/splash_view_model.dart';
@@ -17,15 +20,19 @@ class ProviderManager {
   ProviderManager._init();
 
   List<SingleChildWidget> get providers => [
-        // Core providers
-        ChangeNotifierProvider(create: (context) => AppStateProvider()),
+    // Core providers
+    ChangeNotifierProvider(create: (context) => AppStateProvider()),
 
-        // Feature ViewModels
-        ChangeNotifierProvider(create: (context) => SplashViewModel()),
-        ChangeNotifierProvider(create: (context) => LoginViewModel()),
-        ChangeNotifierProvider(create: (context) => HomeViewModel()),
-        ChangeNotifierProvider(
-            create: (context) => VehicleRegistrationViewModel(context)),
-        ChangeNotifierProvider(create: (context) => ProfileViewModel()),
-      ];
+    // Feature ViewModels
+    ChangeNotifierProvider(create: (context) => SplashViewModel()),
+    ChangeNotifierProvider(create: (context) => LoginViewModel()),
+    ChangeNotifierProvider(create: (context) => HomeViewModel()),
+    Provider(create: (context) => JobListViewModel()),
+    Provider(create: (context) => JobDetailsViewModel()),
+    ChangeNotifierProvider(
+      create: (context) => VehicleRegistrationViewModel(context),
+    ),
+    Provider(create: (context) => ProfileViewModel()),
+    ChangeNotifierProvider(create: (context) => DocumentUploadViewModel()),
+  ];
 }

@@ -11,7 +11,11 @@ class LogoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       spacing: context.spacingS,
-      children: [_buildAppLogo(context), _buildWelcomeMessage(context)],
+      children: [
+        SizedBox(height: context.spacingXxxl),
+        _buildAppLogo(context),
+        _buildWelcomeMessage(context),
+      ],
     );
   }
 

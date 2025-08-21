@@ -122,9 +122,11 @@ class AppInfoCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final String? subtitle;
   final Color? iconColor;
   final Color? labelColor;
   final Color? valueColor;
+  final Color? subtitleColor;
   final Color? backgroundColor;
   final VoidCallback? onTap;
   final Widget? trailing;
@@ -134,9 +136,11 @@ class AppInfoCard extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
+    this.subtitle,
     this.iconColor,
     this.labelColor,
     this.valueColor,
+    this.subtitleColor,
     this.backgroundColor,
     this.onTap,
     this.trailing,
@@ -174,6 +178,13 @@ class AppInfoCard extends StatelessWidget {
                   value,
                   color: valueColor ?? context.onSurface,
                 ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 4),
+                  AppText.caption(
+                    subtitle!,
+                    color: subtitleColor ?? context.onSurface.withValues(alpha: 0.5),
+                  ),
+                ],
               ],
             ),
           ),

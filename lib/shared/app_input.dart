@@ -262,7 +262,7 @@ class AppInput extends StatelessWidget {
 
   Widget _buildDropdown(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: dropdownValue,
+      initialValue: dropdownValue,
       onChanged: enabled ? onDropdownChanged : null,
       validator: validator,
       isExpanded: true,

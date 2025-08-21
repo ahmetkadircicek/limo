@@ -11,6 +11,18 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
+    // Load environment variables
+    def envFile = file("../.env")
+    def env = [:]
+    if (envFile.exists()) {
+        envFile.eachLine { line ->
+            if (line.contains('=')) {
+                def (key, value) = line.split('=', 2)
+                env[key.trim()] = value.trim()
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -29,6 +41,12 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Environment variables for manifest
+        manifestPlaceholders = [
+            GOOGLE_MAPS_API_KEY: env.get('GOOGLE_MAPS_API_KEY', ''),
+            GOOGLE_CLIENT_ID: env.get('GOOGLE_CLIENT_ID', '')
+        ]
     }
 
     buildTypes {

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/feature/job_list/model/job_model.dart';
-import 'package:limo/feature/job_list/viewmodel/job_list_view_model.dart';
+import 'package:limo/feature/job_list/view/job_list_mixin.dart';
 import 'package:limo/feature/job_list/widgets/job_card_widget.dart';
 import 'package:limo/feature/job_list/widgets/job_list_header_widget.dart';
-import 'package:provider/provider.dart';
 
 /// Job list view displaying available jobs with search and filtering capabilities
 class JobListView extends StatefulWidget {
@@ -17,73 +14,56 @@ class JobListView extends StatefulWidget {
   State<JobListView> createState() => _JobListViewState();
 }
 
-class _JobListViewState extends State<JobListView> with WidgetsBindingObserver {
-  final TextEditingController _searchController = TextEditingController();
-
+class _JobListViewState extends State<JobListView>
+    with WidgetsBindingObserver, JobListMixin {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    initializeJobListMixin();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _searchController.dispose();
+    disposeJobListMixin();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => JobListViewModel(),
-      child: Consumer<JobListViewModel>(
-        builder: (context, viewModel, child) {
-          // Initialize the ViewModel when first built
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (viewModel.jobs.isEmpty) {
-              viewModel.initializeJobList();
-            }
-          });
+    initializeViewModelIfNeeded();
+    setupSearchListener();
 
-          // Add search listener
-          _searchController.addListener(() {
-            viewModel.filterJobs(_searchController.text);
-          });
+    return _buildMainContainer(context);
+  }
 
-          return Container(
-            color: context.surfaceContainer,
-            child: RefreshIndicator(
-              onRefresh: () async {
-                await viewModel.refreshJobList();
-                widget.onRefresh?.call();
-              },
-              child: CustomScrollView(
-                slivers: [
-                  _buildHeaderSection(viewModel),
-                  _buildJobListSection(viewModel),
-                ],
-              ),
-            ),
-          );
-        },
+  /// Build the main container with refresh indicator and scroll view
+  Widget _buildMainContainer(BuildContext context) {
+    return Container(
+      color: context.surfaceContainer,
+      child: RefreshIndicator(
+        onRefresh: () => handleRefresh(widget.onRefresh),
+        child: CustomScrollView(
+          slivers: [_buildHeaderSection(), _buildJobListSection()],
+        ),
       ),
     );
   }
 
   /// Build the header section with search and filters
-  Widget _buildHeaderSection(JobListViewModel viewModel) {
+  Widget _buildHeaderSection() {
     return SliverToBoxAdapter(
       child: JobListHeaderWidget(
         jobCount: viewModel.jobs.length,
-        searchController: _searchController,
+        searchController: searchController,
         onFilterTap: viewModel.showFilters,
       ),
     );
   }
 
   /// Build the job list section with proper padding
-  Widget _buildJobListSection(JobListViewModel viewModel) {
+  Widget _buildJobListSection() {
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(
         context.spacingL,
@@ -96,16 +76,10 @@ class _JobListViewState extends State<JobListView> with WidgetsBindingObserver {
           final job = viewModel.filteredJobs[index];
           return JobCardWidget(
             job: job,
-            onTap: () => _navigateToJobDetails(job),
+            onTap: () => navigateToJobDetails(context, job),
           );
         }, childCount: viewModel.filteredJobs.length),
       ),
     );
-  }
-
-  /// Navigate to job details page
-  void _navigateToJobDetails(JobModel job) {
-    debugPrint("Navigation to Job Details from Job List");
-    context.push('/job-details', extra: job);
   }
 }

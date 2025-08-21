@@ -1,134 +1,161 @@
-/// User model for storing authentication and profile information
+/// User model for storing essential authentication and profile information
 class UserModel {
-  final String id;
+  final String userId;
+  final String provider;
+  final String providerUserId;
   final String email;
-  final String displayName;
-  final String? photoUrl;
-  final DateTime createdAt;
-  final DateTime lastLoginAt;
+  final String? phone;
+  final String userName;
   final String? companyName;
-  final String? companyAddress;
-  final String? companyPhone;
-  final String? companyWebsite;
-  final String? companyTaxNumber;
-  final bool hasDriverLicense;
+  final DateTime createdAt;
+  final DateTime lastLogin;
+  final String? accessToken;
+  final bool isActive;
+  final String? userPhoto; // Profile image as base64 string
+  final String? driverLicense; // Driver license document as base64 string
+  final bool approved;
 
   const UserModel({
-    required this.id,
+    required this.userId,
+    required this.provider,
+    required this.providerUserId,
     required this.email,
-    required this.displayName,
-    this.photoUrl,
-    required this.createdAt,
-    required this.lastLoginAt,
+    this.phone,
+    required this.userName,
     this.companyName,
-    this.companyAddress,
-    this.companyPhone,
-    this.companyWebsite,
-    this.companyTaxNumber,
-    this.hasDriverLicense = false,
+    required this.createdAt,
+    required this.lastLogin,
+    this.accessToken,
+    this.isActive = true,
+    this.userPhoto,
+    this.driverLicense,
+    this.approved = false,
   });
 
   /// Create user from Google authentication data
   factory UserModel.fromGoogleAuth({
-    required String id,
+    required String providerUserId,
     required String email,
     required String displayName,
     String? photoUrl,
   }) {
     final now = DateTime.now();
     return UserModel(
-      id: id,
+      userId: '',
+      provider: 'google',
+      providerUserId: providerUserId,
       email: email,
-      displayName: displayName,
-      photoUrl: photoUrl,
+      userName: displayName,
+      userPhoto: photoUrl, // Use Google profile photo as base64
       createdAt: now,
-      lastLoginAt: now,
+      lastLogin: now,
+    );
+  }
+
+  /// Create user from Apple authentication data
+  factory UserModel.fromAppleAuth({
+    required String providerUserId,
+    String? email,
+    String? displayName,
+    String? photoUrl,
+  }) {
+    final now = DateTime.now();
+    return UserModel(
+      userId: '',
+      provider: 'apple',
+      providerUserId: providerUserId,
+      email: email ?? 'no-email@apple.com',
+      userName: displayName ?? 'Apple User',
+      userPhoto: photoUrl,
+      createdAt: now,
+      lastLogin: now,
     );
   }
 
   /// Create user from JSON data
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      provider: json['provider'] as String,
+      providerUserId: json['provider_user_id'] as String,
       email: json['email'] as String,
-      displayName: json['displayName'] as String,
-      photoUrl: json['photoUrl'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      lastLoginAt: DateTime.parse(json['lastLoginAt'] as String),
-      companyName: json['companyName'] as String?,
-      companyAddress: json['companyAddress'] as String?,
-      companyPhone: json['companyPhone'] as String?,
-      companyWebsite: json['companyWebsite'] as String?,
-      companyTaxNumber: json['companyTaxNumber'] as String?,
-      hasDriverLicense: json['hasDriverLicense'] as bool? ?? false,
+      phone: json['phone'] as String?,
+      userName: json['user_name'] as String,
+      companyName: json['company_name'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      lastLogin: DateTime.parse(json['last_login'] as String),
+      accessToken: json['access_token'] as String?,
+      isActive: json['is_active'] as bool? ?? true,
+      userPhoto: json['user_photo'] as String?,
+      driverLicense: json['driver_lisans'] as String?,
+      approved: json['approved'] == 'true' || json['approved'] == true,
     );
   }
 
-  /// Convert user to JSON data
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'user_id': userId,
+      'provider': provider,
+      'provider_user_id': providerUserId,
       'email': email,
-      'displayName': displayName,
-      'photoUrl': photoUrl,
-      'createdAt': createdAt.toIso8601String(),
-      'lastLoginAt': lastLoginAt.toIso8601String(),
-      'companyName': companyName,
-      'companyAddress': companyAddress,
-      'companyPhone': companyPhone,
-      'companyWebsite': companyWebsite,
-      'companyTaxNumber': companyTaxNumber,
-      'hasDriverLicense': hasDriverLicense,
+      'phone': phone,
+      'user_name': userName,
+      'company_name': companyName,
+      'created_at': createdAt.toIso8601String(),
+      'last_login': lastLogin.toIso8601String(),
+      'access_token': accessToken,
+      'is_active': isActive,
+      'user_photo': userPhoto,
+      'driver_lisans': driverLicense,
+      'approved': approved,
     };
   }
 
-  /// Create a copy of user with updated fields
   UserModel copyWith({
-    String? id,
+    String? userId,
+    String? provider,
+    String? providerUserId,
     String? email,
-    String? displayName,
-    String? photoUrl,
-    DateTime? createdAt,
-    DateTime? lastLoginAt,
+    String? phone,
+    String? userName,
     String? companyName,
-    String? companyAddress,
-    String? companyPhone,
-    String? companyWebsite,
-    String? companyTaxNumber,
-    bool? hasDriverLicense,
+    DateTime? createdAt,
+    DateTime? lastLogin,
+    String? accessToken,
+    bool? isActive,
+    String? userPhoto,
+    String? driverLicense,
+    bool? approved,
   }) {
     return UserModel(
-      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      provider: provider ?? this.provider,
+      providerUserId: providerUserId ?? this.providerUserId,
       email: email ?? this.email,
-      displayName: displayName ?? this.displayName,
-      photoUrl: photoUrl ?? this.photoUrl,
-      createdAt: createdAt ?? this.createdAt,
-      lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      phone: phone ?? this.phone,
+      userName: userName ?? this.userName,
       companyName: companyName ?? this.companyName,
-      companyAddress: companyAddress ?? this.companyAddress,
-      companyPhone: companyPhone ?? this.companyPhone,
-      companyWebsite: companyWebsite ?? this.companyWebsite,
-      companyTaxNumber: companyTaxNumber ?? this.companyTaxNumber,
-      hasDriverLicense: hasDriverLicense ?? this.hasDriverLicense,
+      createdAt: createdAt ?? this.createdAt,
+      lastLogin: lastLogin ?? this.lastLogin,
+      accessToken: accessToken ?? this.accessToken,
+      isActive: isActive ?? this.isActive,
+      userPhoto: userPhoto ?? this.userPhoto,
+      driverLicense: driverLicense ?? this.driverLicense,
+      approved: approved ?? this.approved,
     );
-  }
-
-  /// Update last login time
-  UserModel updateLastLogin() {
-    return copyWith(lastLoginAt: DateTime.now());
   }
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl, companyName: $companyName, companyAddress: $companyAddress, companyPhone: $companyPhone, companyWebsite: $companyWebsite, companyTaxNumber: $companyTaxNumber, hasDriverLicense: $hasDriverLicense)';
+    return 'UserModel(userId: $userId, provider: $provider, providerUserId: $providerUserId, email: $email, phone: $phone, userName: $userName, companyName: $companyName, accessToken: ${accessToken != null ? "***" : null}, isActive: $isActive, userPhoto: ${userPhoto != null ? "***" : null}, driverLicense: ${driverLicense != null ? "***" : null}, approved: $approved)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is UserModel && other.id == id;
+    return other is UserModel && other.userId == userId;
   }
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => userId.hashCode;
 }

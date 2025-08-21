@@ -90,18 +90,7 @@ class JobListHeaderWidget extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Filtering feature will be added soon'),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          );
-        },
+        onTap: onFilterTap,
         borderRadius: context.radiusMedium,
         child: Container(
           padding: context.paddingM,

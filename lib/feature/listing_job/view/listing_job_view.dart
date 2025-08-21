@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/constants/general_constants.dart';
@@ -610,16 +610,8 @@ class _ListingJobViewState extends State<ListingJobView> {
   }) async {
     
 
-    // Navigate to location picker and get the result
-    final result = await context.push(
-      '/location-picker',
-      extra: {'title': title},
-    );
-
-    // Handle the result
-    if (result != null && result is LocationModel) {
-      onLocationSelected(result);
-    }
+    // TODO: Navigate to location picker page
+    // For now, just show a message or handle differently
   }
 
   // Create job with validation and service call

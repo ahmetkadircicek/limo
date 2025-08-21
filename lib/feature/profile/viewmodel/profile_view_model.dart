@@ -1,234 +1,161 @@
-import 'package:flutter/material.dart';
+import 'package:limo/core/models/user_model.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
+import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/feature/profile/services/profile_image_service.dart';
+import 'package:limo/feature/profile/services/user_update_service.dart';
 
 /// Profile ViewModel for managing profile data and state
-class ProfileViewModel extends ChangeNotifier {
-  // Controllers
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController licenseController = TextEditingController();
-  final TextEditingController companyNameController = TextEditingController();
-  final TextEditingController companyContactController =
-      TextEditingController();
-
-  // State variables
+class ProfileViewModel {
   bool _isLoading = false;
-  bool _isEditing = false;
   String? _errorMessage;
   String? _successMessage;
-  final List<Map<String, String>> _vehicles = [];
 
-  // Original values for reset functionality
-  String _originalPhone = '';
-  String _originalCompanyName = '';
-  String _originalCompanyContact = '';
-
-  // AppStateProvider reference
-  AppStateProvider? _appStateProvider;
-
-  // Getters
   bool get isLoading => _isLoading;
-  bool get isEditing => _isEditing;
-  List<Map<String, String>> get vehicles => _vehicles;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
 
-  /// Set the AppStateProvider for profile updates
-  void setAppStateProvider(AppStateProvider provider) {
-    _appStateProvider = provider;
-  }
-
-  /// Initialize the ViewModel with user data
-  Future<void> initialize(AppStateProvider appState) async {
+  /// Update user profile with new data
+  Future<void> updateUser(
+    UserModel updatedUser,
+    AppStateProvider appState,
+  ) async {
     _setLoading(true);
-
-    try {
-      // Set the AppStateProvider reference
-      _appStateProvider = appState;
-
-      // Initialize with empty data
-      addressController.text = '';
-      licenseController.text = '';
-      _vehicles.clear();
-
-      // Clear all demo data - leave fields empty
-      phoneController.text = '';
-      companyNameController.text = '';
-      companyContactController.text = '';
-
-      // Store original values (empty)
-      _originalPhone = phoneController.text;
-      _originalCompanyName = companyNameController.text;
-      _originalCompanyContact = companyContactController.text;
-
-      _clearMessages();
-    } catch (e) {
-      _setError('Failed to initialize profile data: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  /// Start editing mode
-  void startEditing() {
-    // Store current values as original values
-    _originalPhone = phoneController.text;
-    _originalCompanyName = companyNameController.text;
-    _originalCompanyContact = companyContactController.text;
-
-    _isEditing = true;
-    notifyListeners();
-  }
-
-  /// Cancel editing and reset to original values
-  void cancelEditing() {
-    _isEditing = false;
     _clearMessages();
 
-    // Reset to original values
-    phoneController.text = _originalPhone;
-    companyNameController.text = _originalCompanyName;
-    companyContactController.text = _originalCompanyContact;
-
-    notifyListeners();
-  }
-
-  /// Save profile changes
-  Future<void> saveChanges() async {
-    if (!_isEditing) return;
-
-    _setLoading(true);
-
     try {
-      // Validate required fields
-      if (!_validateRequiredFields()) {
-        _setError('Please fill in all required fields');
-        return;
+      final backendResponse = await UserUpdateService.updateUser(updatedUser);
+
+      if (backendResponse != null) {
+        final updatedUserFromBackend = UserModel.fromJson(backendResponse);
+        appState.updateCurrentUser(updatedUserFromBackend);
+
+        _setSuccess('Profile updated successfully');
+      } else {
+        _setError('Failed to update profile. Please try again.');
       }
-
-      // API call not implemented yet
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Update user profile in AppStateProvider
-      if (_appStateProvider != null) {
-        _appStateProvider!.updateUserProfile(
-          companyName: companyNameController.text.trim(),
-          companyPhone: companyContactController.text.trim(),
-          // Note: phone number is not part of UserModel yet, so we'll skip it for now
-        );
-      }
-
-      // Update user data
-      _setSuccess('Profile updated successfully');
-      _isEditing = false;
-
-      // Store new values as original values
-      _originalPhone = phoneController.text;
-      _originalCompanyName = companyNameController.text;
-      _originalCompanyContact = companyContactController.text;
-
-      notifyListeners();
     } catch (e) {
+      LoggerService.error(
+        'Error updating user profile: $e',
+        tag: 'PROFILE_VIEWMODEL',
+      );
       _setError('Failed to save profile: $e');
     } finally {
       _setLoading(false);
     }
   }
 
-  /// Add a new vehicle to the list
-  void addVehicle(Map<String, String> vehicle) {
-    _vehicles.add(vehicle);
-    notifyListeners();
-  }
+  /// Update user profile image from gallery
+  Future<void> updateProfileImageFromGallery(AppStateProvider appState) async {
+    _setLoading(true);
+    _clearMessages();
 
-  /// Remove a vehicle from the list
-  void removeVehicle(int index) {
-    if (index >= 0 && index < _vehicles.length) {
-      _vehicles.removeAt(index);
-      notifyListeners();
+    try {
+      final imageFile = await ProfileImageService.pickImageFromGallery();
+
+      if (imageFile == null) {
+        _setError('No image selected');
+        return;
+      }
+
+      // Validate image file
+      if (!ProfileImageService.isValidImageFile(imageFile)) {
+        _setError('Please select a valid image file (JPG, PNG, WebP)');
+        return;
+      }
+
+      // Check file size
+      if (!ProfileImageService.isFileSizeAcceptable(imageFile)) {
+        _setError('Image file size must be less than 5MB');
+        return;
+      }
+
+      // Convert image to base64
+      final base64String = await ProfileImageService.convertImageToBase64(
+        imageFile,
+      );
+      if (base64String == null) {
+        _setError('Failed to process image. Please try again.');
+        return;
+      }
+
+      final currentUser = appState.currentUser;
+
+      if (currentUser != null) {
+        // Update user with base64 image data
+        final updatedUser = currentUser.copyWith(userPhoto: base64String);
+
+        // Update local state immediately for better UX
+        appState.updateCurrentUser(updatedUser);
+
+        // Upload base64 to backend via UserUpdateService
+        await updateUser(updatedUser, appState);
+
+        _setSuccess('Profile image updated successfully');
+      } else {
+        _setError('No user found. Please sign in again.');
+      }
+    } catch (e) {
+      LoggerService.error(
+        'Error updating profile image: $e',
+        tag: 'PROFILE_VIEWMODEL',
+      );
+      _setError('Failed to update profile image: $e');
+    } finally {
+      _setLoading(false);
     }
   }
 
-  /// Update vehicle information
-  void updateVehicle(int index, Map<String, String> vehicle) {
-    if (index >= 0 && index < _vehicles.length) {
-      _vehicles[index] = vehicle;
-      notifyListeners();
+  /// Update user profile image
+  Future<void> updateProfileImage(String imageUrl) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final appState = AppStateProvider();
+      final currentUser = appState.currentUser;
+
+      if (currentUser != null) {
+        final updatedUser = currentUser.copyWith(userPhoto: imageUrl);
+        await updateUser(updatedUser, appState);
+      } else {
+        _setError('No user found. Please sign in again.');
+      }
+    } catch (e) {
+      LoggerService.error(
+        'Error updating profile image: $e',
+        tag: 'PROFILE_VIEWMODEL',
+      );
+      _setError('Failed to update profile image: $e');
+    } finally {
+      _setLoading(false);
     }
   }
 
-  /// Validate required fields
-  bool _validateRequiredFields() {
-    // Validate phone number
-    if (phoneController.text.trim().isEmpty) {
-      _setError('Phone number is required');
-      return false;
-    }
+  void _setLoading(bool loading) => _isLoading = loading;
 
-    // Remove all non-digit characters for validation
-    String digitsOnly = phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-    // Basic phone number validation
-    if (digitsOnly.length < 10) {
-      _setError('Phone number must be at least 10 digits');
-      return false;
-    }
-
-    if (digitsOnly.length > 15) {
-      _setError('Phone number is too long');
-      return false;
-    }
-
-    return true;
-  }
-
-  /// Set loading state
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  /// Set error message
   void _setError(String message) {
     _errorMessage = message;
     _successMessage = null;
-    notifyListeners();
+    // Clear error message after a short delay since AppSnackbar will show it
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_errorMessage == message) clearError();
+    });
   }
 
-  /// Set success message
   void _setSuccess(String message) {
     _successMessage = message;
     _errorMessage = null;
-    notifyListeners();
+    // Clear success message after a short delay since AppSnackbar will show it
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_successMessage == message) clearSuccess();
+    });
   }
 
-  /// Clear all messages
   void _clearMessages() {
     _errorMessage = null;
     _successMessage = null;
-    notifyListeners();
   }
 
-  /// Clear error message
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
-  }
-
-  /// Clear success message
-  void clearSuccess() {
-    _successMessage = null;
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    phoneController.dispose();
-    addressController.dispose();
-    licenseController.dispose();
-    companyNameController.dispose();
-    companyContactController.dispose();
-
-    super.dispose();
-  }
+  void clearError() => _errorMessage = null;
+  void clearSuccess() => _successMessage = null;
 }

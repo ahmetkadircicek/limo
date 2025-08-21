@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/feature/splash/view/splash_view_mixin.dart';
 import 'package:limo/feature/splash/viewmodel/splash_view_model.dart';
 import 'package:limo/feature/splash/widgets/splash_loading_widget.dart';
@@ -16,50 +17,37 @@ class SplashView extends StatefulWidget {
 class _SplashViewState extends State<SplashView> with SplashViewMixin {
   @override
   Widget build(BuildContext context) {
-    return Consumer<SplashViewModel>(
-      builder: (context, viewModel, child) {
-        return _buildScaffold(viewModel);
+    return Consumer2<SplashViewModel, AppStateProvider>(
+      builder: (context, viewModel, appState, child) {
+        return _buildScaffold(viewModel, appState);
       },
     );
   }
 
   /// Builds the main scaffold with splash content
-  Widget _buildScaffold(SplashViewModel viewModel) {
+  Widget _buildScaffold(SplashViewModel viewModel, AppStateProvider appState) {
     return Scaffold(
       backgroundColor: context.primary,
-      body: _buildBody(viewModel),
+      body: _buildBody(viewModel, appState),
     );
   }
 
   /// Builds the main body content
-  Widget _buildBody(SplashViewModel viewModel) {
-    return SafeArea(child: _buildContent(viewModel));
+  Widget _buildBody(SplashViewModel viewModel, AppStateProvider appState) {
+    return SafeArea(child: _buildContent(viewModel, appState));
   }
 
   /// Builds the centered content layout
-  Widget _buildContent(SplashViewModel viewModel) {
+  Widget _buildContent(SplashViewModel viewModel, AppStateProvider appState) {
     return Center(
       child: Column(
         children: [
           const Spacer(),
-          _buildLogo(),
+          SplashLogoWidget(),
           const Spacer(),
-          _buildLoadingIndicator(viewModel),
+          SplashLoadingWidget(),
         ],
       ),
-    );
-  }
-
-  /// Builds the app logo using reusable widget
-  Widget _buildLogo() {
-    return const SplashLogoWidget();
-  }
-
-  /// Builds the loading indicator using reusable widget
-  Widget _buildLoadingIndicator(SplashViewModel viewModel) {
-    return SplashLoadingWidget(
-      isLoading: viewModel.isLoading,
-      color: context.onPrimary,
     );
   }
 }

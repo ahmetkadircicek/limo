@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
+import 'package:limo/shared/app_profile_image.dart';
 import 'package:limo/shared/app_text.dart';
 import 'package:provider/provider.dart';
 
@@ -83,39 +84,21 @@ class AppDrawer extends StatelessWidget {
 
   /// Builds the user avatar with fallback icon
   Widget _buildUserAvatar(BuildContext context, AppStateProvider appState) {
-    return Container(
-      width: 72,
-      height: 72,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color:
-            appState.isAuthenticated && appState.currentUser?.photoUrl != null
-                ? Colors.transparent
-                : context.primary,
-      ),
-      child:
-          appState.isAuthenticated && appState.currentUser?.photoUrl != null
-              ? ClipOval(
-                child: Image.network(
-                  appState.currentUser!.photoUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.person,
-                      size: 36,
-                      color: context.onPrimary,
-                    );
-                  },
-                ),
-              )
-              : Icon(Icons.person, size: 36, color: context.onPrimary),
+    return Consumer<AppStateProvider>(
+      builder: (context, appState, child) {
+        return AppProfileImage(
+          imageBase64: appState.currentUser?.userPhoto,
+          size: 72,
+          backgroundColor: context.primary,
+        );
+      },
     );
   }
 
   /// Builds the user display name text
   Widget _buildUserName(BuildContext context, AppStateProvider appState) {
     return AppText.heading(
-      appState.currentUser?.displayName ?? 'Not specified',
+      appState.currentUser?.userName ?? 'Not specified',
       color: context.onSurface,
     );
   }

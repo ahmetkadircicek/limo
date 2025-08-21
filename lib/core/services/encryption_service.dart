@@ -1,82 +1,257 @@
 import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
 
-import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:limo/core/services/environment_service.dart';
+import 'package:limo/core/utils/logger_service.dart';
+import 'package:pointycastle/export.dart';
 
-/// AES Encryption Service for secure data transmission
+/// Service for encrypting and decrypting API data using AES-256-CBC
+/// Compatible with Node.js backend encryption service
 class EncryptionService {
-  static EncryptionService? _instance;
-  static EncryptionService get instance => _instance ??= EncryptionService._();
+  static const String _tag = 'ENCRYPTION_SERVICE';
+  static const int _ivLength = 16;
+  static const int _keyLength = 32; // 256 bit
 
-  EncryptionService._();
+  /// Current AES key (Base64 string) - loaded from environment
+  static String _aesKey = '';
 
-  // Encryption key (in production, this should be stored securely)
-  // Must be exactly 32 characters for AES-256
-  static const String _secretKey = 'your-secret-key-here-32-chars-long!';
+  /// Initialize encryption service with key from environment
+  static Future<void> initialize() async {
+    _aesKey = EnvironmentService.aesEncryptionKey;
+    LoggerService.info('AES key loaded from environment', tag: _tag);
+  }
 
-  /// Encrypt data using AES-256-CBC
-  static String encryptData(String data) {
-    debugPrint(
-      '🔐 [ENCRYPTION] Starting AES encryption for data length: ${data.length}',
-    );
+  /// Get current key bytes for cryptographic operations
+  static Uint8List _getKeyBytes() {
+    if (_aesKey.isEmpty) {
+      throw Exception('AES key not found in environment. Check .env file.');
+    }
+    return base64Decode(_aesKey);
+  }
 
+  /// Encrypt text data
+  static String encrypt(String plaintext) {
     try {
-      debugPrint('🔐 [ENCRYPTION] Generating random IV...');
-      // Generate a random IV (Initialization Vector)
-      final iv = IV.fromSecureRandom(16);
-      debugPrint('✅ [ENCRYPTION] IV generated successfully');
-
-      debugPrint('🔐 [ENCRYPTION] Creating encryption key...');
-      // Create encryption key from secret
-      final key = Key.fromUtf8(_secretKey);
-
-      debugPrint('🔐 [ENCRYPTION] Creating AES encrypter...');
-      // Create encrypter
-      final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
-
-      debugPrint('🔐 [ENCRYPTION] Encrypting data...');
-      // Encrypt the data
-      final encrypted = encrypter.encrypt(data, iv: iv);
-      debugPrint('✅ [ENCRYPTION] Data encrypted successfully');
-
-      debugPrint('🔐 [ENCRYPTION] Combining IV and encrypted data...');
-      // Combine IV and encrypted data (IV + encrypted data)
-      final combined = iv.bytes + encrypted.bytes;
-
-      debugPrint('🔐 [ENCRYPTION] Converting to base64...');
-      // Convert to base64 for safe transmission
-      final result = base64.encode(combined);
-      debugPrint('✅ [ENCRYPTION] Encryption completed successfully');
+      LoggerService.info(
+        'Encrypting data with AES: ${plaintext.length} characters',
+        tag: _tag,
+      );
+      final result = _encryptAES(plaintext);
+      LoggerService.success(
+        'Data encrypted successfully with AES: ${result.length} characters',
+        tag: _tag,
+      );
       return result;
     } catch (e) {
-      debugPrint('❌ [ENCRYPTION] Encryption failed: $e');
-      throw Exception('Encryption failed: $e');
+      LoggerService.error('AES encryption failed: $e', error: e, tag: _tag);
+      rethrow;
     }
   }
 
-  /// Decrypt data using AES-256-CBC
-  static String decryptData(String encryptedData) {
+  /// Decrypt text data
+  static String decrypt(String encryptedData) {
     try {
-      // Decode from base64
-      final combined = base64.decode(encryptedData);
-
-      // Extract IV (first 16 bytes) and encrypted data
-      final iv = IV(combined.sublist(0, 16));
-      final encryptedBytes = combined.sublist(16);
-
-      // Create encryption key from secret
-      final key = Key.fromUtf8(_secretKey);
-
-      // Create encrypter
-      final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
-
-      // Create encrypted object
-      final encrypted = Encrypted(encryptedBytes);
-
-      // Decrypt the data
-      return encrypter.decrypt(encrypted, iv: iv);
+      LoggerService.info(
+        'Decrypting data with AES: ${encryptedData.length} characters',
+        tag: _tag,
+      );
+      final result = _decryptAES(encryptedData);
+      LoggerService.success(
+        'Data decrypted successfully with AES: ${result.length} characters',
+        tag: _tag,
+      );
+      return result;
     } catch (e) {
-      throw Exception('Decryption failed: $e');
+      LoggerService.error('AES decryption failed: $e', error: e, tag: _tag);
+      rethrow;
     }
+  }
+
+  /// Encrypt JSON data
+  static String encryptJson(Map<String, dynamic> data) {
+    final jsonString = jsonEncode(data);
+    return encrypt(jsonString);
+  }
+
+  /// Decrypt JSON data
+  static Map<String, dynamic>? decryptJson(String encryptedData) {
+    try {
+      final decryptedString = decrypt(encryptedData);
+      return jsonDecode(decryptedString) as Map<String, dynamic>;
+    } catch (e) {
+      LoggerService.error('JSON decryption failed: $e', error: e, tag: _tag);
+      return null;
+    }
+  }
+
+  /// Decrypt raw encrypted data and return as Map<String, dynamic>
+  /// This method handles the case where response body is raw encrypted data
+  static Map<String, dynamic>? decryptRawResponse(String encryptedData) {
+    try {
+      LoggerService.info(
+        'Decrypting raw encrypted response: ${encryptedData.length} characters',
+        tag: _tag,
+      );
+
+      // Clean and sanitize input before decryption
+      final cleanedInput = _cleanInput(encryptedData);
+      LoggerService.debug(
+        'Input cleaned: ${encryptedData.length} -> ${cleanedInput.length} characters',
+        tag: _tag,
+      );
+
+      // Decrypt the cleaned data
+      final decryptedString = _decryptAES(cleanedInput);
+
+      // Parse the decrypted JSON
+      final decryptedData = jsonDecode(decryptedString) as Map<String, dynamic>;
+
+      LoggerService.success(
+        'Raw encrypted response decrypted and parsed successfully',
+        tag: _tag,
+      );
+
+      return decryptedData;
+    } catch (e) {
+      LoggerService.error(
+        'Raw response decryption failed: $e',
+        error: e,
+        tag: _tag,
+      );
+      return null;
+    }
+  }
+
+  /// Clean and sanitize input string before decryption
+  static String _cleanInput(String input) {
+    String cleaned = input;
+
+    // Remove leading/trailing whitespace
+    cleaned = cleaned.trim();
+
+    // Remove surrounding quotes if present
+    if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+      cleaned = cleaned.substring(1, cleaned.length - 1);
+      LoggerService.debug('Removed surrounding quotes from input', tag: _tag);
+    }
+
+    // Remove any remaining quotes
+    cleaned = cleaned.replaceAll('"', '');
+
+    // Remove any remaining whitespace
+    cleaned = cleaned.trim();
+
+    // Validate base64 format after cleaning
+    final base64Regex = RegExp(r'^[A-Za-z0-9+/=]+$');
+    if (!base64Regex.hasMatch(cleaned)) {
+      LoggerService.warning(
+        'Input is not valid base64 format after cleaning',
+        tag: _tag,
+      );
+    }
+
+    return cleaned;
+  }
+
+  /// Internal AES encryption
+  static String _encryptAES(String plaintext) {
+    final key = _getKeyBytes();
+    final data = utf8.encode(plaintext);
+
+    // Generate random IV
+    final random = Random.secure();
+    final iv = Uint8List(_ivLength);
+    for (int i = 0; i < _ivLength; i++) {
+      iv[i] = random.nextInt(256);
+    }
+
+    // Initialize cipher
+    final cipher = CBCBlockCipher(AESEngine());
+    final params = ParametersWithIV(KeyParameter(key), iv);
+    cipher.init(true, params);
+
+    // Add PKCS7 padding
+    final blockSize = 16;
+    final paddingLength = blockSize - (data.length % blockSize);
+    final paddedData = Uint8List(data.length + paddingLength);
+    paddedData.setRange(0, data.length, data);
+    paddedData.fillRange(data.length, paddedData.length, paddingLength);
+
+    // Encrypt
+    final output = Uint8List(paddedData.length);
+    int offset = 0;
+    for (int i = 0; i < paddedData.length; i += blockSize) {
+      final block = paddedData.sublist(i, i + blockSize);
+      offset += cipher.processBlock(block, 0, output, offset);
+    }
+
+    // Format as iv:encrypted
+    final ivBase64 = base64Encode(iv);
+    final ciphertextBase64 = base64Encode(output);
+    return '$ivBase64:$ciphertextBase64';
+  }
+
+  /// Internal AES decryption
+  static String _decryptAES(String encryptedData) {
+    // Parse iv:encrypted format
+    final parts = encryptedData.split(':');
+    if (parts.length != 2) {
+      throw Exception('Invalid encrypted data format');
+    }
+
+    final iv = base64Decode(parts[0]);
+    final ciphertext = base64Decode(parts[1]);
+    final key = _getKeyBytes();
+
+    // Initialize cipher
+    final cipher = CBCBlockCipher(AESEngine());
+    final params = ParametersWithIV(KeyParameter(key), Uint8List.fromList(iv));
+    cipher.init(false, params);
+
+    // Decrypt
+    final output = Uint8List(ciphertext.length);
+    int offset = 0;
+    for (int i = 0; i < ciphertext.length; i += 16) {
+      final block = ciphertext.sublist(i, i + 16);
+      offset += cipher.processBlock(block, 0, output, offset);
+    }
+
+    // Remove PKCS7 padding
+    final paddingLength = output[output.length - 1];
+    final unpadded = output.sublist(0, output.length - paddingLength);
+
+    return utf8.decode(unpadded);
+  }
+
+  /// Create encrypted API request payload
+  static Map<String, dynamic> encryptRequest(Map<String, dynamic> data) {
+    final encryptedData = encryptJson(data);
+    return {'encryptedData': encryptedData};
+  }
+
+  /// Decrypt API response payload
+  static Map<String, dynamic>? decryptResponse(Map<String, dynamic> response) {
+    if (!response.containsKey('encryptedData')) {
+      LoggerService.warning(
+        'Response does not contain encryptedData field',
+        tag: _tag,
+      );
+      return null;
+    }
+
+    final encryptedData = response['encryptedData'] as String;
+    return decryptJson(encryptedData);
+  }
+
+  /// Get encryption service information
+  static Map<String, dynamic> getEncryptionInfo() {
+    return {
+      'enabled': _aesKey.isNotEmpty,
+      'algorithm': 'AES-256-CBC',
+      'iv_length': _ivLength,
+      'key_length_bytes': _keyLength,
+      'version': '1.0',
+    };
   }
 }

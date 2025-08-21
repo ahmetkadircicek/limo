@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:limo/core/constants/image_constants.dart';
+import 'package:limo/core/utils/logger_service.dart';
 
 /// Utility class for asset validation and management
 class AssetValidator {
@@ -11,7 +12,10 @@ class AssetValidator {
       }
       return true;
     } catch (e) {
-      print('Asset validation failed: $e');
+      LoggerService.error(
+        'Asset validation failed: $e',
+        tag: 'ASSET_VALIDATOR',
+      );
       return false;
     }
   }
@@ -22,7 +26,10 @@ class AssetValidator {
       await rootBundle.load(assetPath);
       return true;
     } catch (e) {
-      print('Asset validation failed for $assetPath: $e');
+      LoggerService.error(
+        'Asset validation failed for $assetPath: $e',
+        tag: 'ASSET_VALIDATOR',
+      );
       return false;
     }
   }
@@ -33,7 +40,10 @@ class AssetValidator {
       final data = await rootBundle.load(assetPath);
       return data.lengthInBytes;
     } catch (e) {
-      print('Failed to get asset size for $assetPath: $e');
+      LoggerService.error(
+        'Failed to get asset size for $assetPath: $e',
+        tag: 'ASSET_VALIDATOR',
+      );
       return null;
     }
   }

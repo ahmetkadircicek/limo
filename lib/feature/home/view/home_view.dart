@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
-import 'package:limo/core/services/google_auth_service.dart';
-import 'package:limo/feature/about/about_view.dart';
 import 'package:limo/feature/debug/debug_view.dart';
-import 'package:limo/feature/faq/faq_view.dart';
-import 'package:limo/feature/help_support/help_support_view.dart';
+import 'package:limo/feature/empty/view/empty_view.dart';
 import 'package:limo/feature/home/viewmodel/home_view_model.dart';
 import 'package:limo/feature/home/widgets/bottom_navigation_bar.dart';
 import 'package:limo/feature/job_list/view/job_list_view.dart';
 import 'package:limo/feature/job_tracking/view/job_tracking_view.dart';
 import 'package:limo/feature/listing_job/view/listing_job_view.dart';
-import 'package:limo/feature/notifications/notifications_view.dart';
-import 'package:limo/feature/privacy_policy/privacy_policy_view.dart';
 import 'package:limo/feature/profile/view/profile_view.dart';
-import 'package:limo/feature/settings/settings_view.dart';
-import 'package:limo/feature/terms_conditions/terms_conditions_view.dart';
 import 'package:limo/feature/vehicle_registration/view/vehicle_management_view.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:limo/shared/app_drawer.dart';
@@ -36,8 +27,6 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     _handleInitialPageNavigation();
   }
-
-
 
   /// Handle initial page navigation based on query parameters
   void _handleInitialPageNavigation() {
@@ -65,55 +54,57 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildAppDrawer(HomeViewModel homePageViewModel) {
     return AppDrawer(
       onProfileTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.navigateToProfile();
       },
       onLogoutTap: () async {
         await _handleLogout();
-        context.pop(); // Close drawer
+        if (mounted) {
+          Navigator.of(context).pop(); // Close drawer
+        }
       },
       onVehicleManagementTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.navigateToVehicleManagement();
       },
       onDebugTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(
           5,
         ); // Debug Components page index
       },
       onSettingsTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(6); // Settings page index
       },
       onHelpSupportTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(
           7,
         ); // Help & Support page index
       },
       onFAQTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(8); // FAQ page index
       },
       onAboutTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(9); // About page index
       },
       onPrivacyPolicyTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(
           10,
         ); // Privacy Policy page index
       },
       onTermsConditionsTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(
           11,
         ); // Terms & Conditions page index
       },
       onNotificationsTap: () {
-        context.pop(); // Close drawer
+        Navigator.of(context).pop(); // Close drawer
         homePageViewModel.pageController.jumpToPage(
           12,
         ); // Notifications page index
@@ -171,13 +162,21 @@ class _HomeViewState extends State<HomeView> {
         const ProfileView(), // Profile - Index 4
         // Drawer pages - accessible only from drawer
         const DebugView(), // Debug Components - Index 5
-        const SettingsView(), // Settings - Index 6
-        const HelpSupportView(), // Help & Support - Index 7
-        const FAQView(), // FAQ - Index 8
-        const AboutView(), // About - Index 9
-        const PrivacyPolicyView(), // Privacy Policy - Index 10
-        const TermsConditionsView(), // Terms & Conditions - Index 11
-        const NotificationsView(), // Notifications - Index 12
+        const EmptyView(featureName: 'Settings'), // Settings - Index 6
+        const EmptyView(
+          featureName: 'Help & Support',
+        ), // Help & Support - Index 7
+        const EmptyView(featureName: 'FAQ'), // FAQ - Index 8
+        const EmptyView(featureName: 'About'), // About - Index 9
+        const EmptyView(
+          featureName: 'Privacy Policy',
+        ), // Privacy Policy - Index 10
+        const EmptyView(
+          featureName: 'Terms & Conditions',
+        ), // Terms & Conditions - Index 11
+        const EmptyView(
+          featureName: 'Notifications',
+        ), // Notifications - Index 12
       ],
     );
   }
@@ -189,13 +188,14 @@ class _HomeViewState extends State<HomeView> {
       context,
       listen: false,
     );
-    
+
     // Sign out from Google and clear local state
     await appStateProvider.signOut();
 
     // Navigate to login
     if (mounted) {
-      context.go('/login');
+      // TODO: Navigate to login screen
+      // For now, just close the app or show a message
     }
   }
 }

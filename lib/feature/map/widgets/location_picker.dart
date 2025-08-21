@@ -35,7 +35,6 @@ class _LocationPickerState extends State<LocationPicker> {
   LocationModel? _selectedLocation;
   List<LocationModel> _searchResults = [];
   bool _isSearching = false;
-  bool _isLoadingCurrentLocation = false;
   Timer? _debounceTimer;
 
   // Cupertino, California, USA: 37.322998, -122.032182
@@ -69,8 +68,9 @@ class _LocationPickerState extends State<LocationPicker> {
         _addMarker(widget.initialLocation!);
         _animateToLocation(widget.initialLocation!);
         developer.log(
-            '📍 Using initial location from widget: ${widget.initialLocation!.placeName}',
-            name: _tag);
+          '📍 Using initial location from widget: ${widget.initialLocation!.placeName}',
+          name: _tag,
+        );
         return;
       }
 
@@ -81,8 +81,9 @@ class _LocationPickerState extends State<LocationPicker> {
           // Center map to current location but don't set it as selected
           _animateToLocation(currentLocation);
           developer.log(
-              '📍 Using current user location for centering: ${currentLocation.placeName}',
-              name: _tag);
+            '📍 Using current user location for centering: ${currentLocation.placeName}',
+            name: _tag,
+          );
           return;
         }
       } catch (e) {
@@ -95,13 +96,15 @@ class _LocationPickerState extends State<LocationPicker> {
         // Center map to stored location but don't set it as selected
         _animateToLocation(lastLocation);
         developer.log(
-            '📍 Using stored location for centering only: ${lastLocation.placeName}',
-            name: _tag);
+          '📍 Using stored location for centering only: ${lastLocation.placeName}',
+          name: _tag,
+        );
       } else {
         // If no stored location, use the default position
         developer.log(
-            '📍 No location available, using default position (Cupertino, CA, USA)',
-            name: _tag);
+          '📍 No location available, using default position (Cupertino, CA, USA)',
+          name: _tag,
+        );
       }
     } catch (e) {
       developer.log('💥 Failed to initialize location: $e', name: _tag);
@@ -115,27 +118,33 @@ class _LocationPickerState extends State<LocationPicker> {
 
       // First check if the asset exists in manifest
       try {
-        final manifestContent =
-            await rootBundle.loadString('AssetManifest.json');
+        final manifestContent = await rootBundle.loadString(
+          'AssetManifest.json',
+        );
         final Map<String, dynamic> manifestMap = json.decode(manifestContent);
         final assetPath = 'assets/json/map_theme.json';
 
         if (!manifestMap.containsKey(assetPath)) {
-          developer.log('💥 Asset not found in manifest: $assetPath',
-              name: _tag);
+          developer.log(
+            '💥 Asset not found in manifest: $assetPath',
+            name: _tag,
+          );
           _mapTheme = null;
           return;
         }
 
         developer.log('✅ Asset found in manifest: $assetPath', name: _tag);
       } catch (manifestError) {
-        developer.log('⚠️ Could not check asset manifest: $manifestError',
-            name: _tag);
+        developer.log(
+          '⚠️ Could not check asset manifest: $manifestError',
+          name: _tag,
+        );
       }
 
       // Use rootBundle instead of DefaultAssetBundle for more reliable asset loading
-      final themeData =
-          await rootBundle.loadString('assets/json/map_theme.json');
+      final themeData = await rootBundle.loadString(
+        'assets/json/map_theme.json',
+      );
 
       // Validate JSON format before setting
       try {
@@ -147,8 +156,10 @@ class _LocationPickerState extends State<LocationPicker> {
           developer.log('🎨 Map theme loaded successfully', name: _tag);
         }
       } catch (jsonError) {
-        developer.log('💥 Invalid JSON format in map theme: $jsonError',
-            name: _tag);
+        developer.log(
+          '💥 Invalid JSON format in map theme: $jsonError',
+          name: _tag,
+        );
         _mapTheme = null;
       }
     } catch (e) {
@@ -156,8 +167,10 @@ class _LocationPickerState extends State<LocationPicker> {
       // Try alternative loading method
       try {
         developer.log('🔄 Trying fallback method...', name: _tag);
-        final themeData = await DefaultAssetBundle.of(context)
-            .loadString('assets/json/map_theme.json');
+        final currentContext = context;
+        final themeData = await DefaultAssetBundle.of(
+          currentContext,
+        ).loadString('assets/json/map_theme.json');
         if (mounted) {
           setState(() {
             _mapTheme = themeData;
@@ -165,8 +178,10 @@ class _LocationPickerState extends State<LocationPicker> {
           developer.log('🎨 Map theme loaded with fallback method', name: _tag);
         }
       } catch (fallbackError) {
-        developer.log('💥 Fallback method also failed: $fallbackError',
-            name: _tag);
+        developer.log(
+          '💥 Fallback method also failed: $fallbackError',
+          name: _tag,
+        );
         _mapTheme = null;
       }
     }
@@ -195,8 +210,10 @@ class _LocationPickerState extends State<LocationPicker> {
   void _onMapCreated(GoogleMapController controller) {
     // Prevent multiple controller assignments
     if (_mapController != null) {
-      developer.log('⚠️ Map controller already exists, skipping...',
-          name: _tag);
+      developer.log(
+        '⚠️ Map controller already exists, skipping...',
+        name: _tag,
+      );
       return;
     }
 
@@ -300,47 +317,6 @@ class _LocationPickerState extends State<LocationPicker> {
     );
   }
 
-  // Get current location from device without automatically saving
-  Future<void> _getCurrentLocation() async {
-    setState(() {
-      _isLoadingCurrentLocation = true;
-    });
-
-    try {
-      final location = await LocationService.getCurrentLocation();
-      if (location != null) {
-        _selectLocation(location);
-        // Don't automatically save current location as the default
-        // Only save when user explicitly confirms selection
-        developer.log('📍 Current location obtained: ${location.placeName}',
-            name: _tag);
-      }
-    } catch (e) {
-      developer.log('💥 Failed to get current location: $e', name: _tag);
-    } finally {
-      setState(() {
-        _isLoadingCurrentLocation = false;
-      });
-    }
-  }
-
-  // Manually save current location as default (user-initiated action)
-  Future<void> _saveCurrentLocationAsDefault() async {
-    try {
-      final location = await LocationService.getCurrentLocation();
-      if (location != null) {
-        await _saveLastLocation(location);
-        _selectLocation(location);
-        developer.log(
-            '📍 Current location saved as default: ${location.placeName}',
-            name: _tag);
-      }
-    } catch (e) {
-      developer.log('💥 Failed to save current location as default: $e',
-          name: _tag);
-    }
-  }
-
   // Confirm location selection and navigate back
   void _confirmSelection() async {
     if (_selectedLocation != null) {
@@ -350,7 +326,8 @@ class _LocationPickerState extends State<LocationPicker> {
       // Reset map state before navigating back
       _resetMapState();
       // Use Navigator.pop() to return to the parent page
-      Navigator.of(context).pop(_selectedLocation!);
+      final currentContext = context;
+      Navigator.of(currentContext).pop(_selectedLocation!);
     }
   }
 
@@ -372,11 +349,14 @@ class _LocationPickerState extends State<LocationPicker> {
     final success = await LocationService.saveLocationToStorage(location);
     if (success) {
       developer.log(
-          '📍 Last location saved to persistent storage: ${location.placeName}',
-          name: _tag);
+        '📍 Last location saved to persistent storage: ${location.placeName}',
+        name: _tag,
+      );
     } else {
-      developer.log('❌ Failed to save location to persistent storage',
-          name: _tag);
+      developer.log(
+        '❌ Failed to save location to persistent storage',
+        name: _tag,
+      );
     }
   }
 
@@ -407,10 +387,7 @@ class _LocationPickerState extends State<LocationPicker> {
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
-        icon: const Icon(
-          Icons.arrow_back_ios_rounded,
-          size: 20,
-        ),
+        icon: const Icon(Icons.arrow_back_ios_rounded, size: 20),
         onPressed: () {
           // Reset map state before going back
           _resetMapState();
@@ -418,9 +395,7 @@ class _LocationPickerState extends State<LocationPicker> {
         },
         style: IconButton.styleFrom(
           backgroundColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );
@@ -428,27 +403,34 @@ class _LocationPickerState extends State<LocationPicker> {
 
   // Build the Google Maps widget
   Widget _buildGoogleMap() {
-    final initialPosition = _selectedLocation != null
-        ? CameraPosition(
-            target: LatLng(
-                _selectedLocation!.latitude, _selectedLocation!.longitude),
-            zoom: 15,
-          )
-        : _defaultPosition;
+    final initialPosition =
+        _selectedLocation != null
+            ? CameraPosition(
+              target: LatLng(
+                _selectedLocation!.latitude,
+                _selectedLocation!.longitude,
+              ),
+              zoom: 15,
+            )
+            : _defaultPosition;
 
     // Log which position is being used
     if (_selectedLocation != null) {
       developer.log(
-          '🗺️ Using stored location for map: ${_selectedLocation!.placeName}',
-          name: _tag);
+        '🗺️ Using stored location for map: ${_selectedLocation!.placeName}',
+        name: _tag,
+      );
     } else {
-      developer.log('🗺️ Using default position for map (Cupertino, CA, USA)',
-          name: _tag);
+      developer.log(
+        '🗺️ Using default position for map (Cupertino, CA, USA)',
+        name: _tag,
+      );
     }
 
     return GoogleMap(
       key: const ValueKey(
-          'location_picker_map'), // Add unique key to prevent recreation
+        'location_picker_map',
+      ), // Add unique key to prevent recreation
       onMapCreated: _onMapCreated,
       initialCameraPosition: initialPosition,
       markers: _markers,
@@ -489,9 +471,9 @@ class _LocationPickerState extends State<LocationPicker> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -536,58 +518,6 @@ class _LocationPickerState extends State<LocationPicker> {
     );
   }
 
-  // Build loading indicator for current location button
-  Widget _buildLoadingIndicator() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: const Center(
-        child: SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 2,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Build current location button
-  Widget _buildCurrentLocationButton() {
-    return Tooltip(
-      message: 'Tap to get current location\nLong press to save as default',
-      child: GestureDetector(
-        onTap: _getCurrentLocation,
-        onLongPress: _saveCurrentLocationAsDefault,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: IconButton(
-            onPressed: null, // Disabled since we're using GestureDetector
-            icon: Icon(
-              Icons.my_location_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              size: 22,
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              padding: EdgeInsets.zero,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   // Build search results container
   Widget _buildSearchResults() {
     return Container(
@@ -602,7 +532,7 @@ class _LocationPickerState extends State<LocationPicker> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -616,10 +546,7 @@ class _LocationPickerState extends State<LocationPicker> {
           bottomRight: Radius.circular(16),
         ),
         child: Column(
-          children: [
-            _buildSearchResultsHeader(),
-            _buildSearchResultsList(),
-          ],
+          children: [_buildSearchResultsHeader(), _buildSearchResultsList()],
         ),
       ),
     );
@@ -635,12 +562,7 @@ class _LocationPickerState extends State<LocationPicker> {
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey[200]!,
-            width: 1,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey[200]!, width: 1)),
       ),
       child: Row(
         children: [
@@ -664,51 +586,13 @@ class _LocationPickerState extends State<LocationPicker> {
     );
   }
 
-  /// Builds a chip-style clear button for search results
-  Widget _buildClearButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Material(
-        color: Theme.of(context).colorScheme.secondary.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            setState(() {
-              _searchResults.clear();
-              _searchController.clear();
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.close_rounded,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                const SizedBox(width: 4),
-                AppText.body(
-                  'Clear',
-                  color: Theme.of(context).colorScheme.secondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   // Build search results list
   Widget _buildSearchResultsList() {
     return Expanded(
-      child: _isSearching
-          ? _buildSearchingIndicator()
-          : _buildSearchResultsItems(),
+      child:
+          _isSearching
+              ? _buildSearchingIndicator()
+              : _buildSearchResultsItems(),
     );
   }
 
@@ -727,10 +611,7 @@ class _LocationPickerState extends State<LocationPicker> {
             ),
           ),
           const SizedBox(height: 16),
-          const AppText.bodySmall(
-            'Searching...',
-            color: Colors.grey,
-          ),
+          const AppText.bodySmall('Searching...', color: Colors.grey),
         ],
       ),
     );
@@ -782,7 +663,7 @@ class _LocationPickerState extends State<LocationPicker> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 12),
             ),
@@ -811,7 +692,7 @@ class _LocationPickerState extends State<LocationPicker> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

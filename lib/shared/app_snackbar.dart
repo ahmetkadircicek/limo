@@ -31,21 +31,35 @@ class AppSnackbar {
                   child: child,
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+              child: GestureDetector(
+                onTap: () {
+                  if (entry.mounted) entry.remove();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: AppText.body(
+                          message,
+                          color: Colors.white,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: AppText.body(message,
-                    color: Colors.white, textAlign: TextAlign.center),
               ),
             ),
           ),
@@ -54,7 +68,9 @@ class AppSnackbar {
     );
 
     overlay.insert(entry);
-    Future.delayed(duration, () => entry.remove());
+    Future.delayed(duration, () {
+      if (entry.mounted) entry.remove();
+    });
   }
 
   /// Yukarıdan kayan success snackbar
@@ -63,8 +79,12 @@ class AppSnackbar {
     required String message,
     Duration duration = const Duration(seconds: 4),
   }) {
-    show(context,
-        message: message, backgroundColor: context.success, duration: duration);
+    show(
+      context,
+      message: message,
+      backgroundColor: context.success,
+      duration: duration,
+    );
   }
 
   /// Yukarıdan kayan error snackbar
@@ -73,10 +93,12 @@ class AppSnackbar {
     required String message,
     Duration duration = const Duration(seconds: 4),
   }) {
-    show(context,
-        message: message,
-        backgroundColor: const Color(0xFFD72638),
-        duration: duration);
+    show(
+      context,
+      message: message,
+      backgroundColor: const Color(0xFFD72638),
+      duration: duration,
+    );
   }
 
   /// Yukarıdan kayan info snackbar
@@ -85,10 +107,12 @@ class AppSnackbar {
     required String message,
     Duration duration = const Duration(seconds: 4),
   }) {
-    show(context,
-        message: message,
-        backgroundColor: const Color(0xFF3B82F6),
-        duration: duration);
+    show(
+      context,
+      message: message,
+      backgroundColor: const Color(0xFF3B82F6),
+      duration: duration,
+    );
   }
 
   /// Yukarıdan kayan warning snackbar
@@ -97,10 +121,12 @@ class AppSnackbar {
     required String message,
     Duration duration = const Duration(seconds: 4),
   }) {
-    show(context,
-        message: message,
-        backgroundColor: const Color(0xFFF59E0B),
-        duration: duration);
+    show(
+      context,
+      message: message,
+      backgroundColor: const Color(0xFFF59E0B),
+      duration: duration,
+    );
   }
 }
 

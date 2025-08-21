@@ -1,0 +1,5 @@
+// GoogleService-Info.xcconfig
+// This file contains Google service configuration for iOS build
+
+GOOGLE_CLIENT_ID = 805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji.apps.googleusercontent.com
+GOOGLE_SIGN_IN_URL_SCHEME = 805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji.apps.googleusercontent.com

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
+import 'package:limo/feature/document_upload/view/document_upload_view.dart';
 import 'package:limo/feature/vehicle_registration/model/vehicle_model.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/vehicle_registration_view_model.dart';
-import 'document_upload_view.dart';
 
 /// Main view for vehicle registration form with comprehensive input fields
 final class VehicleRegistrationView extends StatelessWidget {
@@ -24,16 +25,15 @@ final class VehicleRegistrationView extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: context.onSurface),
           onPressed: () {
             // Form'u sıfırla ve geri git
-            final viewModel = Provider.of<VehicleRegistrationViewModel>(context,
-                listen: false);
+            final viewModel = Provider.of<VehicleRegistrationViewModel>(
+              context,
+              listen: false,
+            );
             viewModel.clearForm();
             Navigator.of(context).pop();
           },
         ),
-        title: AppText.heading(
-          'Add Vehicle',
-          color: context.onSurface,
-        ),
+        title: AppText.heading('Add Vehicle', color: context.onSurface),
         centerTitle: true,
       ),
       body: _buildFullScreenContent(),
@@ -57,7 +57,8 @@ Widget _buildFullScreenContent() {
                     child: Column(
                       children: [
                         SizedBox(
-                            height: context.spacingL), // Top padding eklendi
+                          height: context.spacingL,
+                        ), // Top padding eklendi
                         _buildVehicleInfoSection(viewModel, context),
                         SizedBox(height: context.spacingL),
                         _buildVehicleSpecsSection(viewModel, context),
@@ -68,7 +69,8 @@ Widget _buildFullScreenContent() {
                         SizedBox(height: context.spacingL),
                         _buildRegisterButton(viewModel, context),
                         SizedBox(
-                            height: context.spacingL), // Bottom padding eklendi
+                          height: context.spacingL,
+                        ), // Bottom padding eklendi
                       ],
                     ),
                   ),
@@ -84,7 +86,9 @@ Widget _buildFullScreenContent() {
 
 /// Builds the vehicle information section with license plate, brand, and model
 Widget _buildVehicleInfoSection(
-    VehicleRegistrationViewModel viewModel, BuildContext context) {
+  VehicleRegistrationViewModel viewModel,
+  BuildContext context,
+) {
   return _buildSection(
     title: 'Vehicle Information',
     children: [
@@ -117,7 +121,9 @@ Widget _buildVehicleInfoSection(
 
 /// Builds the vehicle specifications section with type, year, and capacity
 Widget _buildVehicleSpecsSection(
-    VehicleRegistrationViewModel viewModel, BuildContext context) {
+  VehicleRegistrationViewModel viewModel,
+  BuildContext context,
+) {
   return _buildSection(
     title: 'Vehicle Specifications',
     children: [
@@ -156,7 +162,9 @@ Widget _buildVehicleSpecsSection(
 
 /// Builds the vehicle category section for classification
 Widget _buildCategorySection(
-    VehicleRegistrationViewModel viewModel, BuildContext context) {
+  VehicleRegistrationViewModel viewModel,
+  BuildContext context,
+) {
   return _buildSection(
     title: 'Vehicle Category',
     children: [
@@ -175,43 +183,51 @@ Widget _buildCategorySection(
 
 /// Builds the document status section for insurance, license, and inspection
 Widget _buildDocumentSection(
-    VehicleRegistrationViewModel viewModel, BuildContext context) {
+  VehicleRegistrationViewModel viewModel,
+  BuildContext context,
+) {
   return _buildSection(
     title: 'Document Status',
     children: [
       AppInfoCard(
         icon: Icons.security,
         label: 'Insurance',
-        value: viewModel.selectedInsuranceStatus == 'Valid'
-            ? 'Approved'
-            : 'Not Uploaded',
-        valueColor: viewModel.selectedInsuranceStatus == 'Valid'
-            ? Colors.green
-            : Colors.red,
+        value:
+            viewModel.selectedInsuranceStatus == 'Valid'
+                ? 'Approved'
+                : 'Not Uploaded',
+        valueColor:
+            viewModel.selectedInsuranceStatus == 'Valid'
+                ? Colors.green
+                : Colors.red,
         onTap: () => _navigateToDocumentUpload(context, 'insurance'),
       ),
       SizedBox(height: context.spacingL),
       AppInfoCard(
         icon: Icons.description,
         label: 'Registration',
-        value: viewModel.selectedLicenseStatus == 'Valid'
-            ? 'Approved'
-            : 'Not Uploaded',
-        valueColor: viewModel.selectedLicenseStatus == 'Valid'
-            ? Colors.green
-            : Colors.red,
+        value:
+            viewModel.selectedLicenseStatus == 'Valid'
+                ? 'Approved'
+                : 'Not Uploaded',
+        valueColor:
+            viewModel.selectedLicenseStatus == 'Valid'
+                ? Colors.green
+                : Colors.red,
         onTap: () => _navigateToDocumentUpload(context, 'registration'),
       ),
       SizedBox(height: context.spacingL),
       AppInfoCard(
         icon: Icons.verified,
         label: 'Inspection',
-        value: viewModel.selectedInspectionStatus == 'Valid'
-            ? 'Approved'
-            : 'Not Uploaded',
-        valueColor: viewModel.selectedInspectionStatus == 'Valid'
-            ? Colors.green
-            : Colors.red,
+        value:
+            viewModel.selectedInspectionStatus == 'Valid'
+                ? 'Approved'
+                : 'Not Uploaded',
+        valueColor:
+            viewModel.selectedInspectionStatus == 'Valid'
+                ? Colors.green
+                : Colors.red,
         onTap: () => _navigateToDocumentUpload(context, 'inspection'),
       ),
     ],
@@ -220,7 +236,9 @@ Widget _buildDocumentSection(
 
 /// Builds the register vehicle button
 Widget _buildRegisterButton(
-    VehicleRegistrationViewModel viewModel, BuildContext context) {
+  VehicleRegistrationViewModel viewModel,
+  BuildContext context,
+) {
   return Container(
     width: double.infinity,
     padding: context.horizontalL,
@@ -239,10 +257,7 @@ Widget _buildRegisterButton(
 }
 
 /// Builds a section with title and children widgets
-Widget _buildSection({
-  required String title,
-  required List<Widget> children,
-}) {
+Widget _buildSection({required String title, required List<Widget> children}) {
   return Builder(
     builder: (context) {
       return Container(
@@ -276,20 +291,26 @@ Widget _buildSection({
 
 /// Builds the section header with title only
 Widget _buildSectionHeader(BuildContext context, String title) {
-  return AppText.heading(
-    title,
-    color: context.onSurface,
-  );
+  return AppText.heading(title, color: context.onSurface);
 }
 
 /// Navigate to document upload page
 void _navigateToDocumentUpload(BuildContext context, String documentType) {
+  // Map document type to DocumentUploadPurpose
+  DocumentUploadPurpose purpose;
+  if (documentType == 'profile_photo') {
+    purpose = DocumentUploadPurpose.profilePhoto;
+  } else {
+    purpose = DocumentUploadPurpose.driverLicense;
+  }
+  
   Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (context) => DocumentUploadView(
-        documentType: documentType,
-        vehiclePlate: 'New Vehicle',
-      ),
+      builder:
+          (context) => DocumentUploadView(
+            purpose: purpose,
+            vehiclePlate: 'New Vehicle',
+          ),
     ),
   );
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/constants/general_constants.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
@@ -27,21 +26,12 @@ class LocationField extends StatelessWidget {
     required this.pickerTitle,
   });
 
-  void _openLocationPicker(BuildContext context) async {
+  // Open location picker
+  Future<void> _openLocationPicker(BuildContext context) async {
     if (!enabled) return;
 
-    
-
-    // Navigate to location picker and get the result
-    final result = await context.push(
-      '/location-picker',
-      extra: {'title': pickerTitle},
-    );
-
-    // Handle the result
-    if (result != null && result is LocationModel) {
-      onLocationSelected(result);
-    }
+    // TODO: Navigate to location picker page
+    // For now, just show a message or handle differently
   }
 
   @override

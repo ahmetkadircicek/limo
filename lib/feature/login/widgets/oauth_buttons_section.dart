@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
+import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/feature/login/services/apple_auth_service.dart';
 import 'package:limo/feature/login/viewmodel/login_view_model.dart';
 import 'package:limo/feature/login/widgets/oauth_button.dart';
 import 'package:limo/shared/app_components.dart';
@@ -16,8 +18,9 @@ class OAuthButtonsSection extends StatefulWidget {
 }
 
 class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
-  // Local loading states - only Google is active
+  // Local loading states for both providers
   bool _isGoogleLoading = false;
+  bool _isAppleLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,30 +35,13 @@ class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
         viewModel.setContext(context);
 
         return Column(
+          spacing: context.spacingL,
           children: [
-            _buildSectionTitle(context),
-            SizedBox(height: context.spacingXl),
             _buildGoogleButton(context, viewModel, googleRed),
-            SizedBox(height: context.spacingL),
-            _buildAppleButton(context),
-            SizedBox(height: context.spacingXl),
-            _buildDivider(context),
-            SizedBox(height: context.spacingXl),
-            _buildGuestButton(context),
+            _buildAppleButton(context, viewModel),
           ],
         );
       },
-    );
-  }
-
-  /// Builds the section title text with improved formatting
-  Widget _buildSectionTitle(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        AppText.title('Welcome back!', color: context.onPrimary),
-        AppText.body("Let's get you moving.", color: context.onPrimary),
-      ],
     );
   }
 
@@ -81,60 +67,25 @@ class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
   }
 
   /// Builds the Apple sign-in button
-  Widget _buildAppleButton(BuildContext context) {
-    return OAuthButton(
-      icon: FontAwesomeIcons.apple,
-      text: 'Continue with Apple',
-      backgroundColor: context.onPrimary.withValues(
-        alpha: 0.3,
-      ), // Dimmed background
-      borderColor: context.onPrimary.withValues(alpha: 0.3), // Dimmed border
-      textColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed text
-      iconColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed icon
-      isLoading: false, // Never loading since it's disabled
-      onPressed: () {
-        // Show info message that Apple Sign-In is not available
-        AppSnackbar.showInfo(
-          context,
-          message:
-              'Apple Sign-In is not available yet. Please use Google Sign-In.',
-        );
-      },
-    );
-  }
+  Widget _buildAppleButton(BuildContext context, LoginViewModel viewModel) {
+    return FutureBuilder<bool>(
+      future: AppleAuthService.instance.isAvailable(),
+      builder: (context, snapshot) {
+        final isAvailable = snapshot.data ?? false;
+        final currentContext = context;
 
-  /// Builds the divider between OAuth and guest options
-  Widget _buildDivider(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: Divider(thickness: 0.5)),
-        Padding(
-          padding: context.horizontalL,
-          child: AppText.bodySmall('OR', color: context.onPrimary),
-        ),
-        Expanded(child: Divider(thickness: 0.5)),
-      ],
-    );
-  }
-
-  /// Builds the guest mode button
-  Widget _buildGuestButton(BuildContext context) {
-    return OAuthButton(
-      icon: Icons.person_outline_rounded,
-      text: 'Continue as Guest',
-      backgroundColor: context.onPrimary.withValues(
-        alpha: 0.3,
-      ), // Dimmed background
-      borderColor: context.onPrimary.withValues(alpha: 0.3), // Dimmed border
-      textColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed text
-      iconColor: context.onPrimary.withValues(alpha: 0.6), // Dimmed icon
-      isLoading: false, // Never loading since it's disabled
-      onPressed: () {
-        // Show info message that guest mode is not available
-        AppSnackbar.showInfo(
-          context,
-          message:
-              'Guest mode is not available yet. Please sign in with Google.',
+        return OAuthButton(
+          icon: FontAwesomeIcons.apple,
+          text: 'Continue with Apple',
+          backgroundColor: isAvailable ? currentContext.surface : Colors.grey,
+          borderColor: isAvailable ? currentContext.surface : Colors.grey,
+          textColor: isAvailable ? currentContext.onSurface : Colors.white,
+          iconColor: isAvailable ? currentContext.onSurface : Colors.white,
+          isLoading: _isAppleLoading,
+          onPressed:
+              (isAvailable && !_isAppleLoading)
+                  ? () => _handleAppleSignIn(currentContext, viewModel)
+                  : null,
         );
       },
     );
@@ -148,8 +99,47 @@ class _OAuthButtonsSectionState extends State<OAuthButtonsSection> {
     setState(() => _isGoogleLoading = true);
     try {
       await viewModel.signInWithGoogle();
+    } catch (e) {
+      // Log any unexpected errors during Google Sign-In
+      LoggerService.error(
+        'Unexpected error during Google Sign-In: $e',
+        tag: 'OAUTH_BUTTONS',
+      );
+
+      // Show user-friendly error message
+      if (mounted) {
+        final currentContext = context;
+        AppSnackbar.showError(
+          currentContext,
+          message: 'Google Sign-In failed. Please try again.',
+        );
+      }
     } finally {
       setState(() => _isGoogleLoading = false);
+    }
+  }
+
+  /// Handles Apple sign-in with local loading state
+  Future<void> _handleAppleSignIn(
+    BuildContext context,
+    LoginViewModel viewModel,
+  ) async {
+    setState(() => _isAppleLoading = true);
+    try {
+      // Check Apple Sign-In availability first
+      final isAvailable = await AppleAuthService.instance.isAvailable();
+
+      if (isAvailable) {
+        await viewModel.signInWithApple();
+      } else if (mounted) {
+        final currentContext = context;
+        AppSnackbar.showError(
+          currentContext,
+          message: 'Apple Sign-In is not available on this device.',
+        );
+      }
+    } finally {
+      setState(() => _isAppleLoading = false);
     }
   }
 }

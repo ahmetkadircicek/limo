@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/enums/vehicle_category_enum.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
@@ -112,7 +111,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
           onPressed: () {
             // Form'u sıfırla ve geri git
             _resetForm();
-            context.pop();
+            Navigator.of(context).pop();
           },
         ),
         title: AppText.heading(
@@ -368,7 +367,7 @@ class _VehicleRequirementPageState extends State<VehicleRequirementPage> {
     );
 
     widget.onSave(requirement);
-    context.pop();
+          Navigator.of(context).pop();
   }
 
   // Reset form to initial state

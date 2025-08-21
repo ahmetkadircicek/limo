@@ -61,6 +61,24 @@
 					<string>com.googleusercontent.apps.805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji</string>
 				</array>
 			</dict>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>google-signin</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>$(GOOGLE_SIGN_IN_URL_SCHEME)</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>apple-signin</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>signinwithapple-$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				</array>
+			</dict>
 		</array>
+		<key>GOOGLE_MAPS_API_KEY</key>
+		<string>YOUR_GOOGLE_MAPS_API_KEY_HERE</string>
 	</dict>
 </plist>

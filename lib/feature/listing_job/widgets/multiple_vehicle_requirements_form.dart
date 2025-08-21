@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/constants/padding_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/model/vehicle_requirement_model.dart';
@@ -42,37 +41,16 @@ class _MultipleVehicleRequirementsFormState
   void _showAddVehicleRequirement() {
     if (!widget.enabled) return;
 
-
-    context.push(
-      '/vehicle-requirements',
-      extra: {
-        'onSave': (requirement) {
-          setState(() {
-            _requirements.add(requirement);
-          });
-          _notifyChanges();
-        },
-      },
-    );
+    // TODO: Navigate to vehicle requirements page
+    // For now, just show a message or handle differently
   }
 
   // Show edit vehicle requirement page
   void _showEditVehicleRequirement(int index) {
     if (!widget.enabled) return;
 
-
-    context.push(
-      '/vehicle-requirements',
-      extra: {
-        'initialRequirement': _requirements[index],
-        'onSave': (requirement) {
-          setState(() {
-            _requirements[index] = requirement;
-          });
-          _notifyChanges();
-        },
-      },
-    );
+    // TODO: Navigate to vehicle requirements page
+    // For now, just show a message or handle differently
   }
 
   // Remove vehicle requirement at specified index

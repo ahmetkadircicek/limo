@@ -12,25 +12,25 @@
           "package_name": "limo.nitec.io"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+              "oauth_client": [
+          {
+            "client_id": "${GOOGLE_CLIENT_ID}",
+            "client_type": 3
+          }
+        ],
       "api_key": [
         {
-          "current_key": "YOUR_GOOGLE_MAPS_API_KEY"
+          "current_key": "${GOOGLE_MAPS_API_KEY}"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "805516186655-so7v6m5f91sr06gkni3nrs4i0qfrf2ji.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+                  "other_platform_oauth_client": [
+          {
+            "client_id": "${GOOGLE_CLIENT_ID}",
+            "client_type": 3
+          }
+        ]
         }
       }
     }

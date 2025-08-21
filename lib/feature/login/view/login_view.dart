@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
 import 'package:limo/core/constants/image_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
@@ -34,10 +34,6 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   Widget build(BuildContext context) {
     return Consumer2<LoginViewModel, AppStateProvider>(
       builder: (context, loginViewModel, appStateProvider, child) {
-
-
-
-
         // Re-enable authentication state change handling
         _handleAuthenticationStateChange(loginViewModel);
 
@@ -57,12 +53,8 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   /// Handles authentication state changes and navigates accordingly
   void _handleAuthenticationStateChange(LoginViewModel viewModel) {
     if (viewModel.isAuthenticated) {
-      // Navigate to home when authenticated
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          context.go('/home');
-        }
-      });
+      // TODO: Navigate to home when authenticated
+      // For now, just show a message or handle differently
     }
   }
 
@@ -106,14 +98,13 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   Widget _buildForegroundContent(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: context.responsivePadding,
+        padding: context.horizontalL,
         child: Column(
+          spacing: context.spacingXl,
           children: [
-            SizedBox(height: context.spacingXxxl),
             const LogoSection(),
             const Spacer(),
             const OAuthButtonsSection(),
-            SizedBox(height: context.spacingL),
             const TermsSection(),
           ],
         ),
