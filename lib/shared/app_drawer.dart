@@ -7,9 +7,7 @@ import 'package:provider/provider.dart';
 
 /// Main drawer widget for the application navigation
 class AppDrawer extends StatelessWidget {
-  final VoidCallback? onProfileTap;
   final VoidCallback? onLogoutTap;
-  final VoidCallback? onVehicleManagementTap;
   final VoidCallback? onDebugTap;
   final VoidCallback? onSettingsTap;
   final VoidCallback? onHelpSupportTap;
@@ -21,9 +19,7 @@ class AppDrawer extends StatelessWidget {
 
   const AppDrawer({
     super.key,
-    this.onProfileTap,
     this.onLogoutTap,
-    this.onVehicleManagementTap,
     this.onDebugTap,
     this.onSettingsTap,
     this.onHelpSupportTap,
@@ -110,20 +106,6 @@ class AppDrawer extends StatelessWidget {
         physics: const ClampingScrollPhysics(),
         padding: EdgeInsets.zero,
         children: [
-          // Main Navigation Group
-          _buildDrawerItem(
-            icon: Icons.person_outline,
-            title: 'Profile',
-            onTap: onProfileTap,
-            context: context,
-          ),
-          _buildDrawerItem(
-            icon: Icons.local_shipping_outlined,
-            title: 'Vehicle Management',
-            onTap: onVehicleManagementTap,
-            context: context,
-          ),
-
           // Settings & Notifications Group
           _buildDrawerItem(
             icon: Icons.settings,

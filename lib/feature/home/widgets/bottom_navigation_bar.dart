@@ -17,10 +17,15 @@ class HomeBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 72,
+      height: 64,
       margin: context.paddingL,
+      padding: context.horizontalL,
       decoration: BoxDecoration(
-        color: context.primary,
+        gradient: LinearGradient(
+          colors: [context.primary, Color(0xFF333333)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
         borderRadius: context.radiusRound,
         boxShadow: context.shadowMedium,
       ),
@@ -54,10 +59,34 @@ class HomeBottomNavigationBar extends StatelessWidget {
             child: CustomNavBarItem(
               icon:
                   viewModel.selectedIndex == 2
-                      ? Icons.location_on
-                      : Icons.location_on_outlined,
+                      ? Icons.timeline
+                      : Icons.timeline_outlined,
               text: 'TRACK',
               index: 2,
+              selectedIndex: viewModel.selectedIndex,
+              onTap: viewModel.onItemTapped,
+            ),
+          ),
+          Expanded(
+            child: CustomNavBarItem(
+              icon:
+                  viewModel.selectedIndex == 3
+                      ? Icons.directions_car
+                      : Icons.directions_car_outlined,
+              text: 'FLEET',
+              index: 3,
+              selectedIndex: viewModel.selectedIndex,
+              onTap: viewModel.onItemTapped,
+            ),
+          ),
+          Expanded(
+            child: CustomNavBarItem(
+              icon:
+                  viewModel.selectedIndex == 4
+                      ? Icons.person
+                      : Icons.person_outline,
+              text: 'PROFILE',
+              index: 4,
               selectedIndex: viewModel.selectedIndex,
               onTap: viewModel.onItemTapped,
             ),

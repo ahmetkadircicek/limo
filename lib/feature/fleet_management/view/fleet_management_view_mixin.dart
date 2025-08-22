@@ -43,12 +43,6 @@ mixin FleetManagementViewMixin<T extends StatefulWidget> on State<T> {
     }
   }
 
-  /// Refresh the vehicle list
-  Future<void> refreshVehicles() async {
-    await _loadVehicles();
-    _showSuccessSnackBar('Vehicle list updated');
-  }
-
   /// Add new vehicle
   void addNewVehicle() {
     Navigator.of(context)

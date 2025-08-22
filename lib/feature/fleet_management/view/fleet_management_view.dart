@@ -68,27 +68,24 @@ class _FleetManagementViewState extends State<FleetManagementView>
 
   /// Build scrollable main content
   Widget _buildScrollableMainContent() {
-    return RefreshIndicator(
-      onRefresh: refreshVehicles,
-      child: CustomScrollView(
-        controller: scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(child: _buildAddVehicleSection()),
-          if (vehicles.isEmpty)
-            SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState())
-          else
-            SliverPadding(
-              padding: EdgeInsets.all(DesignTokens.spacing4),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => _buildVehicleCard(vehicles[index], index),
-                  childCount: vehicles.length,
-                ),
+    return CustomScrollView(
+      controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverToBoxAdapter(child: _buildAddVehicleSection()),
+        if (vehicles.isEmpty)
+          SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState())
+        else
+          SliverPadding(
+            padding: EdgeInsets.all(DesignTokens.spacing4),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _buildVehicleCard(vehicles[index], index),
+                childCount: vehicles.length,
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 

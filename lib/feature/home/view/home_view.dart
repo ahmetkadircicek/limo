@@ -39,19 +39,11 @@ class HomeView extends StatelessWidget {
     BuildContext context,
   ) {
     return AppDrawer(
-      onProfileTap: () {
-        Navigator.of(context).pop(); // Close drawer
-        homePageViewModel.navigateToProfile();
-      },
       onLogoutTap: () async {
         await _handleLogout(context);
         if (context.mounted) {
           Navigator.of(context).pop(); // Close drawer
         }
-      },
-      onVehicleManagementTap: () {
-        Navigator.of(context).pop(); // Close drawer
-        homePageViewModel.navigateToVehicleManagement();
       },
       onDebugTap: () {
         Navigator.of(context).pop(); // Close drawer
@@ -135,13 +127,11 @@ class HomeView extends StatelessWidget {
   /// Build the main page content with PageView
   Widget _buildPageContent(HomeViewModel homePageViewModel) {
     return PageView(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const PageScrollPhysics(),
       controller: homePageViewModel.pageController,
       onPageChanged: homePageViewModel.onPageChanged,
       children: [
-        JobListView(
-          onRefresh: () => homePageViewModel.onJobCreated(),
-        ), // Jobs - Index 0
+        JobListView(), // Jobs - Index 0
         const JobListingView(), // Post job - Index 1
         const JobTrackingView(), // Job tracking - Index 2
         const FleetManagementView(), // Fleet Management - Index 3

@@ -71,13 +71,6 @@ class JobListViewModel {
         job.jobType.toString().split('.').last == _selectedJobType;
   }
 
-  /// Refresh the job list from API and reset filtered results
-  Future<void> refreshJobList() async {
-    // TODO: Implement API call for job list refresh
-    _jobs = [];
-    _filteredJobs = [];
-  }
-
   /// Display filter options modal for job type selection
   void showFilters() {
     // TODO: Implement filter modal UI

@@ -1,7 +1,6 @@
 import 'dart:io'; // Added for File
 
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/utils/image_helper.dart';
 
@@ -58,25 +57,18 @@ class AppProfileImage extends StatelessWidget {
           // Edit icon positioned outside the circle
           if (showEditIcon)
             Positioned(
-              bottom: -2,
-              right: -2,
+              bottom: context.spacingS,
+              right: context.spacingS,
               child: Container(
-                padding: const EdgeInsets.all(DesignTokens.spacing1),
+                padding: context.paddingS,
                 decoration: BoxDecoration(
                   color: context.primary,
                   shape: BoxShape.circle,
                   border: Border.all(color: context.surface, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: Icon(
                   Icons.edit,
-                  size: size * 0.25,
+                  size: context.iconMedium,
                   color: context.onPrimary,
                 ),
               ),

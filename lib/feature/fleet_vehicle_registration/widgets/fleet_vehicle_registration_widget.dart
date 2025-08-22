@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/constants/design_tokens.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/fleet_vehicle_registration/viewmodel/fleet_vehicle_registration_view_model.dart';
 import 'package:limo/feature/job_vehicle_registration/model/vehicle_model.dart';
 import 'package:limo/shared/app_components.dart';
@@ -40,17 +41,24 @@ class _FleetVehicleRegistrationWidgetState
   Widget build(BuildContext context) {
     return Consumer<FleetVehicleRegistrationViewModel>(
       builder: (context, viewModel, child) {
-        return Form(
-          key: viewModel.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildVehicleInfoSection(context, viewModel),
-              SizedBox(height: DesignTokens.spacing4),
-              _buildSpecificationsSection(context, viewModel),
-              SizedBox(height: DesignTokens.spacing6),
-              _buildSubmitButton(context, viewModel),
-            ],
+        return Container(
+          padding: context.paddingL,
+          decoration: BoxDecoration(
+            color: context.surface,
+            borderRadius: context.radiusMedium,
+          ),
+          child: Form(
+            key: viewModel.formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildVehicleInfoSection(context, viewModel),
+                SizedBox(height: DesignTokens.spacing4),
+                _buildSpecificationsSection(context, viewModel),
+                SizedBox(height: DesignTokens.spacing6),
+                _buildSubmitButton(context, viewModel),
+              ],
+            ),
           ),
         );
       },

@@ -6,9 +6,7 @@ import 'package:limo/feature/job_list/widgets/job_list_header_widget.dart';
 
 /// Job list view displaying available jobs with search and filtering capabilities
 class JobListView extends StatefulWidget {
-  final VoidCallback? onRefresh;
-
-  const JobListView({super.key, this.onRefresh});
+  const JobListView({super.key});
 
   @override
   State<JobListView> createState() => _JobListViewState();
@@ -42,11 +40,8 @@ class _JobListViewState extends State<JobListView>
   Widget _buildMainContainer(BuildContext context) {
     return Container(
       color: context.surfaceContainer,
-      child: RefreshIndicator(
-        onRefresh: () => handleRefresh(widget.onRefresh),
-        child: CustomScrollView(
-          slivers: [_buildHeaderSection(), _buildJobListSection()],
-        ),
+      child: CustomScrollView(
+        slivers: [_buildHeaderSection(), _buildJobListSection()],
       ),
     );
   }

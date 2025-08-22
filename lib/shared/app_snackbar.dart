@@ -15,7 +15,7 @@ class AppSnackbar {
     entry = OverlayEntry(
       builder: (context) {
         return Positioned(
-          top: context.spacingM,
+          top: context.height * 0.1,
           left: context.spacingM,
           right: context.spacingM,
           child: Material(

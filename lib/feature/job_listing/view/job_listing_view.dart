@@ -140,26 +140,21 @@ class _JobListingViewState extends State<JobListingView> {
   // Build info card explaining job type requirements
   Widget _buildJobTypeInfoCard() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: context.surfaceContainer,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
-      ),
+      padding: context.paddingL,
       child: Row(
         children: [
           Icon(
             Icons.info_outline,
-            color: context.onSurface.withValues(alpha: 0.6),
-            size: 16,
+            color: context.onSurface,
+            size: context.iconMedium,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: context.spacingM),
           Expanded(
             child: AppText.caption(
               _selectedJobType == 'Point to Point'
                   ? 'Point-to-point transfer requires both pickup and destination locations'
                   : 'Daily/Hourly rental only requires pickup location',
-              color: context.onSurface.withValues(alpha: 0.6),
+              color: context.onSurface,
             ),
           ),
         ],
@@ -341,16 +336,15 @@ class _JobListingViewState extends State<JobListingView> {
   // Build info card for non-point-to-point job types
   Widget _buildOtherJobTypeInfoCard() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: context.surfaceContainer,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: context.onSurface.withValues(alpha: 0.1)),
-      ),
+      padding: context.paddingL,
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: context.warning, size: 16),
-          const SizedBox(width: 8),
+          Icon(
+            Icons.info_outline,
+            color: context.warning,
+            size: context.iconMedium,
+          ),
+          SizedBox(width: context.spacingM),
           Expanded(
             child: AppText.caption(
               'For $_selectedJobType job type, only pickup location is required. Customers will receive service from this point.',

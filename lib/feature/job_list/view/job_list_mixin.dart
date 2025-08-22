@@ -32,15 +32,6 @@ mixin JobListMixin<T extends StatefulWidget> on State<T> {
     });
   }
 
-  /// Handle refresh action with proper state management
-  Future<void> handleRefresh(VoidCallback? onRefresh) async {
-    await _viewModel.refreshJobList();
-    if (mounted) {
-      setState(() {}); // Force rebuild after refresh
-    }
-    onRefresh?.call();
-  }
-
   /// Navigate to job details page
   void navigateToJobDetails(BuildContext context, dynamic job) {
     // TODO: Navigate to job details page

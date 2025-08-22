@@ -13,48 +13,31 @@ class HomeViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
 
-  // Additional pages from drawer
-  final int _vehicleManagementIndex = 3;
-  final int _profileIndex = 4;
-
-  int get vehicleManagementIndex => _vehicleManagementIndex;
-  int get profileIndex => _profileIndex;
-
   /// Handle navigation item tap and update selected index
   void onItemTapped(int index) {
-    _selectedIndex = index;
-    _pageController.jumpToPage(index);
-    notifyListeners();
-  }
-
-  /// Navigate to vehicle management page
-  void navigateToVehicleManagement() {
-    _selectedIndex = _vehicleManagementIndex;
-    _pageController.jumpToPage(_vehicleManagementIndex);
-    notifyListeners();
-  }
-
-  /// Navigate to profile page
-  void navigateToProfile() {
-    _selectedIndex = _profileIndex;
-    _pageController.jumpToPage(_profileIndex);
-    notifyListeners();
+    // Only allow navigation between main pages (0-4)
+    if (index >= 0 && index <= 4) {
+      _selectedIndex = index;
+      _pageController.jumpToPage(index);
+      notifyListeners();
+    }
   }
 
   /// Handle page change from PageView
   void onPageChanged(int index) {
-    _selectedIndex = index;
-    notifyListeners();
+    // Only allow navigation between main pages (0-4)
+    if (index >= 0 && index <= 4) {
+      _selectedIndex = index;
+      notifyListeners();
+    } else {
+      // If user tries to swipe to drawer-only pages, revert to last valid page
+      _pageController.jumpToPage(_selectedIndex);
+    }
   }
 
   /// Open the end drawer if available
   void openEndDrawer() {
     _scaffoldKey.currentState?.openEndDrawer();
-  }
-
-  /// Notify that a job was created and refresh the job list
-  void onJobCreated() {
-    notifyListeners();
   }
 
   @override

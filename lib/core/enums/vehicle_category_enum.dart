@@ -327,18 +327,6 @@ enum VehicleCategory {
   Color get textColor =>
       id >= 6 ? Colors.black87 : Colors.white; // TODO: Move to theme
 
-  /// Get gradient colors for this category
-  List<Color> get gradientColors => [
-    color.withOpacity(0.9),
-    color.withOpacity(0.6),
-  ];
-
-  /// Get upgrade cost estimate (placeholder for future implementation)
-  double? getUpgradeCostEstimate() {
-    // Upgrade cost calculation not implemented yet
-    return null;
-  }
-
   /// Get all categories by tier
   static List<VehicleCategory> getCategoriesByTier(int tier) {
     return VehicleCategory.values

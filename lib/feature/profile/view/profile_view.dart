@@ -257,7 +257,6 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
       decoration: BoxDecoration(
         color: infoColor.withValues(alpha: 0.1),
         borderRadius: context.radiusMedium,
-        border: Border.all(color: infoColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         children: [
