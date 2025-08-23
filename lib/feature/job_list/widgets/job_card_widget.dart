@@ -101,7 +101,7 @@ class JobCardWidget extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: context.spacingL),
               child: AppText.caption(
-                job.fromLocation!.address,
+                job.fromLocation?.address ?? '',
                 color: context.textSecondary.withValues(alpha: 0.7),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -150,7 +150,7 @@ class JobCardWidget extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(left: context.spacingL),
             child: AppText.caption(
-              job.fromLocation!.address,
+              job.fromLocation?.address ?? '',
               color: context.textSecondary.withValues(alpha: 0.7),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -198,7 +198,7 @@ class JobCardWidget extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(left: context.spacingL),
             child: AppText.caption(
-              job.toLocation!.address,
+              job.toLocation?.address ?? '',
               color: context.textSecondary.withValues(alpha: 0.7),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -226,16 +226,6 @@ class JobCardWidget extends StatelessWidget {
         // First row: All info chips grouped together
         Row(
           children: [
-            // Vehicle requirements chip
-            if (job.vehicleRequirements.isNotEmpty) ...[
-              _buildInfoChip(
-                context,
-                Icons.directions_car,
-                '${job.vehicleRequirements.length} vehicles',
-                context.primary,
-              ),
-              SizedBox(width: context.spacingS),
-            ],
             // Price chip if available
             if (job.price != null) ...[
               _buildInfoChip(

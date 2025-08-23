@@ -1,5 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
@@ -7,8 +9,8 @@ import 'package:limo/feature/document_upload/view/document_upload_view.dart';
 import 'package:limo/shared/app_components.dart';
 import 'package:provider/provider.dart';
 
+import '../../profile_update/view/profile_edit_view.dart';
 import '../viewmodel/profile_view_model.dart';
-import '../widgets/profile_info_card.dart';
 import 'profile_view_mixin.dart';
 
 class ProfileView extends StatefulWidget {
@@ -52,191 +54,325 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: context.spacingXl,
         children: [
-          _buildProfileHeader(context, appState),
-          _buildUserInfoSection(context, appState.currentUser),
-          buildActionButtons(viewModel, appState.currentUser),
-          _buildBottomSpacing(),
+          _buildProfilePhotoSection(context, appState.currentUser),
+          _buildPersonalInfoSection(context, appState.currentUser),
+          _buildStatisticsSection(context, appState.currentUser),
+          _buildDriverLicenseSection(context, appState.currentUser),
         ],
       ),
     );
   }
 
-  /// Build profile header section with avatar and user info
-  Widget _buildProfileHeader(BuildContext context, AppStateProvider appState) {
+  /// Build statistics section
+  Widget _buildStatisticsSection(BuildContext context, user) {
+    if (user == null) return const SizedBox.shrink();
+
+    return _buildProviderInfoCard(context, user);
+  }
+
+  /// Build provider information card with black background
+  Widget _buildProviderInfoCard(BuildContext context, user) {
     return Container(
+      width: double.infinity,
       padding: context.paddingL,
-      decoration: _buildHeaderDecoration(context),
-      child: Row(
-        spacing: context.spacingXl,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: context.radiusMedium,
+      ),
+      child: Column(
         children: [
-          _buildProfilePicture(context, appState),
-          _buildProfileInfo(context, appState),
+          // Title row
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: AppText.caption(
+                  'Provider',
+                  color: Colors.white,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: AppText.caption(
+                  'ID',
+                  color: Colors.white,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: AppText.caption(
+                  'Since',
+                  color: Colors.white,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2),
+          // Values row
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: AppText.body(
+                  user.provider ?? 'Unknown',
+                  textAlign: TextAlign.center,
+                  color: Colors.white,
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: AppText.body(
+                  user.userId ?? 'Unknown',
+                  textAlign: TextAlign.center,
+                  color: Colors.white,
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: AppText.body(
+                  _formatYearMonth(user.createdAt),
+                  textAlign: TextAlign.center,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  /// Build header decoration with shadow
-  BoxDecoration _buildHeaderDecoration(BuildContext context) {
-    return BoxDecoration(
-      color: context.surface,
-      borderRadius: context.radiusMedium,
-    );
-  }
-
-  /// Build profile picture with edit functionality
-  Widget _buildProfilePicture(BuildContext context, AppStateProvider appState) {
-    return AppProfileImage(
-      imageBase64: appState.currentUser?.userPhoto,
-      size: 70,
-      onTap: isEditing ? () => updateProfileImageFromGallery(appState) : null,
-      showEditIcon: isEditing,
-    );
-  }
-
-  /// Build profile info text section
-  Widget _buildProfileInfo(BuildContext context, AppStateProvider appState) {
-    return Expanded(
+  /// Build personal information section
+  Widget _buildPersonalInfoSection(BuildContext context, user) {
+    return AppCard.primary(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.spacingM,
         children: [
-          AppText.heading(
-            appState.currentUser?.userName ?? 'Not specified',
-            color: context.onSurface,
+          Row(
+            children: [
+              Expanded(
+                child: AppText.heading(
+                  'Personal Information',
+                  color: context.onSurface,
+                ),
+              ),
+              AppButton.chip(
+                'Edit',
+                onPressed: () => _navigateToProfileEdit(context),
+                icon: CupertinoIcons.pencil,
+              ),
+            ],
           ),
-          AppText.body(
-            appState.currentUser?.email ?? 'Not specified',
-            color: context.onSurface.withValues(alpha: 0.6),
+          _buildInfoRow('Full Name', user.userName),
+          _buildInfoRow('Email', user.email),
+          _buildInfoRow('Phone', user.phone),
+          _buildInfoRow('Company Name', user.companyName),
+        ],
+      ),
+    );
+  }
+
+  /// Build profile photo section
+  Widget _buildProfilePhotoSection(BuildContext context, user) {
+    if (user == null) return const SizedBox.shrink();
+
+    return AppCard.primary(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.spacingL,
+        children: [
+          // Title row with profile picture title and change button
+          Row(
+            children: [
+              Expanded(
+                child: AppText.heading(
+                  'Profile Picture',
+                  color: context.onSurface,
+                ),
+              ),
+              AppButton.chip(
+                'Change',
+                onPressed: () => _navigateToProfilePhotoUpload(context),
+                icon: CupertinoIcons.camera,
+              ),
+            ],
+          ),
+          // Profile image and greeting section
+          Row(
+            spacing: context.spacingL,
+            children: [
+              // Profile image - circular and smaller
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: context.onSurface.withValues(alpha: 0.1),
+                    width: 2,
+                  ),
+                ),
+                child: ClipOval(
+                  child:
+                      user.userPhoto != null && user.userPhoto!.isNotEmpty
+                          ? Image.memory(
+                            base64Decode(user.userPhoto!),
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          )
+                          : Image.asset(
+                            'assets/png/image/image_profile.png',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                ),
+              ),
+              // Greeting message
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: context.spacingXs,
+                  children: [
+                    AppText.heading(
+                      'Hello, ${_getFirstName(user.userName ?? 'User')}!',
+                      color: context.onSurface,
+                    ),
+                    AppText.bodySmall(
+                      'Welcome back to your profile',
+                      color: context.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          // Info message
+          AppInfo.info(
+            message: 'Complete your profile to get more job opportunities',
+            icon: Icons.tips_and_updates,
           ),
         ],
       ),
     );
   }
 
-  /// Build user information section with editable fields
-  Widget _buildUserInfoSection(BuildContext context, user) {
-    return Container(
-      decoration: _buildUserInfoDecoration(context),
-      child: Padding(
-        padding: context.paddingL,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: context.spacingL,
-          children: [
-            _buildSectionHeader(context),
-            _buildReadOnlyFields(user),
-            _buildEditableFields(),
-            _buildDriverLicenseSection(context, user),
-            _buildDriverLicenseInfoBox(user),
-          ],
-        ),
-      ),
-    );
+  /// Get first name from full name
+  String _getFirstName(String fullName) {
+    return fullName.split(' ').first;
   }
 
-  /// Build user info container decoration
-  BoxDecoration _buildUserInfoDecoration(BuildContext context) {
-    return BoxDecoration(
-      color: context.surface,
-      borderRadius: context.radiusMedium,
-    );
-  }
-
-  /// Build section header
-  Widget _buildSectionHeader(BuildContext context) {
-    return AppText.heading('Personal Information', color: context.onSurface);
-  }
-
-  /// Build read-only fields from Google
-  Widget _buildReadOnlyFields(dynamic user) {
+  /// Build individual information row
+  Widget _buildInfoRow(String label, String value) {
     return Column(
-      spacing: context.spacingL,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: context.spacingS,
       children: [
-        ProfileInfoCard(
-          icon: Icons.person,
-          label: 'Full Name',
-          value: user?.userName ?? 'Not specified',
-          badgeText: 'Google',
-        ),
-        ProfileInfoCard(
-          icon: Icons.email,
-          label: 'Email',
-          value: user?.email ?? 'Not specified',
-          badgeText: 'Google',
-        ),
+        AppText.caption(label, color: context.onSurface.withValues(alpha: 0.7)),
+        AppText.body(value, color: context.onSurface),
+        const Divider(),
       ],
     );
   }
 
-  /// Build editable input fields
-  Widget _buildEditableFields() {
-    return Column(
-      spacing: context.spacingL,
-      children: [_buildPhoneInput(), _buildCompanyNameInput()],
-    );
+  /// Format date to show only year and month
+  String _formatYearMonth(DateTime? date) {
+    if (date == null) return 'Not specified';
+
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    return '${months[date.month - 1]} ${date.year}';
   }
 
-  /// Build phone number input field
-  Widget _buildPhoneInput() {
-    return AppInput.primary(
-      controller: phoneController,
-      labelText: 'Phone',
-      hintText: 'Enter your phone number',
-      keyboardType: TextInputType.phone,
-      enabled: isEditing,
-      inputFormatters: isEditing ? _buildPhoneInputFormatters() : null,
-    );
+  /// Navigate to profile edit page
+  void _navigateToProfileEdit(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ProfileEditView()));
   }
 
-  /// Build phone input formatters
-  List<TextInputFormatter> _buildPhoneInputFormatters() {
-    return [FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-\(\)\s]'))];
-  }
-
-  /// Build company name input field
-  Widget _buildCompanyNameInput() {
-    return AppInput.primary(
-      controller: companyNameController,
-      labelText: 'Company Name',
-      hintText: 'Enter your company name',
-      enabled: isEditing,
+  /// Navigate to profile photo upload
+  void _navigateToProfilePhotoUpload(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                DocumentUploadView(purpose: DocumentUploadPurpose.profilePhoto),
+      ),
     );
+
+    // Refresh the view when returning from document upload
+    if (result == true && mounted) {
+      setState(() {
+        // Trigger rebuild to reflect changes
+      });
+    }
   }
 
   /// Build driver license section
   Widget _buildDriverLicenseSection(BuildContext context, user) {
-    return Consumer<AppStateProvider>(
-      builder: (context, appState, child) {
-        final currentUser = appState.currentUser;
-        return AppInfoCard(
-          icon: Icons.drive_eta,
-          label: 'Driver License',
-          value: _getDriverLicenseStatus(currentUser),
-          iconColor: _getDriverLicenseIconColor(context, currentUser),
-          valueColor: _getDriverLicenseStatusColor(currentUser),
-          onTap: _buildDriverLicenseOnTap(context, currentUser),
-        );
-      },
+    if (user == null) return const SizedBox.shrink();
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.spacingL,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: AppText.heading(
+                  'Driver License Status',
+                  color: context.onSurface,
+                ),
+              ),
+              AppButton.chip(
+                'Upload',
+                onPressed: () => _navigateToDriverLicenseUpload(context),
+                icon: CupertinoIcons.doc_text,
+              ),
+            ],
+          ),
+          _buildInfoRow('Status', _getDriverLicenseStatus(user)),
+          AppInfo(
+            icon: _getDriverLicenseInfoIcon(user),
+            message: _getDriverLicenseInfoText(user),
+            color: _getDriverLicenseStatusColor(user),
+          ),
+          if (_canUploadDriverLicense(user))
+            SizedBox(
+              width: double.infinity,
+              child: AppButton.primary(
+                'Upload Driver License',
+                onPressed: () => _navigateToDriverLicenseUpload(context),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
-  /// Get driver license icon color
-  Color _getDriverLicenseIconColor(BuildContext context, user) {
-    return _canUploadDriverLicense(user)
-        ? context.primary
-        : context.onSurface.withValues(alpha: 0.5);
-  }
-
-  /// Build driver license onTap handler
-  VoidCallback? _buildDriverLicenseOnTap(BuildContext context, user) {
-    return _canUploadDriverLicense(user)
-        ? () => _navigateToDriverLicenseUpload(context)
-        : null;
-  }
-
   /// Navigate to driver license upload
-  void _navigateToDriverLicenseUpload(BuildContext context) {
-    Navigator.of(context).push(
+  void _navigateToDriverLicenseUpload(BuildContext context) async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder:
             (context) => DocumentUploadView(
@@ -244,28 +380,13 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
             ),
       ),
     );
-  }
 
-  /// Build driver license info box
-  Widget _buildDriverLicenseInfoBox(dynamic user) {
-    String infoText = _getDriverLicenseInfoText(user);
-    IconData infoIcon = _getDriverLicenseInfoIcon(user);
-    Color infoColor = _getDriverLicenseStatusColor(user);
-
-    return Container(
-      padding: context.paddingL,
-      decoration: BoxDecoration(
-        color: infoColor.withValues(alpha: 0.1),
-        borderRadius: context.radiusMedium,
-      ),
-      child: Row(
-        children: [
-          Icon(infoIcon, color: infoColor, size: context.iconMedium),
-          SizedBox(width: context.spacingM),
-          Expanded(child: AppText.caption(infoText, color: infoColor)),
-        ],
-      ),
-    );
+    // Refresh the view when returning from document upload
+    if (result == true && mounted) {
+      setState(() {
+        // Trigger rebuild to reflect changes
+      });
+    }
   }
 
   /// Get driver license info text for info box
@@ -288,20 +409,20 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
 
   /// Get driver license info icon for info box
   IconData _getDriverLicenseInfoIcon(dynamic user) {
-    if (user == null) return Icons.help_outline;
+    if (user == null) return CupertinoIcons.question_circle;
 
     // If user is approved, show check icon
     if (user.approved == true) {
-      return Icons.check_circle_outline;
+      return CupertinoIcons.check_mark_circled;
     }
 
     // If driver license is not uploaded, show upload icon
     if (user.driverLicense == null || user.driverLicense!.isEmpty) {
-      return Icons.upload_outlined;
+      return CupertinoIcons.arrow_up_circle;
     }
 
     // If driver license is uploaded but pending approval, show clock icon
-    return Icons.schedule_outlined;
+    return CupertinoIcons.clock;
   }
 
   /// Get driver license status text based on user data
@@ -354,10 +475,5 @@ class _ProfileViewState extends State<ProfileView> with ProfileViewMixin {
 
     // No driver license uploaded
     return Colors.red;
-  }
-
-  /// Build bottom spacing for better layout
-  Widget _buildBottomSpacing() {
-    return const SizedBox(height: 100);
   }
 }

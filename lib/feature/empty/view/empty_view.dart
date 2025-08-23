@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/shared/app_components.dart';
 
 /// Simple empty view for features that are not yet developed
 class EmptyView extends StatelessWidget {
@@ -8,34 +10,12 @@ class EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.construction, size: 80, color: Colors.grey[400]),
-              const SizedBox(height: 24),
-              Text(
-                '$featureName is under development',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'This feature will be available in future updates',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+    return Container(
+      color: context.surfaceContainer,
+      child: AppEmptyState(
+        imagePath: 'assets/png/image/image_under_development.png',
+        title: '$featureName is under development',
+        description: 'This feature will be available in future updates',
       ),
     );
   }

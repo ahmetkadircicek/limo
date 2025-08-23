@@ -38,6 +38,14 @@ class _FleetVehicleRegistrationWidgetState
   }
 
   @override
+  void dispose() {
+    // Reset form when leaving the page
+    final viewModel = context.read<FleetVehicleRegistrationViewModel>();
+    viewModel.resetForm();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<FleetVehicleRegistrationViewModel>(
       builder: (context, viewModel, child) {
@@ -78,6 +86,7 @@ class _FleetVehicleRegistrationWidgetState
         AppInput.primary(
           controller: viewModel.plateNumberController,
           labelText: 'License Plate',
+          hintText: 'ABC-1234',
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'License plate is required';
@@ -88,6 +97,7 @@ class _FleetVehicleRegistrationWidgetState
         SizedBox(height: DesignTokens.spacing3),
         AppInput.dropdown(
           labelText: 'Brand',
+          hintText: 'Select vehicle brand',
           dropdownValue: viewModel.selectedBrand,
           dropdownItems: viewModel.brandOptions,
           onDropdownChanged: viewModel.setSelectedBrand,
@@ -102,6 +112,7 @@ class _FleetVehicleRegistrationWidgetState
         AppInput.primary(
           controller: viewModel.modelController,
           labelText: 'Model',
+          hintText: 'Camry, E-Class, Transit...',
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Model is required';
@@ -112,6 +123,7 @@ class _FleetVehicleRegistrationWidgetState
         SizedBox(height: DesignTokens.spacing3),
         AppInput.dropdown(
           labelText: 'Model Year',
+          hintText: 'Select manufacturing year',
           dropdownValue: viewModel.selectedModelYear?.toString(),
           dropdownItems:
               viewModel.modelYearOptions
@@ -145,6 +157,7 @@ class _FleetVehicleRegistrationWidgetState
         SizedBox(height: DesignTokens.spacing3),
         AppInput.dropdown(
           labelText: 'Capacity',
+          hintText: 'Select passenger capacity',
           dropdownValue:
               viewModel.selectedCapacity != null
                   ? '${viewModel.selectedCapacity} passengers'
@@ -172,6 +185,7 @@ class _FleetVehicleRegistrationWidgetState
         SizedBox(height: DesignTokens.spacing3),
         AppInput.dropdown(
           labelText: 'Body Type',
+          hintText: 'Select vehicle body type',
           dropdownValue: viewModel.selectedBodyType,
           dropdownItems: viewModel.bodyTypeOptions,
           onDropdownChanged: viewModel.setSelectedBodyType,
@@ -185,6 +199,7 @@ class _FleetVehicleRegistrationWidgetState
         SizedBox(height: DesignTokens.spacing3),
         AppInput.dropdown(
           labelText: 'Category',
+          hintText: 'Select vehicle category',
           dropdownValue: viewModel.selectedCategory,
           dropdownItems: viewModel.categoryOptions,
           onDropdownChanged: viewModel.setSelectedCategory,

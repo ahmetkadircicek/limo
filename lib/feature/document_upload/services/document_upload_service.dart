@@ -7,7 +7,7 @@ import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/core/utils/logger_service.dart';
 import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
 import 'package:limo/feature/document_upload/model/document_model.dart';
-import 'package:limo/feature/profile/services/user_update_service.dart';
+import 'package:limo/feature/profile_update/services/user_update_service.dart';
 
 /// Service for handling document upload operations
 class DocumentUploadService {
@@ -211,7 +211,7 @@ class DocumentUploadService {
   }
 
   /// Upload document to backend using UserUpdateService
-  static Future<Map<String, dynamic>?> uploadDocument(
+  static Future<bool> uploadDocument(
     DocumentModel document,
     AppStateProvider appState,
   ) async {
@@ -253,9 +253,10 @@ class DocumentUploadService {
       );
 
       // Use UserUpdateService instead of direct API call
-      final response = await UserUpdateService.updateUser(updatedUser);
+      final userUpdateService = UserUpdateService();
+      final success = await userUpdateService.updateUser(updatedUser);
 
-      if (response != null) {
+      if (success) {
         // Update local AppState
         appState.updateCurrentUser(updatedUser);
 
@@ -263,17 +264,21 @@ class DocumentUploadService {
           '✅ Upload successful: ${document.purpose.title} via UserUpdateService',
           tag: _tag,
         );
+
+        return true;
       } else {
+        LoggerService.error(
+          '❌ Upload failed: ${document.purpose.title} - UserUpdateService returned false',
+          tag: _tag,
+        );
         throw Exception('Failed to update user profile via UserUpdateService');
       }
-
-      return response;
     } catch (e) {
       LoggerService.error(
         '❌ Upload failed: ${document.purpose.title} - $e',
         tag: _tag,
       );
-      rethrow;
+      return false;
     }
   }
 }

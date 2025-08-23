@@ -8,6 +8,7 @@ import 'package:limo/feature/job_list/viewmodel/job_list_view_model.dart';
 import 'package:limo/feature/job_vehicle_registration/viewmodel/job_vehicle_registration_view_model.dart';
 import 'package:limo/feature/login/viewmodel/login_view_model.dart';
 import 'package:limo/feature/profile/viewmodel/profile_view_model.dart';
+import 'package:limo/feature/profile_update/viewmodel/profile_update_view_model.dart';
 import 'package:limo/feature/splash/viewmodel/splash_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -39,6 +40,7 @@ class ProviderManager {
       create: (context) => FleetVehicleRegistrationViewModel(),
     ),
     Provider(create: (context) => ProfileViewModel()),
+    ChangeNotifierProvider(create: (context) => ProfileUpdateViewModel()),
     ChangeNotifierProvider(create: (context) => DocumentUploadViewModel()),
   ];
 }

@@ -43,26 +43,10 @@ class _FleetManagementViewState extends State<FleetManagementView>
 
   /// Build empty state
   Widget _buildEmptyState() {
-    return Padding(
-      padding: context.paddingL,
-      child: Column(
-        spacing: context.spacingXs,
-        children: [
-          Icon(
-            Icons.directions_car_outlined,
-            size: 64,
-            color: context.onSurface.withValues(alpha: 0.5),
-          ),
-          AppText.heading(
-            'No vehicles added yet',
-            color: context.onSurface.withValues(alpha: 0.7),
-          ),
-          AppText.bodySmall(
-            'Add your first vehicle to start accepting jobs',
-            color: context.onSurface.withValues(alpha: 0.5),
-          ),
-        ],
-      ),
+    return const AppEmptyState(
+      imagePath: 'assets/png/image/image_car_repair.png',
+      title: 'No vehicles added yet',
+      description: 'Add your first vehicle to start accepting jobs',
     );
   }
 
@@ -93,59 +77,28 @@ class _FleetManagementViewState extends State<FleetManagementView>
   Widget _buildAddVehicleSection() {
     return Container(
       margin: context.paddingL,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [context.primary, context.primary.withValues(alpha: 0.8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: addNewVehicle,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacing6,
-                vertical: DesignTokens.spacing5,
-              ),
-              child: Row(
-                spacing: DesignTokens.spacing4,
+      child: AppCard.primary(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: context.spacingS,
                 children: [
-                  Icon(
-                    Icons.directions_car_filled,
-                    color: context.surface,
-                    size: 30,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: DesignTokens.spacing1,
-                      children: [
-                        AppText.body(
-                          'Add Vehicle',
-                          color: context.surface,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        AppText.bodySmall(
-                          'Register new vehicle',
-                          color: context.surface.withValues(alpha: 0.85),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: context.surface.withValues(alpha: 0.8),
-                    size: 16,
+                  AppText.heading('Fleet Management'),
+                  AppText.bodySmall(
+                    '${vehicles.length} vehicles registered',
+                    color: context.textSecondary,
                   ),
                 ],
               ),
             ),
-          ),
+            AppButton.chip(
+              'Add Vehicle',
+              icon: Icons.directions_car_filled,
+              onPressed: addNewVehicle,
+            ),
+          ],
         ),
       ),
     );

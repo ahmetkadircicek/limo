@@ -22,6 +22,7 @@ extension ThemeExtensions on BuildContext {
   Color get onSurface => Theme.of(this).colorScheme.onSurface; // #0A0A0A
   Color get surfaceContainer =>
       Theme.of(this).colorScheme.surfaceContainer; // #F6F6F6
+  Color get surface200 => DesignTokens.surface200; // #F6F6F6
 
   /// Tertiary Colors (Üçüncül renkler)
   Color get tertiary => Theme.of(this).colorScheme.tertiary; // #F6F6F6

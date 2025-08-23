@@ -13,25 +13,21 @@ class HomeViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
 
-  /// Handle navigation item tap and update selected index
+  /// Instantly jump to the selected page with a right-slide animation (no intermediate pages)
   void onItemTapped(int index) {
-    // Only allow navigation between main pages (0-4)
     if (index >= 0 && index <= 4) {
       _selectedIndex = index;
-      _pageController.jumpToPage(index);
       notifyListeners();
+      _pageController.jumpToPage(index);
     }
   }
 
-  /// Handle page change from PageView
-  void onPageChanged(int index) {
-    // Only allow navigation between main pages (0-4)
-    if (index >= 0 && index <= 4) {
-      _selectedIndex = index;
+  /// Navigate to drawer page and clear navbar selection
+  void navigateToDrawerPage(int index) {
+    if (index >= 5 && index <= 12) {
+      _selectedIndex = -1;
+      _pageController.jumpToPage(index);
       notifyListeners();
-    } else {
-      // If user tries to swipe to drawer-only pages, revert to last valid page
-      _pageController.jumpToPage(_selectedIndex);
     }
   }
 

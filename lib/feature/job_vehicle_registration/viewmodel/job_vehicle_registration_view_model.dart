@@ -242,4 +242,9 @@ class JobVehicleRegistrationViewModel with ChangeNotifier {
     capacityController.dispose();
     super.dispose();
   }
+
+  /// Reset form to initial state
+  void resetForm() {
+    clearForm();
+  }
 }

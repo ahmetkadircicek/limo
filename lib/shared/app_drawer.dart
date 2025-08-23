@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/app_state_provider.dart';
-import 'package:limo/shared/app_profile_image.dart';
 import 'package:limo/shared/app_text.dart';
-import 'package:provider/provider.dart';
 
 /// Main drawer widget for the application navigation
 class AppDrawer extends StatelessWidget {
@@ -37,6 +34,7 @@ class AppDrawer extends StatelessWidget {
         color: context.surface,
         child: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(context),
               _buildNavigationSection(context),
@@ -48,53 +46,25 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  /// Builds the user profile header section with avatar and user info
+  /// Builds the app logo header section
   Widget _buildHeader(BuildContext context) {
-    return Consumer<AppStateProvider>(
-      builder: (context, appState, child) {
-        return Container(
-          padding: context.paddingXl,
-          decoration: BoxDecoration(color: context.surface),
-          child: Column(
-            children: [
-              _buildUserAvatar(context, appState),
-              SizedBox(height: context.spacingS),
-              _buildUserName(context, appState),
-              SizedBox(height: context.spacingXs),
-              _buildUserEmail(context, appState),
-            ],
+    return Container(
+      padding: context.paddingXl,
+      decoration: BoxDecoration(color: context.surface),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ColorFiltered(
+            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+            child: Image.asset(
+              'assets/png/image/image_logo.png',
+              width: 120,
+              fit: BoxFit.cover,
+            ),
           ),
-        );
-      },
-    );
-  }
-
-  /// Builds the user avatar with fallback icon
-  Widget _buildUserAvatar(BuildContext context, AppStateProvider appState) {
-    return Consumer<AppStateProvider>(
-      builder: (context, appState, child) {
-        return AppProfileImage(
-          imageBase64: appState.currentUser?.userPhoto,
-          size: 72,
-          backgroundColor: context.primary,
-        );
-      },
-    );
-  }
-
-  /// Builds the user display name text
-  Widget _buildUserName(BuildContext context, AppStateProvider appState) {
-    return AppText.heading(
-      appState.currentUser?.userName ?? 'Not specified',
-      color: context.onSurface,
-    );
-  }
-
-  /// Builds the user email text
-  Widget _buildUserEmail(BuildContext context, AppStateProvider appState) {
-    return AppText.caption(
-      appState.currentUser?.email ?? 'Not specified',
-      color: context.textSecondary,
+          AppText.bodySmall('Fast and secure work.'),
+        ],
+      ),
     );
   }
 

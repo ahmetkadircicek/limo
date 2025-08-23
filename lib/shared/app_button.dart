@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/shared/app_snackbar.dart';
 import 'package:limo/shared/app_text.dart';
 
-enum ButtonVariant { primary, secondary, tertiary, error, success }
+enum ButtonVariant { primary, secondary, tertiary, error, success, black, chip }
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -67,60 +68,142 @@ class AppButton extends StatelessWidget {
     this.isLoading = false,
   }) : variant = ButtonVariant.success;
 
+  const AppButton.chip(
+    this.text, {
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.width,
+    this.isLoading = false,
+  }) : variant = ButtonVariant.chip;
+
   @override
   Widget build(BuildContext context) {
-    final buttonHeight = context.buttonHeight;
+    final buttonHeight =
+        variant == ButtonVariant.chip ? 40.0 : context.buttonHeight;
     final isEnabled = onPressed != null && !isLoading;
+    final hasText = text.isNotEmpty;
+
+    // Tertiary variant için width ve height eşit olsun
+    final buttonWidth =
+        variant == ButtonVariant.tertiary && !hasText ? buttonHeight : width;
+
+    // onPressed null ise "Yapılacak" snackbar göster
+    VoidCallback? handleOnPressed =
+        onPressed ??
+        (() {
+          AppSnackbar.showInfo(context, message: 'Yapılacak');
+        });
 
     return SizedBox(
-      width: width,
+      width: buttonWidth,
       height: buttonHeight,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: context.radiusMedium,
+          borderRadius:
+              variant == ButtonVariant.chip
+                  ? BorderRadius.circular(20.0)
+                  : context.radiusMedium,
           boxShadow: _getShadow(context, isEnabled),
         ),
-        child: TextButton.icon(
-          onPressed: isEnabled ? onPressed : null,
-          style: TextButton.styleFrom(
-            backgroundColor: _getBackgroundColor(context),
-            foregroundColor: _getForegroundColor(context),
-            disabledBackgroundColor: _getBackgroundColor(
-              context,
-            ).withValues(alpha: 0.5),
-            side: _getBorder(context),
-            shape: RoundedRectangleBorder(borderRadius: context.radiusMedium),
-            shadowColor: Colors.transparent,
-            minimumSize: Size(0, buttonHeight),
-          ),
-          icon:
-              isLoading
-                  ? SizedBox(
-                    width: context.iconMedium,
-                    height: context.iconMedium,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(
-                        _getForegroundColor(context),
-                      ),
+        child:
+            hasText
+                ? TextButton.icon(
+                  onPressed: isEnabled ? handleOnPressed : null,
+                  style: TextButton.styleFrom(
+                    backgroundColor: _getBackgroundColor(context),
+                    foregroundColor: _getForegroundColor(context),
+                    disabledBackgroundColor: _getBackgroundColor(
+                      context,
+                    ).withValues(alpha: 0.5),
+                    side: _getBorder(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          variant == ButtonVariant.chip
+                              ? BorderRadius.circular(20.0)
+                              : context.radiusMedium,
                     ),
-                  )
-                  : (icon != null
-                      ? Icon(
-                        icon,
-                        size: context.iconLarge,
-                        color: _getForegroundColor(context),
-                      )
-                      : null),
-          label: AppText.body(
-            text,
-            color: _getForegroundColor(context),
-            fontWeight: FontWeight.w600,
-            textAlign: TextAlign.center,
-          ),
-        ),
+                    shadowColor: Colors.transparent,
+                    minimumSize: Size(0, buttonHeight),
+                    padding:
+                        variant == ButtonVariant.chip
+                            ? const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            )
+                            : null,
+                    splashFactory:
+                        variant == ButtonVariant.tertiary
+                            ? NoSplash.splashFactory
+                            : null,
+                  ),
+                  icon: _buildIcon(context, isEnabled),
+                  label:
+                      variant == ButtonVariant.chip
+                          ? AppText.caption(
+                            text,
+                            color: _getForegroundColor(context),
+                            fontWeight: FontWeight.w400,
+                            textAlign: TextAlign.center,
+                          )
+                          : AppText.body(
+                            text,
+                            color: _getForegroundColor(context),
+                            fontWeight: FontWeight.w600,
+                            textAlign: TextAlign.center,
+                          ),
+                )
+                : TextButton(
+                  onPressed: isEnabled ? handleOnPressed : null,
+                  style: TextButton.styleFrom(
+                    backgroundColor: _getBackgroundColor(context),
+                    foregroundColor: _getForegroundColor(context),
+                    disabledBackgroundColor: _getBackgroundColor(
+                      context,
+                    ).withValues(alpha: 0.5),
+                    side: _getBorder(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          variant == ButtonVariant.chip
+                              ? BorderRadius.circular(20.0)
+                              : context.radiusMedium,
+                    ),
+                    shadowColor: Colors.transparent,
+                    minimumSize: Size(0, buttonHeight),
+                    padding: EdgeInsets.zero,
+                    splashFactory:
+                        variant == ButtonVariant.tertiary
+                            ? NoSplash.splashFactory
+                            : null,
+                  ),
+                  child: _buildIcon(context, isEnabled),
+                ),
       ),
     );
+  }
+
+  /// Build icon widget
+  Widget _buildIcon(BuildContext context, bool isEnabled) {
+    if (isLoading) {
+      return SizedBox(
+        width: variant == ButtonVariant.chip ? 16 : context.iconMedium,
+        height: variant == ButtonVariant.chip ? 16 : context.iconMedium,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation(_getForegroundColor(context)),
+        ),
+      );
+    }
+
+    if (icon != null) {
+      return Icon(
+        icon,
+        size: variant == ButtonVariant.chip ? 16 : context.iconLarge,
+        color: _getForegroundColor(context),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Color _getBackgroundColor(BuildContext context) {
@@ -135,6 +218,10 @@ class AppButton extends StatelessWidget {
         return context.error;
       case ButtonVariant.success:
         return context.success;
+      case ButtonVariant.black:
+        return Colors.black;
+      case ButtonVariant.chip:
+        return context.surface200;
     }
   }
 
@@ -150,6 +237,10 @@ class AppButton extends StatelessWidget {
         return context.onError;
       case ButtonVariant.success:
         return Colors.white;
+      case ButtonVariant.black:
+        return Colors.white;
+      case ButtonVariant.chip:
+        return context.textPrimary;
     }
   }
 

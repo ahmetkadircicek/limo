@@ -1,4 +1,4 @@
-import 'dart:io'; // Added for File
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
@@ -7,7 +7,7 @@ import 'package:limo/core/utils/image_helper.dart';
 class AppProfileImage extends StatelessWidget {
   final String? imageUrl;
   final String? imageBase64;
-  final double size;
+  final double? size;
   final VoidCallback? onTap;
   final bool showEditIcon;
   final Color? backgroundColor;
@@ -18,7 +18,7 @@ class AppProfileImage extends StatelessWidget {
     super.key,
     this.imageUrl,
     this.imageBase64,
-    this.size = 70.0,
+    this.size,
     this.onTap,
     this.showEditIcon = false,
     this.backgroundColor,
@@ -33,16 +33,20 @@ class AppProfileImage extends StatelessWidget {
     final defaultBorderColor =
         borderColor ?? context.onSurface.withValues(alpha: 0.2);
 
+    final double resolvedSize = size ?? MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onTap: onTap,
       child: Stack(
         children: [
           Container(
-            width: size,
-            height: size,
+            width: resolvedSize,
+            height: resolvedSize,
             decoration: BoxDecoration(
               color: defaultBgColor,
-              borderRadius: BorderRadius.circular(size / 2),
+              borderRadius: BorderRadius.circular(
+                resolvedSize / 2,
+              ), // TODO: move radius to theme
               border:
                   borderWidth > 0
                       ? Border.all(
@@ -51,20 +55,15 @@ class AppProfileImage extends StatelessWidget {
                       )
                       : null,
             ),
-            child: ClipOval(child: _buildImageContent(context)),
+            child: _buildImageContent(context, resolvedSize),
           ),
-
-          // Edit icon positioned outside the circle
           if (showEditIcon)
-            Positioned(
-              bottom: context.spacingS,
-              right: context.spacingS,
+            Positioned.fill(
               child: Container(
                 padding: context.paddingS,
                 decoration: BoxDecoration(
-                  color: context.primary,
+                  color: context.primary.withValues(alpha: 0.6),
                   shape: BoxShape.circle,
-                  border: Border.all(color: context.surface, width: 2),
                 ),
                 child: Icon(
                   Icons.edit,
@@ -78,94 +77,89 @@ class AppProfileImage extends StatelessWidget {
     );
   }
 
-  Widget _buildImageContent(BuildContext context) {
-    // If no image URL or base64, show placeholder icon
+  Widget _buildImageContent(BuildContext context, double resolvedSize) {
     if ((imageUrl == null || imageUrl!.isEmpty) &&
         (imageBase64 == null || imageBase64!.isEmpty)) {
-      return _buildPlaceholderIcon(context);
+      return _buildPlaceholderIcon(context, resolvedSize);
     }
 
-    // Priority 1: Show base64 image if available
     if (imageBase64 != null && imageBase64!.isNotEmpty) {
-      return _buildBase64Image(context);
+      return _buildBase64Image(context, resolvedSize);
     }
 
-    // Priority 2: Try to load network image
     if (imageUrl != null &&
         imageUrl!.isNotEmpty &&
         (imageUrl!.startsWith('http://') || imageUrl!.startsWith('https://'))) {
-      return _buildNetworkImage(context);
+      return _buildNetworkImage(context, resolvedSize);
     }
 
-    // Priority 3: Handle local file paths (for images selected from gallery)
     if (imageUrl != null &&
         imageUrl!.isNotEmpty &&
         (imageUrl!.startsWith('/') || imageUrl!.contains('\\'))) {
-      return _buildLocalImage(context);
+      return _buildLocalImage(context, resolvedSize);
     }
 
-    // Fallback to placeholder
-    return _buildPlaceholderIcon(context);
+    return _buildPlaceholderIcon(context, resolvedSize);
   }
 
-  /// Build base64 image
-  Widget _buildBase64Image(BuildContext context) {
+  Widget _buildBase64Image(BuildContext context, double resolvedSize) {
     return ImageHelper.base64ToImage(
       base64String: imageBase64,
-      width: size,
-      height: size,
+      width: resolvedSize,
+      height: resolvedSize,
       fit: BoxFit.cover,
-      errorWidget: _buildPlaceholderIcon(context),
-      placeholder: _buildLoadingPlaceholder(context),
+      errorWidget: _buildPlaceholderIcon(context, resolvedSize),
+      placeholder: _buildLoadingPlaceholder(context, resolvedSize),
     );
   }
 
-  Widget _buildNetworkImage(BuildContext context) {
+  Widget _buildNetworkImage(BuildContext context, double resolvedSize) {
     return Image.network(
       imageUrl!,
+      width: resolvedSize,
+      height: resolvedSize,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        // Fallback to placeholder if network image fails
-        return _buildPlaceholderIcon(context);
+        return _buildPlaceholderIcon(context, resolvedSize);
       },
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
-        return _buildLoadingPlaceholder(context);
+        return _buildLoadingPlaceholder(context, resolvedSize);
       },
     );
   }
 
-  Widget _buildLocalImage(BuildContext context) {
+  Widget _buildLocalImage(BuildContext context, double resolvedSize) {
     try {
       return Image.file(
         File(imageUrl!),
+        width: resolvedSize,
+        height: resolvedSize,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          // Fallback to placeholder if local image fails
-          return _buildPlaceholderIcon(context);
+          return _buildPlaceholderIcon(context, resolvedSize);
         },
       );
     } catch (e) {
-      // Fallback to placeholder if file doesn't exist
-      return _buildPlaceholderIcon(context);
+      return _buildPlaceholderIcon(context, resolvedSize);
     }
   }
 
-  Widget _buildPlaceholderIcon(BuildContext context) {
+  Widget _buildPlaceholderIcon(BuildContext context, double resolvedSize) {
     return Icon(
       Icons.person,
-      size: size * 0.4,
+      size: resolvedSize * 0.4,
       color: context.onSurface.withValues(alpha: 0.6),
     );
   }
 
-  Widget _buildLoadingPlaceholder(BuildContext context) {
+  Widget _buildLoadingPlaceholder(BuildContext context, double resolvedSize) {
     return Container(
       color: context.surface,
       child: Center(
         child: SizedBox(
-          width: size * 0.3,
-          height: size * 0.3,
+          width: resolvedSize * 0.3,
+          height: resolvedSize * 0.3,
           child: CircularProgressIndicator(
             strokeWidth: 2.0,
             valueColor: AlwaysStoppedAnimation<Color>(context.primary),

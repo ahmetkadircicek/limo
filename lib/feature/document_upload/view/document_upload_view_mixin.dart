@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/constants/image_constants.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/core/utils/image_helper.dart';
 import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
@@ -36,12 +37,11 @@ mixin DocumentUploadViewMixin<T extends StatefulWidget> on State<T> {
             ),
             child: SafeArea(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     width: 40,
                     height: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    margin: context.paddingM,
                     decoration: BoxDecoration(
                       color: context.onSurface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(2),
@@ -78,7 +78,7 @@ mixin DocumentUploadViewMixin<T extends StatefulWidget> on State<T> {
       await viewModel.pickImageAndConvert(purpose: purpose);
     } catch (e) {
       if (mounted) {
-        context.showErrorTopSnackbar('Failed to pick image: $e');
+        AppSnackbar.showError(context, message: 'Failed to pick image: $e');
       }
     }
   }
@@ -89,7 +89,7 @@ mixin DocumentUploadViewMixin<T extends StatefulWidget> on State<T> {
       await viewModel.pickImageAndConvert(purpose: purpose);
     } catch (e) {
       if (mounted) {
-        context.showErrorTopSnackbar('Failed to take photo: $e');
+        AppSnackbar.showError(context, message: 'Failed to take photo: $e');
       }
     }
   }
@@ -104,53 +104,35 @@ mixin DocumentUploadViewMixin<T extends StatefulWidget> on State<T> {
     return GestureDetector(
       onTap: onTap ?? () => _showImagePickerDialog(purpose),
       child: Container(
-        width: double.infinity,
-        height: 200,
         decoration: BoxDecoration(
           color:
               hasSelectedDocument
-                  ? context.success.withValues(alpha: 0.08)
+                  ? context.success.withValues(alpha: 0.1)
                   : context.surfaceContainer,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color:
-                hasSelectedDocument
-                    ? context.success.withValues(alpha: 0.4)
-                    : context.onSurface.withValues(alpha: 0.15),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color:
-                  hasSelectedDocument
-                      ? context.success.withValues(alpha: 0.15)
-                      : Colors.black.withValues(alpha: 0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: context.radiusMedium,
         ),
+        width: double.infinity,
+        height: 200,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icon with background
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: context.paddingM,
               decoration: BoxDecoration(
                 color: Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: context.radiusMedium,
               ),
-              child: Icon(
-                hasSelectedDocument ? Icons.check_circle : Icons.file_upload,
-                size: 48,
-                color: hasSelectedDocument ? context.success : context.onSurface.withValues(alpha: 0.6),
+              child: Image.asset(
+                hasSelectedDocument ? ImageAssets.success : ImageAssets.addFile,
+                width: 128,
+                height: 128,
               ),
             ),
-            const SizedBox(height: 12),
 
             // Main text - short and clear
             AppText.heading(
-              hasSelectedDocument ? 'Selected' : 'Tap to select',
+              hasSelectedDocument ? 'Successfully selected!' : 'Tap to select',
               textAlign: TextAlign.center,
               color:
                   hasSelectedDocument

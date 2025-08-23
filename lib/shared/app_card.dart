@@ -7,7 +7,6 @@ enum CardVariant { primary, secondary, tertiary }
 /// Unified card component with 3 variants
 class AppCard extends StatelessWidget {
   final Widget child;
-  final EdgeInsets? padding;
   final double? height;
   final double? width;
   final VoidCallback? onTap;
@@ -16,7 +15,6 @@ class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
-    this.padding,
     this.height,
     this.width,
     this.onTap,
@@ -27,7 +25,6 @@ class AppCard extends StatelessWidget {
   const AppCard.primary({
     super.key,
     required this.child,
-    this.padding,
     this.height,
     this.width,
     this.onTap,
@@ -36,7 +33,6 @@ class AppCard extends StatelessWidget {
   const AppCard.secondary({
     super.key,
     required this.child,
-    this.padding,
     this.height,
     this.width,
     this.onTap,
@@ -45,7 +41,6 @@ class AppCard extends StatelessWidget {
   const AppCard.tertiary({
     super.key,
     required this.child,
-    this.padding,
     this.height,
     this.width,
     this.onTap,
@@ -56,11 +51,10 @@ class AppCard extends StatelessWidget {
     final widget = Container(
       height: height,
       width: width,
-      padding: padding ?? context.paddingL, // Context'ten alınıyor
+      padding: context.paddingL,
       decoration: BoxDecoration(
         color: _getBackgroundColor(context),
-        borderRadius: context.radiusMedium, // Context'ten alınıyor
-        boxShadow: _getShadow(context), // Context'ten shadow
+        borderRadius: context.radiusMedium,
       ),
       child: child,
     );
@@ -80,17 +74,6 @@ class AppCard extends StatelessWidget {
         return context.surfaceContainer; // Light gray - Context'ten
       case CardVariant.tertiary:
         return context.secondary.withValues(alpha: 0.05); // Subtle tint
-    }
-  }
-
-  List<BoxShadow>? _getShadow(BuildContext context) {
-    switch (variant) {
-      case CardVariant.primary:
-        return context.elevationLow; // Context'ten elevation
-      case CardVariant.secondary:
-        return context.elevationNone; // Context'ten elevation
-      case CardVariant.tertiary:
-        return context.elevationNone; // No shadow - Context'ten
     }
   }
 }

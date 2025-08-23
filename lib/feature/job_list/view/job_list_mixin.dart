@@ -4,48 +4,31 @@ import 'package:limo/feature/job_list/viewmodel/job_list_view_model.dart';
 /// Mixin for JobListView business logic
 mixin JobListMixin<T extends StatefulWidget> on State<T> {
   late final JobListViewModel _viewModel;
-  late final TextEditingController _searchController;
+  bool _isInitialized = false;
 
-  /// Initialize the mixin with required controllers and view model
+  /// Initialize the mixin with required view model
   void initializeJobListMixin() {
     _viewModel = JobListViewModel();
-    _searchController = TextEditingController();
   }
 
   /// Initialize the ViewModel when first built
   void initializeViewModelIfNeeded() {
+    if (_isInitialized) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _viewModel.jobs.isEmpty) {
-        _viewModel.initializeJobList();
+      if (mounted && !_isInitialized) {
+        _viewModel.buildInitializeJobList();
+        _isInitialized = true;
         setState(() {}); // Force rebuild after initialization
       }
     });
   }
 
-  /// Setup search controller listener for real-time filtering
-  void setupSearchListener() {
-    _searchController.addListener(() {
-      if (mounted) {
-        _viewModel.filterJobs(_searchController.text);
-        setState(() {}); // Force rebuild after filtering
-      }
-    });
-  }
-
-  /// Navigate to job details page
-  void navigateToJobDetails(BuildContext context, dynamic job) {
-    // TODO: Navigate to job details page
-    // For now, just show a message or handle differently
-  }
-
   /// Get the view model instance
   JobListViewModel get viewModel => _viewModel;
 
-  /// Get the search controller instance
-  TextEditingController get searchController => _searchController;
-
   /// Dispose mixin resources
   void disposeJobListMixin() {
-    _searchController.dispose();
+    // No resources to dispose
   }
 }

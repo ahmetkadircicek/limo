@@ -22,18 +22,9 @@ class FleetVehicleRegistrationView extends StatelessWidget {
 
   /// Build app bar
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: context.surface,
-      elevation: 0,
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: context.onSurface),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      title: AppText.heading(
-        vehicleToEdit != null ? 'Edit Fleet Vehicle' : 'Add Vehicle to Fleet',
-        color: context.onSurface,
-      ),
-      centerTitle: true,
+    return AppAppBar.secondary(
+      title:
+          vehicleToEdit != null ? 'Edit Fleet Vehicle' : 'Add Vehicle to Fleet',
     );
   }
 

@@ -8,16 +8,6 @@ import 'package:limo/core/constants/design_tokens.dart';
 
 /// Helper utility for handling base64 image conversion and display
 class ImageHelper {
-  static const String _tag = 'IMAGE_HELPER';
-
-  /// Convert base64 string to Image widget
-  ///
-  /// [base64String] - Base64 encoded image string
-  /// [width] - Optional width for the image
-  /// [height] - Optional height for the image
-  /// [fit] - How the image should be fitted (default: BoxFit.cover)
-  /// [errorWidget] - Widget to show if image loading fails
-  /// [placeholder] - Widget to show while image is loading
   static Widget base64ToImage({
     required String? base64String,
     double? width,

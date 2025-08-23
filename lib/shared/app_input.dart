@@ -5,7 +5,7 @@ import 'package:limo/core/constants/design_tokens.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
 
-enum InputVariant { primary, secondary, tertiary }
+enum InputVariant { primary, secondary, tertiary, search }
 
 class AppInput extends StatelessWidget {
   final String? hintText;
@@ -18,6 +18,7 @@ class AppInput extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
   final VoidCallback? onSuffixIconTap;
   final InputVariant variant;
   final bool isDropdown;
@@ -38,6 +39,7 @@ class AppInput extends StatelessWidget {
     this.keyboardType,
     this.inputFormatters,
     this.onChanged,
+    this.onSubmitted,
     this.onSuffixIconTap,
     this.variant = InputVariant.primary,
     this.isDropdown = false,
@@ -59,6 +61,7 @@ class AppInput extends StatelessWidget {
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     Function(String)? onChanged,
+    Function(String)? onSubmitted,
     VoidCallback? onSuffixIconTap,
   }) : this(
          key: key,
@@ -72,6 +75,7 @@ class AppInput extends StatelessWidget {
          keyboardType: keyboardType,
          inputFormatters: inputFormatters,
          onChanged: onChanged,
+         onSubmitted: onSubmitted,
          onSuffixIconTap: onSuffixIconTap,
          variant: InputVariant.primary,
        );
@@ -89,6 +93,7 @@ class AppInput extends StatelessWidget {
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     Function(String)? onChanged,
+    Function(String)? onSubmitted,
     VoidCallback? onSuffixIconTap,
   }) : this(
          key: key,
@@ -102,6 +107,7 @@ class AppInput extends StatelessWidget {
          keyboardType: keyboardType,
          inputFormatters: inputFormatters,
          onChanged: onChanged,
+         onSubmitted: onSubmitted,
          onSuffixIconTap: onSuffixIconTap,
          variant: InputVariant.secondary,
        );
@@ -119,6 +125,7 @@ class AppInput extends StatelessWidget {
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     Function(String)? onChanged,
+    Function(String)? onSubmitted,
     VoidCallback? onSuffixIconTap,
   }) : this(
          key: key,
@@ -132,8 +139,30 @@ class AppInput extends StatelessWidget {
          keyboardType: keyboardType,
          inputFormatters: inputFormatters,
          onChanged: onChanged,
+         onSubmitted: onSubmitted,
          onSuffixIconTap: onSuffixIconTap,
          variant: InputVariant.tertiary,
+       );
+
+  // Factory: Search
+  const AppInput.search({
+    Key? key,
+    String? hintText,
+    TextEditingController? controller,
+    bool enabled = true,
+    Function(String)? onChanged,
+    Function(String)? onSubmitted,
+    VoidCallback? onSuffixIconTap,
+  }) : this(
+         key: key,
+         hintText: hintText ?? 'Search...',
+         labelText: '',
+         controller: controller,
+         enabled: enabled,
+         onChanged: onChanged,
+         onSubmitted: onSubmitted,
+         onSuffixIconTap: onSuffixIconTap,
+         variant: InputVariant.search,
        );
 
   // Factory: Dropdown
@@ -165,10 +194,11 @@ class AppInput extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: context.verticalXs,
-          child: AppText.caption(labelText, color: _getLabelColor(context)),
-        ),
+        if (variant != InputVariant.search)
+          Padding(
+            padding: context.verticalXs,
+            child: AppText.caption(labelText, color: _getLabelColor(context)),
+          ),
         isDropdown ? _buildDropdown(context) : _buildTextField(context),
       ],
     );
@@ -188,26 +218,55 @@ class AppInput extends StatelessWidget {
       case InputVariant.tertiary:
         borderColor = context.secondary.withValues(alpha: 0.25);
         break;
+      case InputVariant.search:
+        borderColor = context.onSurface.withValues(alpha: 0.12);
+        break;
     }
 
-    return InputDecoration(
+    InputDecoration baseDecoration = InputDecoration(
       hintText: hintText,
       hintStyle: GoogleFonts.montserrat(
         color: _getHintColor(context),
         fontSize: DesignTokens.bodySmall.fontSize,
         fontWeight: DesignTokens.bodySmall.fontWeight,
       ),
-      suffixIcon:
-          suffixIcon != null
-              ? IconButton(
-                onPressed: onSuffixIconTap,
-                icon: Icon(suffixIcon, color: _getIconColor(context)),
-              )
-              : null,
       filled: true,
       fillColor: _getBackgroundColor(context),
       contentPadding: context.horizontalL,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: BorderSide(color: borderColor, width: 0),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: BorderSide(color: borderColor, width: 0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: BorderSide(color: borderColor, width: 0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: BorderSide(color: context.error, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        borderSide: BorderSide(color: context.error, width: 1),
+      ),
     );
+
+    // Search variant için özel decoration
+    if (variant == InputVariant.search) {
+      baseDecoration = baseDecoration.copyWith(
+        prefixIcon: const Icon(Icons.search, color: Colors.grey),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: context.spacingM,
+          vertical: context.spacingS,
+        ),
+      );
+    }
+
+    return baseDecoration;
   }
 
   Widget _buildTextField(BuildContext context) {
@@ -219,6 +278,7 @@ class AppInput extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
       maxLines: 1,
       style: GoogleFonts.montserrat(
         color: _getTextColor(context),
@@ -237,10 +297,9 @@ class AppInput extends StatelessWidget {
       isExpanded: true,
       style: GoogleFonts.montserrat(
         color: _getTextColor(context),
-        fontSize:
-            DesignTokens.bodyLarge.fontSize, // 16px - consistent with theme
-        fontWeight: FontWeight.w400, // Normal weight - consistent with theme
-        height: DesignTokens.bodyLarge.height, // 22/16 - consistent line height
+        fontSize: DesignTokens.bodyLarge.fontSize,
+        fontWeight: FontWeight.w400,
+        height: DesignTokens.bodyLarge.height,
       ),
       decoration: _baseDecoration(context),
       items:
@@ -262,22 +321,22 @@ class AppInput extends StatelessWidget {
   Color _getLabelColor(BuildContext context) =>
       variant == InputVariant.primary && _isPrimaryBackground(context)
           ? context.onPrimary
-          : context.onSurface;
+          : context.onSurface.withValues(alpha: 0.6);
 
   Color _getTextColor(BuildContext context) =>
       variant == InputVariant.primary && _isPrimaryBackground(context)
           ? context.onPrimary
           : context.onSurface;
 
-  Color _getHintColor(BuildContext context) =>
-      variant == InputVariant.primary && _isPrimaryBackground(context)
-          ? context.onPrimary.withValues(alpha: 0.5)
-          : context.onSurface.withValues(alpha: 0.5);
+  Color _getHintColor(BuildContext context) {
+    if (!enabled) {
+      return context.onSurface.withValues(alpha: 0.3);
+    }
 
-  Color _getIconColor(BuildContext context) =>
-      variant == InputVariant.primary && _isPrimaryBackground(context)
-          ? context.onPrimary.withValues(alpha: 0.6)
-          : context.onSurface.withValues(alpha: 0.6);
+    return variant == InputVariant.primary && _isPrimaryBackground(context)
+        ? context.onPrimary.withValues(alpha: 0.5)
+        : context.onSurface.withValues(alpha: 0.5);
+  }
 
   bool _isPrimaryBackground(BuildContext context) =>
       _getBackgroundColor(context).toARGB32() == context.primary.toARGB32();
@@ -290,6 +349,8 @@ class AppInput extends StatelessWidget {
         return context.surface;
       case InputVariant.tertiary:
         return context.secondary.withValues(alpha: 0.1);
+      case InputVariant.search:
+        return context.surfaceContainer;
     }
   }
 }

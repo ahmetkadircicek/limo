@@ -23,14 +23,15 @@ class CustomNavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isSelected = index == selectedIndex;
+    bool isSelected = index == selectedIndex && selectedIndex >= 0;
     final Color iconColor =
-        isSelected ? context.secondary : context.surface.withValues(alpha: 0.4);
+        isSelected ? context.secondary : context.primary.withValues(alpha: 0.4);
 
     return GestureDetector(
       onTap: () => onTap(index),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: context.spacingXs,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: iconColor),
@@ -38,7 +39,7 @@ class CustomNavBarItem extends StatelessWidget {
             text,
             color: iconColor,
             fontSize: 10,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
         ],
       ),

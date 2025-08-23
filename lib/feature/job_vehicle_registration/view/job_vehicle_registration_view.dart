@@ -23,31 +23,7 @@ final class JobVehicleRegistrationView extends StatelessWidget {
 
   /// Build app bar with back button and title
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: context.surface,
-      elevation: 0,
-      leading: _buildBackButton(context),
-      title: AppText.heading('Add Vehicle', color: context.onSurface),
-      centerTitle: true,
-    );
-  }
-
-  /// Build back button with form clearing
-  Widget _buildBackButton(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back, color: context.onSurface),
-      onPressed: () => _buildHandleBackNavigation(context),
-    );
-  }
-
-  /// Handle back navigation with form clearing
-  void _buildHandleBackNavigation(BuildContext context) {
-    final viewModel = Provider.of<JobVehicleRegistrationViewModel>(
-      context,
-      listen: false,
-    );
-    viewModel.clearForm();
-    Navigator.of(context).pop();
+    return AppAppBar.secondary(title: 'Add Vehicle');
   }
 }
 

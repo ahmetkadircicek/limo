@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/shared/app_text.dart';
@@ -7,148 +9,130 @@ class AppSnackbar {
     BuildContext context, {
     required String message,
     required Color backgroundColor,
-    Duration duration = const Duration(seconds: 4),
+    Duration duration = const Duration(seconds: 3),
   }) {
     final overlay = Overlay.of(context);
 
     late OverlayEntry entry;
+
     entry = OverlayEntry(
       builder: (context) {
-        return Positioned(
-          top: context.height * 0.1,
-          left: context.spacingM,
-          right: context.spacingM,
-          child: Material(
-            color: Colors.transparent,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: -1, end: 0),
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-              builder: (context, value, child) {
-                return Transform.translate(
-                  offset: Offset(0, value * 100),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
-                onTap: () {
-                  if (entry.mounted) entry.remove();
-                },
-                child: Container(
-                  padding: context.paddingL,
-                  decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: context.radiusMedium,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: AppText.body(
-                          message,
-                          color: context.onSurface,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+        return SnackbarWidget(
+          message: message,
+          backgroundColor: backgroundColor,
+          duration: duration,
+          onDismissed: () {
+            if (entry.mounted) entry.remove();
+          },
         );
       },
     );
 
     overlay.insert(entry);
-    Future.delayed(duration, () {
-      if (entry.mounted) entry.remove();
-    });
   }
 
-  /// Yukarıdan kayan success snackbar
-  static void showSuccess(
-    BuildContext context, {
-    required String message,
-    Duration duration = const Duration(seconds: 4),
-  }) {
-    show(
-      context,
-      message: message,
-      backgroundColor: context.success,
-      duration: duration,
-    );
+  static void showSuccess(BuildContext context, {required String message}) {
+    show(context, message: message, backgroundColor: Colors.green);
   }
 
-  static void showError(
-    BuildContext context, {
-    required String message,
-    Duration duration = const Duration(seconds: 4),
-  }) {
-    show(
-      context,
-      message: message,
-      backgroundColor: context.error,
-      duration: duration,
-    );
+  static void showError(BuildContext context, {required String message}) {
+    show(context, message: message, backgroundColor: Colors.red);
   }
 
-  static void showInfo(
-    BuildContext context, {
-    required String message,
-    Duration duration = const Duration(seconds: 4),
-  }) {
-    show(
-      context,
-      message: message,
-      backgroundColor: context.secondary,
-      duration: duration,
-    );
+  static void showInfo(BuildContext context, {required String message}) {
+    show(context, message: message, backgroundColor: Colors.blue);
   }
 
-  static void showWarning(
-    BuildContext context, {
-    required String message,
-    Duration duration = const Duration(seconds: 4),
-  }) {
-    show(
-      context,
-      message: message,
-      backgroundColor: context.warning,
-      duration: duration,
-    );
+  static void showWarning(BuildContext context, {required String message}) {
+    show(context, message: message, backgroundColor: Colors.orange);
   }
 }
 
-extension AppSnackbarTopExtension on BuildContext {
-  void showSuccessTopSnackbar(String message, {Duration? duration}) {
-    AppSnackbar.showSuccess(
-      this,
-      message: message,
-      duration: duration ?? const Duration(seconds: 4),
+class SnackbarWidget extends StatefulWidget {
+  final String message;
+  final Color backgroundColor;
+  final Duration duration;
+  final VoidCallback onDismissed;
+
+  const SnackbarWidget({
+    super.key,
+    required this.message,
+    required this.backgroundColor,
+    required this.duration,
+    required this.onDismissed,
+  });
+
+  @override
+  State<SnackbarWidget> createState() => _SnackbarWidgetState();
+}
+
+class _SnackbarWidgetState extends State<SnackbarWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _offset;
+  Timer? _dismissTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
     );
+    _offset = Tween(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _controller.forward();
+
+    _dismissTimer = Timer(widget.duration, _dismiss);
   }
 
-  void showErrorTopSnackbar(String message, {Duration? duration}) {
-    AppSnackbar.showError(
-      this,
-      message: message,
-      duration: duration ?? const Duration(seconds: 4),
-    );
+  @override
+  void dispose() {
+    _dismissTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
-  void showInfoTopSnackbar(String message, {Duration? duration}) {
-    AppSnackbar.showInfo(
-      this,
-      message: message,
-      duration: duration ?? const Duration(seconds: 4),
-    );
+  Future<void> _dismiss() async {
+    if (!mounted) return;
+    await _controller.reverse();
+    if (mounted) {
+      widget.onDismissed();
+    }
   }
 
-  void showWarningTopSnackbar(String message, {Duration? duration}) {
-    AppSnackbar.showWarning(
-      this,
-      message: message,
-      duration: duration ?? const Duration(seconds: 4),
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: SlideTransition(
+          position: _offset,
+          child: GestureDetector(
+            onTap: _dismiss,
+            child: Container(
+              width: context.width,
+              margin: context.paddingM,
+              padding: context.paddingM,
+              decoration: BoxDecoration(
+                color: widget.backgroundColor,
+                borderRadius: context.radiusMedium,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: AppText.body(
+                  widget.message,
+                  color: context.onPrimary,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

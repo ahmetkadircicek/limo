@@ -37,7 +37,6 @@ class _JobTrackingViewState extends State<JobTrackingView> {
 
   Widget _buildSegmentedControl() {
     return AppCard.secondary(
-      padding: const EdgeInsets.all(4),
       child: Row(
         children: [
           Expanded(child: _buildSegmentButton('Active Jobs', 0)),

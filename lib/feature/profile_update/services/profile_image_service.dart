@@ -54,7 +54,9 @@ class ProfileImageService {
                 onTap: () async {
                   Navigator.of(context).pop();
                   final image = await pickImageFromGallery();
-                  Navigator.of(context).pop(image);
+                  if (context.mounted) {
+                    Navigator.of(context).pop(image);
+                  }
                 },
               ),
             ],

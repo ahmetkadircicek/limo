@@ -31,8 +31,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
-  })  : fontSize = 34.0, // DesignTokens.displayXL
-        fontWeight = FontWeight.w600;
+  }) : fontSize = 34.0, // DesignTokens.displayXL
+       fontWeight = FontWeight.w600;
 
   const AppText.title(
     this.text, {
@@ -41,8 +41,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
-  })  : fontSize = 28.0, // DesignTokens.h1
-        fontWeight = FontWeight.w600;
+  }) : fontSize = 28.0, // DesignTokens.h1
+       fontWeight = FontWeight.w600;
 
   const AppText.subtitle(
     this.text, {
@@ -51,8 +51,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
-  })  : fontSize = 22.0, // DesignTokens.h2
-        fontWeight = FontWeight.w500;
+  }) : fontSize = 22.0, // DesignTokens.h2
+       fontWeight = FontWeight.w500;
 
   const AppText.heading(
     this.text, {
@@ -61,8 +61,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
-  })  : fontSize = 18.0, // DesignTokens.h3
-        fontWeight = FontWeight.w500;
+  }) : fontSize = 18.0, // DesignTokens.h3
+       fontWeight = FontWeight.w500;
 
   const AppText.body(
     this.text, {
@@ -81,8 +81,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
-  })  : fontSize = 14.0, // DesignTokens.bodySmall
-        fontWeight = FontWeight.w400;
+  }) : fontSize = 14.0, // DesignTokens.bodySmall
+       fontWeight = FontWeight.w400;
 
   const AppText.caption(
     this.text, {
@@ -91,8 +91,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.overflow,
-  })  : fontSize = 12.0, // DesignTokens.caption
-        fontWeight = FontWeight.w600;
+    this.fontWeight,
+  }) : fontSize = 12.0; // DesignTokens.caption
 
   @override
   Widget build(BuildContext context) {

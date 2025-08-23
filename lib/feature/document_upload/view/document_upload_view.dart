@@ -32,15 +32,8 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.surfaceContainer,
-      appBar: AppBar(
-        title: AppText.body(
-          widget.title ?? 'Upload ${widget.purpose.title}',
-          fontWeight: FontWeight.w600,
-        ),
-        backgroundColor: context.surface,
-        elevation: 0,
-        iconTheme: IconThemeData(color: context.onSurface),
-        centerTitle: true,
+      appBar: AppAppBar.secondary(
+        title: widget.title ?? 'Upload ${widget.purpose.title}',
       ),
       body: Consumer2<DocumentUploadViewModel, AppStateProvider>(
         builder: (context, viewModel, appState, child) {
@@ -48,12 +41,15 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (viewModel.errorMessage != null &&
                 viewModel.errorMessage!.isNotEmpty) {
-              context.showErrorTopSnackbar(viewModel.errorMessage!);
+              AppSnackbar.showError(context, message: viewModel.errorMessage!);
               viewModel.clearError();
             }
             if (viewModel.successMessage != null &&
                 viewModel.successMessage!.isNotEmpty) {
-              context.showSuccessTopSnackbar(viewModel.successMessage!);
+              AppSnackbar.showSuccess(
+                context,
+                message: viewModel.successMessage!,
+              );
               viewModel.clearSuccess();
             }
           });
@@ -63,24 +59,8 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Upload Section
-                _buildUploadSection(viewModel),
-                const SizedBox(height: 24),
-
-                // Info Section (only show when no document selected)
-                if (viewModel.selectedDocument == null) ...[
-                  _buildInfoSection(),
-                  const SizedBox(height: 24),
-                ],
-
-                // Status Section (only show when document selected)
-                if (viewModel.selectedDocument != null) ...[
-                  _buildStatusSection(viewModel),
-                  const SizedBox(height: 24),
-                ],
-
-                // Action Buttons
-                _buildActionButtonsSection(viewModel, appState),
+                // Upload Section (now includes upload button and info/status)
+                _buildUploadSection(viewModel, appState),
               ],
             ),
           );
@@ -89,8 +69,11 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
     );
   }
 
-  /// Build upload section
-  Widget _buildUploadSection(DocumentUploadViewModel viewModel) {
+  /// Build upload section with upload button inside card
+  Widget _buildUploadSection(
+    DocumentUploadViewModel viewModel,
+    AppStateProvider appState,
+  ) {
     return AppCard.primary(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +81,7 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
           // Simple header
           Row(
             children: [
-              Icon(widget.purpose.icon, color: context.primary, size: 24),
+              Icon(Icons.upload, color: context.primary, size: 24),
               const SizedBox(width: 12),
               AppText.body(
                 'Upload ${widget.purpose.title}',
@@ -115,69 +98,34 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
             onTap: () => _pickDocumentImage(widget.purpose),
             hasSelectedDocument: viewModel.selectedDocument != null,
           ),
-        ],
-      ),
-    );
-  }
+          const SizedBox(height: 20),
 
-  /// Build info section with helpful tips
-  Widget _buildInfoSection() {
-    return AppCard.tertiary(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline, color: context.primary, size: 20),
-              const SizedBox(width: 12),
-              AppText.body(
-                'Upload Requirements',
-                fontWeight: FontWeight.w600,
-                color: context.onSurface,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          AppText.body(
-            '• Clear image, max 5MB',
-            color: context.onSurface.withValues(alpha: 0.7),
-          ),
-          const SizedBox(height: 8),
-          AppText.body(
-            '• JPG, PNG, WebP supported',
-            color: context.onSurface.withValues(alpha: 0.7),
-          ),
-        ],
-      ),
-    );
-  }
+          // Info/Status message above upload button
+          if (viewModel.selectedDocument == null)
+            AppInfo.info(
+              message:
+                  'Please select a document to upload. The document should be clearly readable.',
+            )
+          else
+            AppInfo.success(
+              message:
+                  'Document successfully selected. After uploading to the system, the approval process will be initiated.',
+            ),
+          const SizedBox(height: 20),
 
-  /// Build status section for selected document
-  Widget _buildStatusSection(DocumentUploadViewModel viewModel) {
-    return AppCard.secondary(
-      child: Row(
-        children: [
-          Icon(Icons.check_circle, color: context.success, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: AppText.body(
-              'Document ready for upload',
-              color: context.success,
+          // Upload button inside card
+          SizedBox(
+            width: double.infinity,
+            child: AppButton.primary(
+              'Upload Document',
+              onPressed:
+                  viewModel.selectedDocument != null
+                      ? () => _uploadDocument(appState)
+                      : null,
             ),
           ),
         ],
       ),
-    );
-  }
-
-  /// Build action buttons section
-  Widget _buildActionButtonsSection(
-    DocumentUploadViewModel viewModel,
-    AppStateProvider appState,
-  ) {
-    return buildActionButtons(
-      hasSelectedDocument: viewModel.selectedDocument != null,
-      onUpload: () => _uploadDocument(appState),
     );
   }
 
@@ -186,8 +134,8 @@ class _DocumentUploadViewState extends State<DocumentUploadView>
     viewModel.uploadSelectedDocument(
       appState,
       onSuccess: () {
-        // Navigate back after successful upload
-        Navigator.of(context).pop();
+        // Navigate back after successful upload with success result
+        Navigator.of(context).pop(true);
       },
     );
   }

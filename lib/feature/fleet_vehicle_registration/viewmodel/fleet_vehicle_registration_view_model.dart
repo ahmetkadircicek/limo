@@ -33,16 +33,16 @@ class FleetVehicleRegistrationViewModel extends ChangeNotifier {
 
   // Dropdown options
   List<String> get brandOptions => [
-    'Toyota',
-    'Mercedes-Benz',
-    'Ford',
-    'Volkswagen',
-    'BMW',
     'Audi',
-    'Renault',
+    'BMW',
     'Fiat',
-    'Peugeot',
+    'Ford',
+    'Mercedes-Benz',
     'Nissan',
+    'Peugeot',
+    'Renault',
+    'Toyota',
+    'Volkswagen',
   ];
 
   List<int> get modelYearOptions =>
@@ -67,16 +67,16 @@ class FleetVehicleRegistrationViewModel extends ChangeNotifier {
   ];
 
   List<String> get bodyTypeOptions => [
-    'Sedan',
-    'Hatchback',
-    'SUV',
-    'Station Wagon',
-    'Coupe',
-    'Convertible',
-    'Pickup',
-    'Van',
-    'Minibus',
     'Bus',
+    'Convertible',
+    'Coupe',
+    'Hatchback',
+    'Minibus',
+    'Pickup',
+    'Sedan',
+    'Station Wagon',
+    'SUV',
+    'Van',
   ];
 
   List<String> get categoryOptions => [
@@ -184,5 +184,10 @@ class FleetVehicleRegistrationViewModel extends ChangeNotifier {
     plateNumberController.dispose();
     modelController.dispose();
     super.dispose();
+  }
+
+  /// Reset form to initial state
+  void resetForm() {
+    clearForm();
   }
 }

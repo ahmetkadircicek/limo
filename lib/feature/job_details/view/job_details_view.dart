@@ -143,8 +143,8 @@ class _JobDetailsViewState extends State<JobDetailsView> {
             widget.job.jobType.toString().split('.').last,
           ),
           _buildInfoRow('Status', 'Active'),
-          if (widget.job.pricing != null)
-            _buildInfoRow('Price', widget.job.pricing!.getPricingSummary()),
+          if (widget.job.price != null)
+            _buildInfoRow('Price', '\$${widget.job.price}'),
         ],
       ),
     );
@@ -178,9 +178,9 @@ class _JobDetailsViewState extends State<JobDetailsView> {
           ),
           const SizedBox(height: 16),
           if (widget.job.fromLocation != null)
-            _buildLocationRow('From', widget.job.fromLocation!.placeName),
+            _buildLocationRow('From', widget.job.fromLocation?.placeName ?? ''),
           if (widget.job.toLocation != null)
-            _buildLocationRow('To', widget.job.toLocation!.placeName),
+            _buildLocationRow('To', widget.job.toLocation?.placeName ?? ''),
         ],
       ),
     );
@@ -213,11 +213,10 @@ class _JobDetailsViewState extends State<JobDetailsView> {
             ),
           ),
           const SizedBox(height: 16),
-          if (widget.job.vehicleRequirements.isNotEmpty)
-            _buildInfoRow(
-              'Vehicle Requirements',
-              '${widget.job.vehicleRequirements.length} requirement(s)',
-            ),
+          _buildInfoRow(
+            'Job Type',
+            widget.job.jobType?.toString().split('.').last ?? 'Unknown',
+          ),
         ],
       ),
     );

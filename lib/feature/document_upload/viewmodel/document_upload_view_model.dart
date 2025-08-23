@@ -97,7 +97,7 @@ class DocumentUploadViewModel extends ChangeNotifier {
         appState,
       );
 
-      if (response != null) {
+      if (response) {
         // Clear selected document after successful upload
         _selectedDocument = null;
 
@@ -123,7 +123,7 @@ class DocumentUploadViewModel extends ChangeNotifier {
         // Call success callback if provided
         onSuccess?.call();
       } else {
-        // Use purpose-specific error message
+        // Use purpose-specific error message for failed upload
         _setError(documentToUpload.purpose.errorMessage);
       }
     } catch (e) {

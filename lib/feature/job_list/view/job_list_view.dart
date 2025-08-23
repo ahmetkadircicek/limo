@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:limo/core/extensions/general_extensions.dart';
 import 'package:limo/feature/job_list/view/job_list_mixin.dart';
 import 'package:limo/feature/job_list/widgets/job_card_widget.dart';
-import 'package:limo/feature/job_list/widgets/job_list_header_widget.dart';
+import 'package:limo/feature/job_search/view/job_search_view.dart';
+import 'package:limo/shared/app_components.dart';
 
-/// Job list view displaying available jobs with search and filtering capabilities
+/// Job list view displaying available jobs
 class JobListView extends StatefulWidget {
   const JobListView({super.key});
 
@@ -19,6 +20,7 @@ class _JobListViewState extends State<JobListView>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     initializeJobListMixin();
+    initializeViewModelIfNeeded();
   }
 
   @override
@@ -30,35 +32,98 @@ class _JobListViewState extends State<JobListView>
 
   @override
   Widget build(BuildContext context) {
-    initializeViewModelIfNeeded();
-    setupSearchListener();
-
     return _buildMainContainer(context);
   }
 
-  /// Build the main container with refresh indicator and scroll view
+  /// Build the main container with scroll view
   Widget _buildMainContainer(BuildContext context) {
     return Container(
       color: context.surfaceContainer,
       child: CustomScrollView(
-        slivers: [_buildHeaderSection(), _buildJobListSection()],
+        slivers: [_buildSearchSection(), _buildJobListSection()],
       ),
     );
   }
 
-  /// Build the header section with search and filters
-  Widget _buildHeaderSection() {
+  /// Build the search section with search field and filter button
+  Widget _buildSearchSection() {
     return SliverToBoxAdapter(
-      child: JobListHeaderWidget(
-        jobCount: viewModel.jobs.length,
-        searchController: searchController,
-        onFilterTap: viewModel.showFilters,
+      child: Container(
+        padding: EdgeInsets.all(context.spacingL),
+        child: AppCard.primary(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: context.spacingL,
+            children: [
+              // Header section with title and job count
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: context.spacingS,
+                      children: [
+                        AppText.heading('Available Jobs'),
+                        AppText.bodySmall(
+                          '${viewModel.jobs.length} jobs found',
+                          color: context.textSecondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppButton.chip(
+                    'Filter',
+                    icon: Icons.tune,
+                    onPressed: _showFilters,
+                  ),
+                ],
+              ),
+              // Search input
+              GestureDetector(
+                onTap: () => _navigateToSearch(),
+                child: AppInput.search(
+                  hintText: 'Search jobs...',
+                  enabled: false, // Make it non-functional
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  /// Show filter options
+  void _showFilters() {
+    AppSnackbar.showInfo(context, message: 'Filters will be implemented soon');
+  }
+
+  /// Navigate to search page
+  void _navigateToSearch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const JobSearchView()),
+    );
+  }
+
+  /// Build empty state
+  Widget _buildEmptyState() {
+    return const AppEmptyState(
+      imagePath: 'assets/png/image/image_dashboard.png',
+      title: 'No jobs available',
+      description: 'Check back later for new job opportunities',
     );
   }
 
   /// Build the job list section with proper padding
   Widget _buildJobListSection() {
+    if (viewModel.jobs.isEmpty) {
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: _buildEmptyState(),
+      );
+    }
+
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(
         context.spacingL,
@@ -68,12 +133,14 @@ class _JobListViewState extends State<JobListView>
       ),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate((context, index) {
-          final job = viewModel.filteredJobs[index];
+          final job = viewModel.jobs[index];
           return JobCardWidget(
             job: job,
-            onTap: () => navigateToJobDetails(context, job),
+            onTap: () {
+              // Job details navigation will be implemented later
+            },
           );
-        }, childCount: viewModel.filteredJobs.length),
+        }, childCount: viewModel.jobs.length),
       ),
     );
   }

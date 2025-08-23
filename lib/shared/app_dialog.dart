@@ -61,7 +61,6 @@ class _AppDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: context.radiusMedium),
       child: AppCard.primary(
-        padding: context.paddingXxl,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
