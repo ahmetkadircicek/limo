@@ -1,14 +1,16 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/image_constants.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/app_state_provider.dart';
-import 'package:limo/feature/login/viewmodel/login_view_model.dart';
-import 'package:limo/feature/login/widgets/logo_section.dart';
-import 'package:limo/feature/login/widgets/oauth_buttons_section.dart';
-import 'package:limo/feature/login/widgets/terms_section.dart';
+import 'package:limo/feature/login/view/login_view_mixin.dart';
+import 'package:limo/shared/constants/image_constants.dart';
+import 'package:limo/shared/constants/padding_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
 import 'package:provider/provider.dart';
+
+import '../view_model/login_view_model.dart';
+import '../widgets/logo_section.dart';
+import '../widgets/oauth_buttons_section.dart';
+import '../widgets/terms_section.dart';
 
 /// Modern OAuth-only login screen with extracted widgets
 class LoginView extends StatelessWidget {
@@ -28,11 +30,11 @@ class _LoginViewBody extends StatefulWidget {
   State<_LoginViewBody> createState() => _LoginViewBodyState();
 }
 
-class _LoginViewBodyState extends State<_LoginViewBody> {
+class _LoginViewBodyState extends State<_LoginViewBody> with LoginViewMixin {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<LoginViewModel, AppStateProvider>(
-      builder: (context, loginViewModel, appStateProvider, child) {
+    return Consumer<LoginViewModel>(
+      builder: (context, loginViewModel, child) {
         return Scaffold(
           body: Stack(
             fit: StackFit.expand,
@@ -62,7 +64,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   /// Build the background image
   Widget _buildBackgroundImage() {
     return Image.asset(
-      ImageAssets.loginImage,
+      ImageConstants.loginImage,
       fit: BoxFit.fitHeight,
       width: double.infinity,
       height: double.infinity,
@@ -94,9 +96,9 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
   Widget _buildForegroundContent(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: context.horizontalL,
+        padding: PaddingConstants.horizontal20,
         child: Column(
-          spacing: context.spacingXl,
+          spacing: PaddingConstants.p20,
           children: [
             const Spacer(),
             const LogoSection(),

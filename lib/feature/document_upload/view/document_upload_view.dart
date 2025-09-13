@@ -1,150 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/app_state_provider.dart';
 import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
-import 'package:limo/feature/document_upload/view/document_upload_view_mixin.dart';
 import 'package:limo/feature/document_upload/viewmodel/document_upload_view_model.dart';
-import 'package:limo/shared/app_components.dart';
+import 'package:limo/feature/document_upload/widgets/document_upload_area.dart';
+import 'package:limo/feature/document_upload/widgets/document_upload_button.dart';
+import 'package:limo/feature/document_upload/widgets/document_upload_header.dart';
+import 'package:limo/shared/constants/padding_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
+import 'package:limo/shared/widgets/shared_app_bar.dart';
+import 'package:limo/shared/widgets/shared_card.dart';
+import 'package:limo/shared/widgets/shared_info.dart';
 import 'package:provider/provider.dart';
 
-/// Main document upload view for handling various document types
-class DocumentUploadView extends StatefulWidget {
+class DocumentUploadView extends StatelessWidget {
   final DocumentUploadPurpose purpose;
-  final String? vehiclePlate;
-  final String? title;
-  final String? description;
 
-  const DocumentUploadView({
-    super.key,
-    required this.purpose,
-    this.vehiclePlate,
-    this.title,
-    this.description,
-  });
+  const DocumentUploadView({super.key, required this.purpose});
 
-  @override
-  State<DocumentUploadView> createState() => _DocumentUploadViewState();
-}
-
-class _DocumentUploadViewState extends State<DocumentUploadView>
-    with DocumentUploadViewMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.surfaceContainer,
-      appBar: AppAppBar.secondary(
-        title: widget.title ?? 'Upload ${widget.purpose.title}',
-      ),
-      body: Consumer2<DocumentUploadViewModel, AppStateProvider>(
-        builder: (context, viewModel, appState, child) {
-          // Show messages using AppSnackbar
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (viewModel.errorMessage != null &&
-                viewModel.errorMessage!.isNotEmpty) {
-              AppSnackbar.showError(context, message: viewModel.errorMessage!);
-              viewModel.clearError();
-            }
-            if (viewModel.successMessage != null &&
-                viewModel.successMessage!.isNotEmpty) {
-              AppSnackbar.showSuccess(
-                context,
-                message: viewModel.successMessage!,
-              );
-              viewModel.clearSuccess();
-            }
-          });
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Upload Section (now includes upload button and info/status)
-                _buildUploadSection(viewModel, appState),
-              ],
+      appBar: SharedAppBar(title: purpose.title),
+      body: Consumer<DocumentUploadViewModel>(
+        builder: (context, viewModel, child) {
+          return Padding(
+            padding: PaddingConstants.all20,
+            child: SharedCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                spacing: PaddingConstants.p20,
+                children: [
+                  DocumentUploadHeader(title: purpose.title),
+                  DocumentUploadArea(purpose: purpose),
+                  _buildInfoStatus(viewModel, purpose),
+                  DocumentUploadButton(purpose: purpose),
+                ],
+              ),
             ),
           );
         },
       ),
+      backgroundColor: context.surfaceContainer,
     );
   }
 
-  /// Build upload section with upload button inside card
-  Widget _buildUploadSection(
+  Widget _buildInfoStatus(
     DocumentUploadViewModel viewModel,
-    AppStateProvider appState,
+    DocumentUploadPurpose purpose,
   ) {
-    return AppCard.primary(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Simple header
-          Row(
-            children: [
-              Icon(Icons.upload, color: context.primary, size: 24),
-              const SizedBox(width: 12),
-              AppText.body(
-                'Upload ${widget.purpose.title}',
-                fontWeight: FontWeight.w600,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Upload area
-          buildUploadArea(
-            purpose: widget.purpose,
-            vehiclePlate: widget.vehiclePlate,
-            onTap: () => _pickDocumentImage(widget.purpose),
-            hasSelectedDocument: viewModel.selectedDocument != null,
-          ),
-          const SizedBox(height: 20),
-
-          // Info/Status message above upload button
-          if (viewModel.selectedDocument == null)
-            AppInfo.info(
-              message:
-                  'Please select a document to upload. The document should be clearly readable.',
-            )
-          else
-            AppInfo.success(
-              message:
-                  'Document successfully selected. After uploading to the system, the approval process will be initiated.',
-            ),
-          const SizedBox(height: 20),
-
-          // Upload button inside card
-          SizedBox(
-            width: double.infinity,
-            child: AppButton.primary(
-              'Upload Document',
-              onPressed:
-                  viewModel.selectedDocument != null
-                      ? () => _uploadDocument(appState)
-                      : null,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Upload selected document
-  void _uploadDocument(AppStateProvider appState) {
-    viewModel.uploadSelectedDocument(
-      appState,
-      onSuccess: () {
-        // Navigate back after successful upload with success result
-        Navigator.of(context).pop(true);
-      },
-    );
-  }
-
-  /// Pick document image from gallery
-  void _pickDocumentImage(DocumentUploadPurpose purpose) {
-    viewModel.pickImageAndConvert(
-      purpose: purpose,
-      vehiclePlate: widget.vehiclePlate,
-    );
+    if (viewModel.errorMessage != null) {
+      return SharedInfo(
+        icon: Icons.error,
+        label: 'Error',
+        value: viewModel.errorMessage!,
+      );
+    } else if (viewModel.successMessage != null) {
+      return SharedInfo(
+        icon: Icons.check_circle,
+        label: 'Success',
+        value: viewModel.successMessage!,
+      );
+    } else if (!viewModel.hasSelectedImage) {
+      return SharedInfo(
+        icon: Icons.info,
+        label: 'Info',
+        value: purpose.description,
+      );
+    } else {
+      return SharedInfo(
+        icon: Icons.check_circle_outline,
+        label: 'Ready',
+        value: 'Document successfully selected. Click upload.',
+      );
+    }
   }
 }

@@ -1,69 +1,51 @@
 import 'package:flutter/material.dart';
 
-/// Enum defining the purpose of document upload
-/// This determines the page content, service calls, and behavior
-enum DocumentUploadPurpose {
-  // Profile related documents
-  profilePhoto('profile_photo', 'Profile Photo', 'Upload a profile photo'),
+import '../viewmodel/document_upload_view_model.dart';
 
-  // Driver related documents
+enum DocumentUploadPurpose {
+  profilePhoto(
+    title: 'Profile Photo',
+    description: 'Please select a clear profile photo.',
+    serviceType: UploadServiceType.userPhoto,
+  ),
   driverLicense(
-    'driver_license',
-    'Driver License',
-    'Upload your driver license for verification',
+    title: 'Driver License',
+    description: 'Please select a clear image of your driver license.',
+    serviceType: UploadServiceType.driverLicense,
+  ),
+  vehicleRegistration(
+    title: 'Vehicle Registration',
+    description: 'Upload your vehicle registration document.',
+    serviceType: UploadServiceType.vehicleDocument,
   );
 
-  const DocumentUploadPurpose(this.value, this.title, this.description);
-
-  final String value;
   final String title;
   final String description;
+  final UploadServiceType serviceType;
 
-  /// Get appropriate icon for the document type
-  IconData get icon {
+  const DocumentUploadPurpose({
+    required this.title,
+    required this.description,
+    required this.serviceType,
+  });
+}
+
+enum UploadServiceType { userPhoto, driverLicense, vehicleDocument }
+
+extension DocumentUploadPurposeExtension on DocumentUploadPurpose {
+  void onTap(DocumentUploadViewModel viewModel) {
     switch (this) {
       case DocumentUploadPurpose.profilePhoto:
-        return Icons.person;
       case DocumentUploadPurpose.driverLicense:
-        return Icons.credit_card;
+      case DocumentUploadPurpose.vehicleRegistration:
+        viewModel.pickImage();
     }
   }
 
-  /// Get success message for this document type
-  String get successMessage {
-    switch (this) {
-      case DocumentUploadPurpose.profilePhoto:
-        return 'Profile photo uploaded successfully!';
-      case DocumentUploadPurpose.driverLicense:
-        return 'Driver license uploaded successfully!';
-    }
-  }
-
-  /// Get error message for this document type
-  String get errorMessage {
-    switch (this) {
-      case DocumentUploadPurpose.profilePhoto:
-        return 'Failed to upload profile photo';
-      case DocumentUploadPurpose.driverLicense:
-        return 'Failed to upload driver license';
-    }
-  }
-
-  /// Get specific instructions for this document type
-  List<String> get specificInstructions {
-    switch (this) {
-      case DocumentUploadPurpose.profilePhoto:
-        return [
-          'Use a clear, recent photo',
-          'Ensure good lighting',
-          'Face should be clearly visible',
-        ];
-      case DocumentUploadPurpose.driverLicense:
-        return [
-          'Ensure all text is readable',
-          'Include front and back if needed',
-          'Check expiration date is visible',
-        ];
-    }
+  Future<void> upload(
+    DocumentUploadViewModel viewModel,
+    BuildContext context,
+  ) async {
+    await viewModel.uploadDocument(context, this);
   }
 }

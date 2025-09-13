@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:limo/core/services/environment_service.dart';
 import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/shared/constants/app_constants.dart';
 import 'package:pointycastle/export.dart';
 
 /// Service for encrypting and decrypting API data using AES-256-CBC
@@ -13,21 +13,27 @@ class EncryptionService {
   static const int _ivLength = 16;
   static const int _keyLength = 32; // 256 bit
 
-  /// Current AES key (Base64 string) - loaded from environment
-  static String _aesKey = '';
-
   /// Initialize encryption service with key from environment
   static Future<void> initialize() async {
-    _aesKey = EnvironmentService.aesEncryptionKey;
-    LoggerService.info('AES key loaded from environment', tag: _tag);
+    final key = AppConstants.aesKey;
+
+    if (key.isNotEmpty) {
+      final keyBytes = base64Decode(key);
+      LoggerService.info(
+        'AES key loaded successfully: ${key.substring(0, 8)}...${key.substring(key.length - 8)} (${keyBytes.length} bytes)',
+        tag: _tag,
+      );
+
+      // Log key details
+      LoggerService.debug('Full AES key (base64): $key', tag: _tag);
+    } else {
+      LoggerService.error('AES key is empty or not loaded', tag: _tag);
+    }
   }
 
   /// Get current key bytes for cryptographic operations
   static Uint8List _getKeyBytes() {
-    if (_aesKey.isEmpty) {
-      throw Exception('AES key not found in environment. Check .env file.');
-    }
-    return base64Decode(_aesKey);
+    return base64Decode(AppConstants.aesKey);
   }
 
   /// Encrypt text data
@@ -159,12 +165,21 @@ class EncryptionService {
     final key = _getKeyBytes();
     final data = utf8.encode(plaintext);
 
+    // Log key information for debugging
+    LoggerService.debug(
+      'Using AES key: ${base64Encode(key).substring(0, 8)}...${base64Encode(key).substring(base64Encode(key).length - 8)} (length: ${key.length} bytes)',
+      tag: _tag,
+    );
+
     // Generate random IV
     final random = Random.secure();
     final iv = Uint8List(_ivLength);
     for (int i = 0; i < _ivLength; i++) {
       iv[i] = random.nextInt(256);
     }
+
+    // Log IV for debugging
+    LoggerService.debug('Generated IV: ${base64Encode(iv)}', tag: _tag);
 
     // Initialize cipher
     final cipher = CBCBlockCipher(AESEngine());
@@ -247,7 +262,7 @@ class EncryptionService {
   /// Get encryption service information
   static Map<String, dynamic> getEncryptionInfo() {
     return {
-      'enabled': _aesKey.isNotEmpty,
+      'enabled': AppConstants.aesKey.isNotEmpty,
       'algorithm': 'AES-256-CBC',
       'iv_length': _ivLength,
       'key_length_bytes': _keyLength,

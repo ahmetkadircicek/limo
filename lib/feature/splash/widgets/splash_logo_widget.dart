@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/constants/image_constants.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
+import 'package:limo/shared/constants/image_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
+import 'package:limo/shared/extensions/context_size_extension.dart';
 
 /// Reusable widget for displaying the app logo in splash screens
 class SplashLogoWidget extends StatelessWidget {
@@ -11,7 +12,7 @@ class SplashLogoWidget extends StatelessWidget {
     return ColorFiltered(
       colorFilter: ColorFilter.mode(context.onPrimary, BlendMode.srcIn),
       child: Image.asset(
-        ImageAssets.logo,
+        ImageConstants.logo,
         width: context.width * 0.7,
         fit: BoxFit.contain,
       ),

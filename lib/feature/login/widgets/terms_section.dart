@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/shared/app_components.dart';
+import 'package:limo/shared/constants/padding_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
+import 'package:limo/shared/extensions/context_typography_extension.dart';
+import 'package:limo/shared/widgets/app_snackbar.dart';
 
 /// Terms and privacy section widget for login view
 class TermsSection extends StatelessWidget {
@@ -9,22 +11,19 @@ class TermsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: context.horizontalL,
+      padding: PaddingConstants.horizontal20,
       child: Column(
-        children: [
-          _buildTermsText(context),
-          SizedBox(height: context.spacingL),
-          _buildTermsButtons(context),
-        ],
+        spacing: PaddingConstants.p8,
+        children: [_buildTermsText(context), _buildTermsButtons(context)],
       ),
     );
   }
 
   /// Builds the terms acceptance text
   Widget _buildTermsText(BuildContext context) {
-    return AppText.caption(
+    return Text(
       'By continuing, you accept the Terms of Service and Privacy Policy.',
-      color: context.onPrimary.withValues(alpha: 0.7),
+      style: context.subhead.copyWith(color: context.onSurface),
       textAlign: TextAlign.center,
     );
   }
@@ -45,7 +44,10 @@ class TermsSection extends StatelessWidget {
   Widget _buildTermsButton(BuildContext context) {
     return TextButton(
       onPressed: () => _showTermsSnackbar(context),
-      child: AppText.caption('Terms of Service', color: context.onPrimary),
+      child: Text(
+        'Terms of Service',
+        style: context.footnote.copyWith(color: context.onSurface),
+      ),
     );
   }
 
@@ -62,23 +64,20 @@ class TermsSection extends StatelessWidget {
   Widget _buildPrivacyButton(BuildContext context) {
     return TextButton(
       onPressed: () => _showPrivacySnackbar(context),
-      child: AppText.caption('Privacy Policy', color: context.onPrimary),
+      child: Text(
+        'Privacy Policy',
+        style: context.footnote.copyWith(color: context.onSurface),
+      ),
     );
   }
 
   /// Shows Terms of Service information via snackbar
   void _showTermsSnackbar(BuildContext context) {
-    AppSnackbar.showInfo(
-      context,
-      message: 'Terms of Service will be available soon.',
-    );
+    AppSnackbar.info(message: 'Terms of Service will be available soon.');
   }
 
   /// Shows Privacy Policy information via snackbar
   void _showPrivacySnackbar(BuildContext context) {
-    AppSnackbar.showInfo(
-      context,
-      message: 'Privacy Policy will be available soon.',
-    );
+    AppSnackbar.info(message: 'Privacy Policy will be available soon.');
   }
 }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/extensions/general_extensions.dart';
-import 'package:limo/core/providers/app_state_provider.dart';
-import 'package:limo/shared/app_components.dart';
-import 'package:provider/provider.dart';
+import 'package:limo/feature/profile_update/view/profile_edit_view_mixin.dart';
+import 'package:limo/shared/constants/padding_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
+import 'package:limo/shared/widgets/shared_app_bar.dart';
+import 'package:limo/shared/widgets/shared_button.dart';
+import 'package:limo/shared/widgets/shared_card.dart';
+import 'package:limo/shared/widgets/shared_input.dart';
 
 import '../viewmodel/profile_update_view_model.dart';
-import 'profile_edit_view_mixin.dart';
 
-/// Profile edit view for updating user information
+/// Profile edit view with all UI elements in a single build method
 class ProfileEditView extends StatefulWidget {
   const ProfileEditView({super.key});
 
@@ -19,141 +21,61 @@ class _ProfileEditViewState extends State<ProfileEditView>
     with ProfileEditViewMixin {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<AppStateProvider, ProfileUpdateViewModel>(
-      builder: (context, appState, viewModel, child) {
-        return _buildScaffold(context, appState, viewModel);
-      },
-    );
-  }
-
-  /// Build main scaffold
-  Widget _buildScaffold(
-    BuildContext context,
-    AppStateProvider appState,
-    ProfileUpdateViewModel viewModel,
-  ) {
     return Scaffold(
+      appBar: SharedAppBar(title: 'Edit Profile'),
       backgroundColor: context.surfaceContainer,
-      appBar: _buildAppBar(context),
-      body: _buildBody(context, appState, viewModel),
-    );
-  }
-
-  /// Build app bar
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppAppBar.secondary(title: 'Edit Profile');
-  }
-
-  /// Build main body content
-  Widget _buildBody(
-    BuildContext context,
-    AppStateProvider appState,
-    ProfileUpdateViewModel viewModel,
-  ) {
-    return SingleChildScrollView(
-      padding: context.paddingL,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: context.spacingXl,
-        children: [
-          _buildPersonalInfoSection(context, appState.currentUser, viewModel),
-        ],
+      body: Padding(
+        padding: PaddingConstants.all20,
+        child: SharedCard(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: PaddingConstants.p20,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildUserUpdateForm(viewModel),
+              _buildSaveButton(viewModel, context),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  /// Build personal information section
-  Widget _buildPersonalInfoSection(
-    BuildContext context,
-    user,
-    ProfileUpdateViewModel viewModel,
-  ) {
-    return AppCard.primary(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: context.spacingL,
-        children: [
-          _buildInputField(
-            context,
-            label: 'Full Name',
-            controller: fullNameController,
-            hintText: 'Enter your full name',
-          ),
-          _buildInputField(
-            context,
-            label: 'Phone',
-            controller: phoneController,
-            hintText: 'Enter your phone number',
-            keyboardType: TextInputType.phone,
-          ),
-          _buildInputField(
-            context,
-            label: 'Company Name',
-            controller: companyNameController,
-            hintText: 'Enter your company name',
-          ),
-          SizedBox(height: context.spacingXl),
-          _buildSaveButton(context, viewModel),
-        ],
-      ),
+  Column _buildUserUpdateForm(ProfileUpdateViewModel vm) {
+    return Column(
+      spacing: PaddingConstants.p16,
+      children: [
+        SharedInput(
+          controller: vm.fullNameController,
+          label: 'Full Name',
+          hint: 'John Doe ',
+        ),
+        // Phone
+        SharedInput(
+          controller: vm.phoneController,
+          label: 'Phone',
+          hint: '1234567890',
+        ),
+        // Company Name
+        SharedInput(
+          controller: vm.companyNameController,
+          label: 'Company Name',
+          hint: 'Company Name',
+        ),
+      ],
     );
   }
 
-  /// Build input field
-  Widget _buildInputField(
-    BuildContext context, {
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType? keyboardType,
-  }) {
-    return AppInput.primary(
-      controller: controller,
-      labelText: label,
-      hintText: hintText,
-      keyboardType: keyboardType,
-    );
-  }
-
-  /// Build save button
   Widget _buildSaveButton(
+    ProfileUpdateViewModel profileUpdateViewModel,
     BuildContext context,
-    ProfileUpdateViewModel viewModel,
   ) {
-    return SizedBox(
-      width: double.infinity,
-      child: AppButton.primary(
-        'Save Changes',
-        onPressed:
-            viewModel.isLoading ? null : () => _saveChanges(context, viewModel),
-        isLoading: viewModel.isLoading,
-      ),
+    return SharedButton(
+      text: 'Save Changes',
+      isLoading: profileUpdateViewModel.isLoading,
+      backgroundColor: context.primary,
+      foregroundColor: context.onPrimary,
+      onPressed: () => profileUpdateViewModel.onSavePressed(context),
     );
-  }
-
-  /// Save profile changes
-  Future<void> _saveChanges(
-    BuildContext context,
-    ProfileUpdateViewModel viewModel,
-  ) async {
-    final appState = Provider.of<AppStateProvider>(context, listen: false);
-
-    final success = await viewModel.saveProfileChanges(
-      fullName: fullNameController.text,
-      phone: phoneController.text,
-      companyName: companyNameController.text,
-      appState: appState,
-    );
-
-    if (context.mounted && success) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  @override
-  void dispose() {
-    // Reset form when leaving the page
-    resetForm();
-    super.dispose();
   }
 }

@@ -1,38 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/init/navigation/navigation_service.dart';
-import 'package:limo/core/init/theme/app_theme.dart';
-import 'package:limo/core/services/encryption_service.dart';
+import 'package:limo/core/init/provider_initializer.dart';
+import 'package:limo/core/navigation/navigation_manager.dart';
 import 'package:limo/core/services/environment_service.dart';
-import 'package:limo/feature/login/services/google_auth_service.dart';
-import 'package:limo/feature/splash/view/splash_view.dart';
+import 'package:limo/core/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
-import 'core/init/notifier/provider_manager.dart';
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await _initializeServices();
+  await EnvironmentService.initialize();
   _runApp();
 }
 
-/// Initialize all required services
-Future<void> _initializeServices() async {
-  await EnvironmentService.initialize();
-
-  if (!EnvironmentService.validateRequired()) {
-    throw Exception('Missing required environment variables');
-  }
-
-  await EncryptionService.initialize();
-  await GoogleAuthService.initialize();
-}
-
-/// Run the application
 void _runApp() {
   runApp(
     MultiProvider(
-      providers: ProviderManager.instance.providers,
+      providers: ProviderInitializer.instance.allProviders,
       child: const MyApp(),
     ),
   );
@@ -48,12 +33,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Limo',
       theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
-      navigatorKey: NavigationService.instance.navigatorKey,
-      home: const SplashView(),
+      routerConfig: NavigationManager.router,
     );
   }
 }
