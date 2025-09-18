@@ -1,13 +1,13 @@
 import 'package:go_router/go_router.dart';
-import 'package:limo/feature/document_upload/enums/document_upload_purpose_enum.dart';
-import 'package:limo/feature/document_upload/view/document_upload_view.dart';
-import 'package:limo/feature/fleet_management/view/fleet_management_view.dart';
-import 'package:limo/feature/fleet_vehicle_registration/view/fleet_vehicle_registration_view.dart';
-import 'package:limo/feature/login/view/login_view.dart';
-import 'package:limo/feature/navigation/view/navigation_view.dart';
-import 'package:limo/feature/profile/view/profile_view.dart';
-import 'package:limo/feature/profile_update/view/profile_edit_view.dart';
-import 'package:limo/feature/splash/view/splash_view.dart';
+import 'package:limo/module/car_management/view/car_management_view.dart';
+import 'package:limo/module/car_registration/view/car_registration_view.dart';
+import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
+import 'package:limo/module/document_upload/view/document_upload_view.dart';
+import 'package:limo/module/login/view/login_view.dart';
+import 'package:limo/module/navigation/view/navigation_view.dart';
+import 'package:limo/module/profile/view/profile_view.dart';
+import 'package:limo/module/profile_update/view/profile_edit_view.dart';
+import 'package:limo/module/splash/view/splash_view.dart';
 
 class NavigationManager {
   static const String splash = '/';
@@ -15,8 +15,8 @@ class NavigationManager {
   static const String home = '/home';
   static const String profile = 'profile';
   static const String profileEdit = 'profile/edit';
-  static const String fleetManagement = 'fleet';
-  static const String fleetVehicleRegistration = 'fleet/vehicle/register';
+  static const String carManagement = 'cars';
+  static const String carRegistration = 'cars/register';
   static const String documentUpload = 'document/upload';
 
   static final GoRouter router = GoRouter(
@@ -49,14 +49,14 @@ class NavigationManager {
             builder: (context, state) => const ProfileEditView(),
           ),
           GoRoute(
-            path: fleetManagement,
-            name: 'fleetManagement',
-            builder: (context, state) => const FleetManagementView(),
+            path: carManagement,
+            name: 'carManagement',
+            builder: (context, state) => const CarManagementView(),
           ),
           GoRoute(
-            path: fleetVehicleRegistration,
-            name: 'fleetVehicleRegistration',
-            builder: (context, state) => const FleetVehicleRegistrationView(),
+            path: carRegistration,
+            name: 'carRegistration',
+            builder: (context, state) => const CarRegistrationView(),
           ),
           GoRoute(
             path: documentUpload,

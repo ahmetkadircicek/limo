@@ -24,7 +24,7 @@ class SharedCard extends StatelessWidget {
     final widget = Container(
       height: height,
       width: width,
-      padding: PaddingConstants.all16,
+      padding: PaddingConstants.all20,
       decoration: BoxDecoration(
         color: backgroundColor ?? context.surface,
         borderRadius: RadiusConstants.standard,
