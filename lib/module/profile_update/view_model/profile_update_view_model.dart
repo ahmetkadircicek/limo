@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/core/services/user_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
 
 class ProfileUpdateViewModel extends ChangeNotifier {
   // Controllers

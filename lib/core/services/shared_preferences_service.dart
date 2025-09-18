@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/oauth_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -132,22 +132,28 @@ class SharedPreferencesService {
   static Future<bool> clearAllData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      LoggerService.info(
-        'Clearing all data from SharedPreferences',
-        tag: _tag,
-      );
+      LoggerService.info('Clearing all data from SharedPreferences', tag: _tag);
 
       final result = await prefs.clear();
 
       if (result) {
-        LoggerService.success('All SharedPreferences data cleared successfully', tag: _tag);
+        LoggerService.success(
+          'All SharedPreferences data cleared successfully',
+          tag: _tag,
+        );
       } else {
-        LoggerService.warning('Failed to clear all SharedPreferences data', tag: _tag);
+        LoggerService.warning(
+          'Failed to clear all SharedPreferences data',
+          tag: _tag,
+        );
       }
 
       return result;
     } catch (e) {
-      LoggerService.error('Error clearing all SharedPreferences data: $e', tag: _tag);
+      LoggerService.error(
+        'Error clearing all SharedPreferences data: $e',
+        tag: _tag,
+      );
       return false;
     }
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/module/profile_update/viewmodel/profile_update_view_model.dart';
+import 'package:limo/module/profile_update/view_model/profile_update_view_model.dart';
 import 'package:limo/shared/models/user_model.dart';
 import 'package:provider/provider.dart';
 

@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:limo/core/services/logger_service.dart';
 
 class GoogleApiKeys {
   static const String placesWebService =
@@ -77,21 +78,24 @@ class GooglePlacesService {
         return preds;
       }
 
-      // Hata/log
-      // ignore: avoid_print
-      print(
+      // Log
+      LoggerService.warning(
         '[PLACES][AUTOCOMPLETE] status=$status code=${res.statusCode} err=${data['error_message']}',
+        tag: 'GooglePlaces',
       );
       return const [];
     } on DioException catch (e) {
-      // ignore: avoid_print
-      print(
+      LoggerService.error(
         '[PLACES][AUTOCOMPLETE][HTTP] ${e.response?.statusCode} ${e.response?.data}',
+        error: e,
+        tag: 'GooglePlaces',
       );
       return const [];
     } catch (e) {
-      // ignore: avoid_print
-      print('[PLACES][AUTOCOMPLETE][ERR] $e');
+      LoggerService.error(
+        '[PLACES][AUTOCOMPLETE][ERR] $e',
+        tag: 'GooglePlaces',
+      );
       return const [];
     }
   }
@@ -127,20 +131,20 @@ class GooglePlacesService {
         return (address: address, lat: lat, lng: lng, placeId: pid);
       }
 
-      // ignore: avoid_print
-      print(
+      LoggerService.warning(
         '[PLACES][DETAILS] status=$status code=${res.statusCode} err=${data['error_message']}',
+        tag: 'GooglePlaces',
       );
       return null;
     } on DioException catch (e) {
-      // ignore: avoid_print
-      print(
+      LoggerService.error(
         '[PLACES][DETAILS][HTTP] ${e.response?.statusCode} ${e.response?.data}',
+        error: e,
+        tag: 'GooglePlaces',
       );
       return null;
     } catch (e) {
-      // ignore: avoid_print
-      print('[PLACES][DETAILS][ERR] $e');
+      LoggerService.error('[PLACES][DETAILS][ERR] $e', tag: 'GooglePlaces');
       return null;
     }
   }
@@ -172,20 +176,20 @@ class GooglePlacesService {
         return (formattedAddress: addr, placeId: pid);
       }
 
-      // ignore: avoid_print
-      print(
+      LoggerService.warning(
         '[GEOCODE][REVERSE] status=$status code=${res.statusCode} err=${data['error_message']}',
+        tag: 'GooglePlaces',
       );
       return null;
     } on DioException catch (e) {
-      // ignore: avoid_print
-      print(
+      LoggerService.error(
         '[GEOCODE][REVERSE][HTTP] ${e.response?.statusCode} ${e.response?.data}',
+        error: e,
+        tag: 'GooglePlaces',
       );
       return null;
     } catch (e) {
-      // ignore: avoid_print
-      print('[GEOCODE][REVERSE][ERR] $e');
+      LoggerService.error('[GEOCODE][REVERSE][ERR] $e', tag: 'GooglePlaces');
       return null;
     }
   }

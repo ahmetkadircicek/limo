@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
+import 'package:limo/module/document_upload/view_model/document_upload_view_model.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
 import 'package:limo/shared/widgets/shared_button.dart';
 import 'package:provider/provider.dart';
-
-import '../enums/document_upload_purpose_enum.dart';
-import '../viewmodel/document_upload_view_model.dart';
 
 class DocumentUploadButton extends StatelessWidget {
   final DocumentUploadPurpose purpose;

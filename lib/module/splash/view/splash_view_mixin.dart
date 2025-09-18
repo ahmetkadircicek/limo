@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/core/navigation/navigation_manager.dart';
-import 'package:limo/module/splash/viewmodel/splash_view_model.dart';
+import 'package:limo/core/navigation/route_paths.dart';
+import 'package:limo/module/splash/view_model/splash_view_model.dart';
 
 mixin SplashMixin<T extends StatefulWidget> on State<T> {
   @override
@@ -23,10 +23,10 @@ mixin SplashMixin<T extends StatefulWidget> on State<T> {
   }
 
   void _navigateToHome() {
-    context.go(NavigationManager.home);
+    context.go(RoutePaths.home);
   }
 
   void _navigateToLogin() {
-    context.go(NavigationManager.login);
+    context.go(RoutePaths.login);
   }
 }

@@ -1,8 +1,7 @@
-// core/services/job_type_service.dart
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/core/services/api_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/job_type_model.dart';
 import 'package:provider/provider.dart';
 
@@ -48,3 +47,5 @@ class JobTypeService {
     }
   }
 }
+
+

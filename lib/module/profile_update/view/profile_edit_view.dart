@@ -7,7 +7,7 @@ import 'package:limo/shared/widgets/shared_button.dart';
 import 'package:limo/shared/widgets/shared_card.dart';
 import 'package:limo/shared/widgets/shared_input.dart';
 
-import '../viewmodel/profile_update_view_model.dart';
+import 'package:limo/module/profile_update/view_model/profile_update_view_model.dart';
 
 /// Profile edit view with all UI elements in a single build method
 class ProfileEditView extends StatefulWidget {

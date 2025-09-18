@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/core/navigation/navigation_manager.dart';
+import 'package:limo/core/navigation/route_paths.dart';
 import 'package:limo/module/login/widgets/oauth_button.dart';
 import 'package:limo/shared/constants/color_constants.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
@@ -30,7 +30,7 @@ class OAuthButtonsSection extends StatelessWidget {
           onPressed: () async {
             final user = await viewModel.signInWithGoogle(context);
             if (user != null && context.mounted) {
-              context.go(NavigationManager.home);
+              context.go(RoutePaths.home);
             }
           },
         ),

@@ -1,13 +1,12 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:limo/core/providers/oauth_provider.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/oauth_model.dart';
 
 class GoogleAuthService {
   static final _tag = 'GOOGLE_AUTH_SERVICE';
   static final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
-  /// Google ile oturum aç ve OAuthProvider'a ekle
   static Future<OAuthModel?> signIn(OAuthProvider oauthProvider) async {
     try {
       final account = await _googleSignIn.authenticate();
@@ -32,3 +31,5 @@ class GoogleAuthService {
     }
   }
 }
+
+

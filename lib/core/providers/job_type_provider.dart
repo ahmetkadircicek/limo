@@ -1,6 +1,6 @@
 // core/providers/job_type_provider.dart
 import 'package:flutter/material.dart';
-import 'package:limo/core/services/job_type_service.dart';
+import 'package:limo/module/job_create/services/job_type_service.dart';
 import 'package:limo/shared/models/job_type_model.dart';
 
 class JobTypeProvider extends ChangeNotifier {

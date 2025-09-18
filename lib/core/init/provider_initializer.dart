@@ -7,13 +7,13 @@ import 'package:limo/core/providers/oauth_provider.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/module/car_management/view_model/car_management_view_model.dart';
 import 'package:limo/module/car_registration/view_model/car_registration_view_model.dart';
-import 'package:limo/module/document_upload/viewmodel/document_upload_view_model.dart';
+import 'package:limo/module/document_upload/view_model/document_upload_view_model.dart';
 import 'package:limo/module/login/view_model/login_view_model.dart';
-import 'package:limo/module/navigation/viewmodel/navigation_view_model.dart'
+import 'package:limo/module/navigation/view_model/navigation_view_model.dart'
     show NavigationViewModel;
 import 'package:limo/module/profile/view_model/profile_view_model.dart';
-import 'package:limo/module/profile_update/viewmodel/profile_update_view_model.dart';
-import 'package:limo/module/splash/viewmodel/splash_view_model.dart';
+import 'package:limo/module/profile_update/view_model/profile_update_view_model.dart';
+import 'package:limo/module/splash/view_model/splash_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 

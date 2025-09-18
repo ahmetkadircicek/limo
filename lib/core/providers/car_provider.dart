@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:limo/core/services/car_service.dart';
+import 'package:limo/module/car_management/services/car_service.dart';
 import 'package:limo/shared/models/car_model.dart';
 
 class CarProvider extends ChangeNotifier {

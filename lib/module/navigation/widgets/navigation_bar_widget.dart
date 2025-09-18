@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:limo/module/navigation/viewmodel/navigation_view_model.dart';
+import 'package:limo/module/navigation/view_model/navigation_view_model.dart';
 import 'package:limo/module/navigation/widgets/navigation_bar_item_widget.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
@@ -46,7 +46,7 @@ class NavigationBarWidget extends StatelessWidget {
                   : Icons.home_outlined,
           isSelected: navigationViewModel.selectedIndex == 0,
           onTap: () => navigationViewModel.onItemTapped(0),
-          label: "Jobs",
+          label: 'Jobs',
         ),
         NavigationBarItemWidget(
           icon:
@@ -55,7 +55,7 @@ class NavigationBarWidget extends StatelessWidget {
                   : Icons.add_circle_outline,
           isSelected: navigationViewModel.selectedIndex == 1,
           onTap: () => navigationViewModel.onItemTapped(1),
-          label: "Post",
+          label: 'Post',
         ),
         NavigationBarItemWidget(
           icon:
@@ -64,7 +64,7 @@ class NavigationBarWidget extends StatelessWidget {
                   : Icons.timeline_outlined,
           isSelected: navigationViewModel.selectedIndex == 2,
           onTap: () => navigationViewModel.onItemTapped(2),
-          label: "Dash",
+          label: 'Dash',
         ),
         NavigationBarItemWidget(
           icon:
@@ -73,7 +73,7 @@ class NavigationBarWidget extends StatelessWidget {
                   : Icons.directions_car_outlined,
           isSelected: navigationViewModel.selectedIndex == 3,
           onTap: () => navigationViewModel.onItemTapped(3),
-          label: "Cars",
+          label: 'Cars',
         ),
         NavigationBarItemWidget(
           icon:
@@ -82,7 +82,7 @@ class NavigationBarWidget extends StatelessWidget {
                   : Icons.person_outline,
           isSelected: navigationViewModel.selectedIndex == 4,
           onTap: () => navigationViewModel.onItemTapped(4),
-          label: "Profile",
+          label: 'Profile',
         ),
       ],
     );

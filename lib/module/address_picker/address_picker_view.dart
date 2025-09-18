@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:limo/core/services/google_places_service.dart';
+import 'package:limo/module/address_picker/services/google_places_service.dart';
 import 'package:limo/shared/models/picked_location_model.dart';
 
 class AddressPickerView extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
-import 'package:limo/module/document_upload/viewmodel/document_upload_view_model.dart';
+import 'package:limo/module/document_upload/view_model/document_upload_view_model.dart';
 import 'package:limo/module/document_upload/widgets/document_upload_area.dart';
 import 'package:limo/module/document_upload/widgets/document_upload_button.dart';
 import 'package:limo/module/document_upload/widgets/document_upload_header.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:limo/core/services/brand_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
+import 'package:limo/module/car_management/services/brand_service.dart';
 import 'package:limo/shared/models/brand_model.dart';
 
 class BrandProvider extends ChangeNotifier {

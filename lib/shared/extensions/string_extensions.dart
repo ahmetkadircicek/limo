@@ -2,19 +2,23 @@ extension StringExtensions on String {
   // String get locale => this.tr();
 
   String toImagePng() {
-    return 'assets/images/$this.png';
+    // TODO: Deprecate direct path building; use ImageTokens.png(name)
+    return 'assets/png/$this.png';
   }
 
   String toImageJpg() {
-    return 'assets/images/$this.jpg';
+    // TODO: Deprecate direct path building; use ImageTokens.png(name)
+    return 'assets/png/$this.jpg';
   }
 
   String toLottie() {
-    return 'assets/lotties/$this.json';
+    // TODO: Deprecate direct path building; use ImageTokens.lottie(name)
+    return 'assets/lottie/$this.json';
   }
 
   String toIconPng() {
-    return 'assets/icons/$this.png';
+    // TODO: Deprecate direct path building; use ImageTokens.png(name)
+    return 'assets/png/$this.png';
   }
 
   String replaceSpecialCharacters() {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../viewmodel/document_upload_view_model.dart';
+import 'package:limo/module/document_upload/view_model/document_upload_view_model.dart';
 
 enum DocumentUploadPurpose {
   profilePhoto(

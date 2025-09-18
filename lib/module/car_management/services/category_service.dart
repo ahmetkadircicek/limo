@@ -1,11 +1,10 @@
 import 'package:limo/core/services/api_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/category_model.dart';
 
 class CategoryService {
   static const String _tag = 'CATEGORY_SERVICE';
 
-  /// Get categories list from API
   static Future<List<CategoryModel>> getCategories({
     required String userId,
     required String accessToken,
@@ -19,9 +18,7 @@ class CategoryService {
         accessToken: accessToken,
       );
 
-      // Response'u kontrol et - List veya Map olabilir
       List<dynamic> categoriesList;
-
       if (response is List) {
         categoriesList = response;
         LoggerService.info('Direct list response received', tag: _tag);
@@ -32,20 +29,14 @@ class CategoryService {
         throw Exception('Unexpected response type: ${response.runtimeType}');
       }
 
-      final categories =
-          categoriesList
-              .map(
-                (categoryJson) => CategoryModel.fromJson(
-                  categoryJson as Map<String, dynamic>,
-                ),
-              )
-              .toList();
+      final categories = categoriesList
+          .map((categoryJson) => CategoryModel.fromJson(categoryJson as Map<String, dynamic>))
+          .toList();
 
       LoggerService.success(
         'Categories fetched successfully: ${categories.length} categories',
         tag: _tag,
       );
-
       return categories;
     } catch (e) {
       LoggerService.error('Failed to fetch categories: $e', tag: _tag);
@@ -53,3 +44,5 @@ class CategoryService {
     }
   }
 }
+
+

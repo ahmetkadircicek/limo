@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/core/services/user_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
 import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
 
 /// ViewModel for managing document upload operations

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/model_provider.dart';
 import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/core/services/car_service.dart';
+import 'package:limo/module/car_management/services/car_service.dart';
 import 'package:limo/shared/models/brand_model.dart';
 import 'package:limo/shared/models/category_model.dart';
 import 'package:limo/shared/models/model_model.dart';

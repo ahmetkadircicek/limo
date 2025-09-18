@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
-/// Centralized logging service for the entire application
-/// Uses the logger package for structured logging
+/// Centralized logging service for the entire application.
+/// Uses the logger package for structured logging.
 class LoggerService {
   static final Logger _logger = Logger(
     filter: kDebugMode ? DevelopmentFilter() : ProductionFilter(),

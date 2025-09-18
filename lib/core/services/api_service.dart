@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/core/services/encryption_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/constants/app_constants.dart';
 import 'package:limo/shared/models/oauth_model.dart';
 import 'package:limo/shared/models/user_model.dart';

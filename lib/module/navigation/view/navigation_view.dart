@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/core/navigation/navigation_manager.dart';
-import 'package:limo/core/services/logout_service.dart';
+import 'package:limo/core/navigation/route_paths.dart';
 import 'package:limo/module/car_management/view/car_management_view.dart';
 import 'package:limo/module/job_create/view/job_create_view.dart';
-import 'package:limo/module/navigation/viewmodel/navigation_view_model.dart';
+import 'package:limo/module/navigation/view_model/navigation_view_model.dart';
 import 'package:limo/module/navigation/widgets/drawer_widget.dart';
 import 'package:limo/module/navigation/widgets/navigation_app_bar.dart';
 import 'package:limo/module/navigation/widgets/navigation_bar_widget.dart';
+import 'package:limo/module/profile/services/logout_service.dart';
 import 'package:limo/module/profile/view/profile_view.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
 import 'package:provider/provider.dart';
@@ -109,7 +109,7 @@ class NavigationView extends StatelessWidget {
       if (!context.mounted) return;
 
       // Navigate to splash screen and clear all navigation history
-      context.go(NavigationManager.splash);
+      context.go(RoutePaths.splash);
     } catch (e) {
       if (!context.mounted) return;
 

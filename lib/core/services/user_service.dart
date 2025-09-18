@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/core/services/api_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:provider/provider.dart';
 
 class UserService {

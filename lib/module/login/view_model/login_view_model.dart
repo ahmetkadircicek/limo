@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/services/api_service.dart';
-import 'package:limo/core/services/google_auth_service.dart';
+import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/core/services/shared_preferences_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/module/login/services/google_auth_service.dart';
 import 'package:limo/shared/models/user_model.dart';
 import 'package:limo/shared/widgets/app_snackbar.dart';
 import 'package:provider/provider.dart';

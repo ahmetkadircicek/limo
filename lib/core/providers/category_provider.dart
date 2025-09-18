@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:limo/core/services/category_service.dart';
-import 'package:limo/core/utils/logger_service.dart';
+import 'package:limo/core/services/logger_service.dart';
+import 'package:limo/module/car_management/services/category_service.dart';
 import 'package:limo/shared/models/category_model.dart';
 
 class CategoryProvider extends ChangeNotifier {

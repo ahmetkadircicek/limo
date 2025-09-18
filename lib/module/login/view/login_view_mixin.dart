@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:limo/core/navigation/navigation_manager.dart';
+import 'package:limo/core/navigation/route_paths.dart';
 import 'package:limo/module/login/view_model/login_view_model.dart';
 import 'package:limo/shared/widgets/app_snackbar.dart';
 
@@ -18,7 +18,7 @@ mixin LoginViewMixin<T extends StatefulWidget> on State<T> {
         AppSnackbar.success(
           message: "Login successful, welcome ${user.userName}",
         );
-        context.go(NavigationManager.home);
+        context.go(RoutePaths.home);
       } else {
         AppSnackbar.warning(
           message: "Login failed or no data received from server",
