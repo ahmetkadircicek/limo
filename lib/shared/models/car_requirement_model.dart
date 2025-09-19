@@ -31,13 +31,13 @@ class CarRequirementModel {
 
   Map<String, dynamic> toJson() {
     return {
-      "brand_id": brandId,
-      "model_id": modelId,
-      "modelyear": modelYear,
-      "capacity": capacity,
-      "category_id": categoryId,
-      "mile_fee": mileFee,
-      "hourly_fee": hourlyFee,
+      'brand_id': brandId,
+      'model_id': modelId,
+      'modelyear': modelYear,
+      'capacity': capacity,
+      'category_id': categoryId,
+      'mile_fee': mileFee,
+      'hourly_fee': hourlyFee,
     };
   }
 

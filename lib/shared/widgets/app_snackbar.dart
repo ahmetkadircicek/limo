@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:limo/main.dart';
+import 'package:limo/core/navigation/navigation_service.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/radius_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
@@ -14,7 +14,7 @@ class AppSnackbar {
     required Color backgroundColor,
     Duration duration = const Duration(seconds: 3),
   }) {
-    final overlay = rootNavigatorKey.currentState?.overlay;
+    final overlay = NavigationService.navigatorKey.currentState?.overlay;
     if (overlay == null) return;
 
     late OverlayEntry entry;

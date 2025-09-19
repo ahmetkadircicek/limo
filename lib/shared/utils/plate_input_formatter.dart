@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 
 class PlateInputFormatter extends TextInputFormatter {
   static final _allowed = RegExp(r'[A-Z0-9]');
-  static final _valid6or7 = RegExp(r'^[A-Z0-9]{0,7}$');
 
   @override
   TextEditingValue formatEditUpdate(

@@ -1,5 +1,6 @@
 // shared/widgets/app_primary_bar.dart
 import 'package:flutter/material.dart';
+import 'package:limo/shared/constants/image_constants.dart';
 
 class NavigationAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -41,12 +42,11 @@ class NavigationAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => _openDrawer(context),
         tooltip: 'Menu',
       ),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: cs.onSurface,
-        ),
+      title: Image.asset(
+        ImageConstants.logo,
+        height: 20,
+        fit: BoxFit.contain,
+        color: Colors.black,
       ),
       actions: actions,
     );

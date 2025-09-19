@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/model_provider.dart';
 import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/module/car_management/services/car_service.dart';
+import 'package:limo/core/services/car_service.dart';
 import 'package:limo/shared/models/brand_model.dart';
 import 'package:limo/shared/models/category_model.dart';
 import 'package:limo/shared/models/model_model.dart';
@@ -10,8 +10,45 @@ import 'package:provider/provider.dart';
 class CarRegistrationViewModel extends ChangeNotifier {
   // Controllers
   final plateNumberController = TextEditingController();
-  final modelYearController = TextEditingController();
-  final capacityController = TextEditingController();
+
+  int _modelYear = DateTime.now().year;
+  int _capacityValue = 3;
+
+  int get modelYear => _modelYear;
+  int get maxModelYear => DateTime.now().year;
+  int get minModelYear => DateTime.now().year - 8;
+  bool get canIncrementModelYear => _modelYear < maxModelYear;
+  bool get canDecrementModelYear => _modelYear > minModelYear;
+
+  int get capacityValue => _capacityValue;
+  int get minCapacity => 3;
+  int get maxCapacity => 12;
+  bool get canIncrementCapacity => _capacityValue < maxCapacity;
+  bool get canDecrementCapacity => _capacityValue > minCapacity;
+
+  void incrementModelYear() {
+    if (!canIncrementModelYear) return;
+    _modelYear++;
+    notifyListeners();
+  }
+
+  void decrementModelYear() {
+    if (!canDecrementModelYear) return;
+    _modelYear--;
+    notifyListeners();
+  }
+
+  void incrementCapacity() {
+    if (!canIncrementCapacity) return;
+    _capacityValue++;
+    notifyListeners();
+  }
+
+  void decrementCapacity() {
+    if (!canDecrementCapacity) return;
+    _capacityValue--;
+    notifyListeners();
+  }
 
   // Selections
   BrandModel? _brand;
@@ -28,15 +65,6 @@ class CarRegistrationViewModel extends ChangeNotifier {
 
   bool _submitting = false;
   bool get isSubmitting => _submitting;
-
-  bool get isFormReady {
-    return plateNumberController.text.trim().isNotEmpty &&
-        selectedBrandId != null &&
-        selectedModelId != null &&
-        selectedCategoryId != null &&
-        int.tryParse(modelYearController.text.trim()) != null &&
-        int.tryParse(capacityController.text.trim()) != null;
-  }
 
   void selectBrand(BuildContext context, BrandModel brand) {
     _brand = brand;
@@ -68,12 +96,16 @@ class CarRegistrationViewModel extends ChangeNotifier {
     'brandId': selectedBrandId,
     'modelId': selectedModelId,
     'categoryId': selectedCategoryId,
-    'modelYear': int.tryParse(modelYearController.text.trim()),
-    'capacity': int.tryParse(capacityController.text.trim()),
+    'modelYear': _modelYear,
+    'capacity': _capacityValue,
   };
 
   Future<bool> submit(BuildContext context) async {
-    if (!isFormReady) return false;
+    if (selectedBrandId == null ||
+        selectedModelId == null ||
+        selectedCategoryId == null) {
+      return false;
+    }
 
     _submitting = true;
     notifyListeners();
@@ -84,8 +116,8 @@ class CarRegistrationViewModel extends ChangeNotifier {
       brandId: selectedBrandId!,
       modelId: selectedModelId!,
       categoryId: selectedCategoryId!,
-      modelYear: int.parse(modelYearController.text.trim()),
-      capacity: int.parse(capacityController.text.trim()),
+      modelYear: _modelYear,
+      capacity: _capacityValue,
     );
 
     _submitting = false;
@@ -97,8 +129,8 @@ class CarRegistrationViewModel extends ChangeNotifier {
 
   void clearForm() {
     plateNumberController.clear();
-    modelYearController.clear();
-    capacityController.clear();
+    _modelYear = maxModelYear;
+    _capacityValue = minCapacity;
     _brand = null;
     _model = null;
     _category = null;
@@ -108,8 +140,6 @@ class CarRegistrationViewModel extends ChangeNotifier {
   @override
   void dispose() {
     plateNumberController.dispose();
-    modelYearController.dispose();
-    capacityController.dispose();
     super.dispose();
   }
 }

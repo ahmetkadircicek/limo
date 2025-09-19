@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:limo/module/address_picker/services/google_places_service.dart';
+import 'package:limo/shared/constants/widget_constants.dart';
 import 'package:limo/shared/models/picked_location_model.dart';
 
 class AddressPickerView extends StatefulWidget {
@@ -14,7 +15,7 @@ class AddressPickerView extends StatefulWidget {
 }
 
 class _AddressPickerViewState extends State<AddressPickerView> {
-  static const _apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+  // static const _apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Removed unused field
   static const CameraPosition _initialCamera = CameraPosition(
     target: LatLng(41.0082, 28.9784),
     zoom: 12,
@@ -197,24 +198,27 @@ class _AddressPickerViewState extends State<AddressPickerView> {
                   Material(
                     elevation: 2,
                     borderRadius: BorderRadius.circular(8),
-                    child: TextField(
-                      controller: _searchCtrl,
-                      decoration: const InputDecoration(
-                        hintText: 'Search address',
-                        prefixIcon: Icon(Icons.search),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 14,
+                    child: SizedBox(
+                      height: WidgetConstants.formFieldHeight,
+                      child: TextField(
+                        controller: _searchCtrl,
+                        decoration: InputDecoration(
+                          hintText: 'Search address',
+                          prefixIcon: const Icon(Icons.search),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 14,
+                          ),
                         ),
+                        textInputAction: TextInputAction.search,
+                        onChanged: _onSearchChanged,
+                        onSubmitted: (_) {
+                          if (_predictions.isNotEmpty) {
+                            _pickFromPrediction(_predictions.first);
+                          }
+                        },
                       ),
-                      textInputAction: TextInputAction.search,
-                      onChanged: _onSearchChanged,
-                      onSubmitted: (_) {
-                        if (_predictions.isNotEmpty) {
-                          _pickFromPrediction(_predictions.first);
-                        }
-                      },
                     ),
                   ),
                   if (_predictions.isNotEmpty)

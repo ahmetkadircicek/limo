@@ -1,39 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/navigation/navigation_service.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
+import 'package:limo/shared/extensions/context_typography_extension.dart';
 
 class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final VoidCallback? onBack;
+  final String? backPath;
 
-  const SharedAppBar({super.key, required this.title, this.onBack});
+  const SharedAppBar({super.key, required this.title, this.backPath});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return AppBar(
       elevation: 0,
-      backgroundColor: cs.surface,
-      foregroundColor: cs.onSurface,
+      backgroundColor: context.surface,
+      foregroundColor: context.onSurface,
       centerTitle: true,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        onPressed:
-            onBack ??
-            () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
-            },
+        onPressed: () {
+          if (backPath != null) {
+            NavigationService.popOrGo(backPath!);
+            return;
+          }
+          NavigationService.pop();
+        },
       ),
       title: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: cs.onSurface,
-        ),
+        style: context.body.copyWith(color: context.onSurface),
       ),
     );
   }

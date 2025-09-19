@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 mixin ProfileEditViewMixin<T extends StatefulWidget> on State<T> {
   late final ProfileUpdateViewModel viewModel;
   late final UserModel user;
+  final GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -18,9 +19,20 @@ mixin ProfileEditViewMixin<T extends StatefulWidget> on State<T> {
   }
 
   void initializeWithUser(ProfileUpdateViewModel vm, UserModel user) {
-    vm.fullNameController.text = user.userName ?? '';
+    vm.fullNameController.text = user.userName;
     vm.phoneController.text = user.phone ?? '';
     vm.companyNameController.text = user.companyName ?? '';
+  }
+
+  String? validateRequiredField(String? value, {required String fieldName}) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    return null;
+  }
+
+  bool validateProfileForm() {
+    return profileFormKey.currentState?.validate() ?? false;
   }
 
   @override

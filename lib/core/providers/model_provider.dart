@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:limo/core/services/logger_service.dart';
-import 'package:limo/module/car_management/services/model_service.dart';
+import 'package:limo/core/services/model_service.dart';
 import 'package:limo/shared/models/model_model.dart';
 
 class ModelProvider extends ChangeNotifier {

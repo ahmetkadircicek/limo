@@ -1,7 +1,9 @@
 part of '../view/job_create_view.dart';
 
 class _JobDetailsSection extends StatelessWidget {
-  const _JobDetailsSection();
+  final String? Function(String?) jobTypeValidator;
+
+  const _JobDetailsSection({required this.jobTypeValidator});
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +15,12 @@ class _JobDetailsSection extends StatelessWidget {
     return SharedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: PaddingConstants.p12,
+        spacing: PaddingConstants.p20,
         children: [
           Text('Job Details', style: theme.textTheme.titleMedium),
-
           // Job Type
           Consumer<JobTypeProvider>(
-            builder: (_, p, __) {
+            builder: (_, p, _) {
               if (p.loading) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
@@ -33,26 +34,14 @@ class _JobDetailsSection extends StatelessWidget {
                       .cast<String>()
                       .toList();
 
-              return DropdownButtonFormField<String>(
-                initialValue: vm.job.jobType, // model-tabanlı
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Job Type',
-                  border: OutlineInputBorder(),
-                ),
-                items:
-                    items
-                        .map(
-                          (name) =>
-                              DropdownMenuItem(value: name, child: Text(name)),
-                        )
-                        .toList(),
-                onChanged: vm.setJobType, // String? alıyor
-                validator:
-                    (v) =>
-                        v == null || v.isEmpty
-                            ? 'Please select job type'
-                            : null,
+              return SharedDropdownField<String>(
+                label: 'Job Type',
+                items: items,
+                value: vm.job.jobType,
+                itemLabelBuilder: (name) => name,
+                onChanged: vm.setJobType,
+                validator: jobTypeValidator,
+                menuMaxHeight: 240,
               );
             },
           ),
@@ -85,6 +74,35 @@ class _JobDetailsSection extends StatelessWidget {
                 },
               ),
             ),
+          ),
+
+          SharedSelectableField(
+            label: 'Pickup Location',
+            value: vm.job.pickupLocation,
+            placeholder: 'Select pickup location',
+            onTap: () async {
+              final picked = await Navigator.push<PickedLocation>(
+                context,
+                MaterialPageRoute(builder: (_) => const AddressPickerView()),
+              );
+              if (picked != null) {
+                vm.setPickupLocation(picked.address);
+              }
+            },
+          ),
+          SharedSelectableField(
+            label: 'Dropoff Location',
+            value: vm.job.dropoffLocation,
+            placeholder: 'Select dropoff location',
+            onTap: () async {
+              final picked = await Navigator.push<PickedLocation>(
+                context,
+                MaterialPageRoute(builder: (_) => const AddressPickerView()),
+              );
+              if (picked != null) {
+                vm.setDropoffLocation(picked.address);
+              }
+            },
           ),
         ],
       ),

@@ -28,13 +28,13 @@ class JobModel {
 
   Map<String, dynamic> toJson() {
     return {
-      "user_id": userId,
-      "job_type": jobType,
-      "pickup_date": pickupDate?.toIso8601String(),
-      "dropoff_date": dropoffDate?.toIso8601String(),
-      "pickup_location": pickupLocation,
-      "dropoff_location": dropoffLocation,
-      "cars": cars.map((c) => c.toJson()).toList(),
+      'user_id': userId,
+      'job_type': jobType,
+      'pickup_date': pickupDate?.toIso8601String(),
+      'dropoff_date': dropoffDate?.toIso8601String(),
+      'pickup_location': pickupLocation,
+      'dropoff_location': dropoffLocation,
+      'cars': cars.map((c) => c.toJson()).toList(),
     };
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/navigation/route_paths.dart';
 import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
 import 'package:limo/module/document_upload/view_model/document_upload_view_model.dart';
 import 'package:limo/module/document_upload/widgets/document_upload_area.dart';
@@ -19,7 +20,10 @@ class DocumentUploadView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SharedAppBar(title: purpose.title),
+      appBar: SharedAppBar(
+        title: purpose.title,
+        backPath: RoutePaths.profile,
+      ),
       body: Consumer<DocumentUploadViewModel>(
         builder: (context, viewModel, child) {
           return Padding(

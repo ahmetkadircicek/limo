@@ -23,7 +23,7 @@ class TermsSection extends StatelessWidget {
   Widget _buildTermsText(BuildContext context) {
     return Text(
       'By continuing, you accept the Terms of Service and Privacy Policy.',
-      style: context.subhead.copyWith(color: context.onSurface),
+      style: context.subhead.copyWith(color: context.surface),
       textAlign: TextAlign.center,
     );
   }
@@ -46,7 +46,7 @@ class TermsSection extends StatelessWidget {
       onPressed: () => _showTermsSnackbar(context),
       child: Text(
         'Terms of Service',
-        style: context.footnote.copyWith(color: context.onSurface),
+        style: context.footnote.copyWith(color: context.surface),
       ),
     );
   }
@@ -66,7 +66,7 @@ class TermsSection extends StatelessWidget {
       onPressed: () => _showPrivacySnackbar(context),
       child: Text(
         'Privacy Policy',
-        style: context.footnote.copyWith(color: context.onSurface),
+        style: context.footnote.copyWith(color: context.surface),
       ),
     );
   }

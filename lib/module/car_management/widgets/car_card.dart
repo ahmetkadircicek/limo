@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/car_provider.dart';
+import 'package:limo/core/services/car_service.dart';
 import 'package:limo/core/services/logger_service.dart';
-import 'package:limo/module/car_management/services/car_service.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/radius_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';

@@ -24,7 +24,7 @@ class SplashViewModel extends ChangeNotifier {
         await SharedPreferencesService.clearOAuthModel();
         return false;
       }
-    } catch (e, st) {
+    } catch (e) {
       await SharedPreferencesService.clearOAuthModel();
       return false;
     }

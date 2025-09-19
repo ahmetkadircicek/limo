@@ -29,7 +29,7 @@ class LogoSection extends StatelessWidget {
   Widget _buildWelcomeMessage(BuildContext context) {
     return Text(
       'Fast and secure work.',
-      style: context.body.copyWith(color: context.onSurface),
+      style: context.body.copyWith(color: context.surface),
       textAlign: TextAlign.center,
     );
   }

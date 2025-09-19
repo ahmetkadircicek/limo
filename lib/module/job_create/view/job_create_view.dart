@@ -2,29 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:limo/core/providers/job_type_provider.dart';
 import 'package:limo/core/providers/user_provider.dart';
 import 'package:limo/module/address_picker/address_picker_view.dart'; // used inside sections (Navigator.push)
+import 'package:limo/module/job_create/view_mixin/job_create_view_mixin.dart';
+import 'package:limo/module/job_create/view_model/job_create_view_model.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
+import 'package:limo/shared/constants/radius_constants.dart';
+import 'package:limo/shared/constants/widget_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
 import 'package:limo/shared/models/picked_location_model.dart';
 import 'package:limo/shared/widgets/shared_card.dart';
+import 'package:limo/shared/widgets/shared_dropdown_field.dart';
+import 'package:limo/shared/widgets/shared_selectable_field.dart';
 import 'package:provider/provider.dart';
 
-import '../view_model/job_create_view_model.dart';
-
-// Sections (keep file names as created in your project)
-part '../section/actions_section.dart';
-part '../section/address_section.dart';
 part '../section/job_details_section.dart';
 part '../section/user_info_section.dart';
 
-/// Job create page composed of multiple sections.
-/// Uses Provider for state (JobCreateViewModel) and JobTypeProvider for dropdown data.
 class JobCreateView extends StatelessWidget {
   const JobCreateView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
-
     return ChangeNotifierProvider<JobCreateViewModel>(
       create:
           (_) => JobCreateViewModel(
@@ -45,13 +43,11 @@ class _JobCreateScaffold extends StatefulWidget {
   State<_JobCreateScaffold> createState() => _JobCreateScaffoldState();
 }
 
-class _JobCreateScaffoldState extends State<_JobCreateScaffold> {
-  final _formKey = GlobalKey<FormState>();
-
+class _JobCreateScaffoldState extends State<_JobCreateScaffold>
+    with JobCreateViewMixin {
   @override
   void initState() {
     super.initState();
-    // Load job types
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<JobTypeProvider>().loadJobTypes(context);
     });
@@ -59,25 +55,31 @@ class _JobCreateScaffoldState extends State<_JobCreateScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final vm = context.watch<JobCreateViewModel>();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(), // dismiss keyboard
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: context.surfaceContainer,
         body: SafeArea(
           child: Form(
-            key: _formKey,
+            key: jobFormKey,
             child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: const [
-                _UserInfoSection(),
-                SizedBox(height: 12),
-                _JobDetailsSection(),
-                SizedBox(height: 12),
-                _LocationsSection(),
-                SizedBox(height: 12),
-                _ActionsSection(),
+              padding: PaddingConstants.all20,
+              children: [
+                const _UserInfoSection(),
+                const SizedBox(height: PaddingConstants.p20),
+                _JobDetailsSection(jobTypeValidator: validateJobType),
+                const SizedBox(height: PaddingConstants.p20),
+                _ActionsSection(
+                  isSubmitting: vm.submitting,
+                  isFormValid: vm.isValid,
+                  onSubmit: () async {
+                    final valid = validateJob(vm);
+                    if (!valid) return;
+                    await vm.submit(context);
+                  },
+                ),
               ],
             ),
           ),
@@ -107,15 +109,21 @@ class _DateField extends StatelessWidget {
             ? 'Select $label'
             : '${value!.year}-${value!.month.toString().padLeft(2, '0')}-${value!.day.toString().padLeft(2, '0')}';
 
-    return InkWell(
-      onTap: onPick,
-      borderRadius: BorderRadius.circular(8),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
+    final decoration = InputDecoration(
+      labelText: label,
+      suffixIcon: const Icon(Icons.calendar_today_outlined),
+    );
+
+    return SizedBox(
+      height: WidgetConstants.formFieldHeight,
+      child: InkWell(
+        onTap: onPick,
+        borderRadius: BorderRadius.circular(RadiusConstants.standardRadius),
+        child: InputDecorator(
+          decoration: decoration,
+          isEmpty: value == null,
+          child: Text(txt, style: Theme.of(context).textTheme.bodyMedium),
         ),
-        child: Text(txt, style: Theme.of(context).textTheme.bodyMedium),
       ),
     );
   }
@@ -139,4 +147,42 @@ Future<DateTime?> _pickDate(
     firstDate: first,
     lastDate: last,
   );
+}
+
+class _ActionsSection extends StatelessWidget {
+  final bool isSubmitting;
+  final bool isFormValid;
+  final Future<void> Function() onSubmit;
+
+  const _ActionsSection({
+    required this.isSubmitting,
+    required this.isFormValid,
+    required this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: PaddingConstants.bottom16,
+      height: 48,
+      child: ElevatedButton(
+        onPressed:
+            isSubmitting
+                ? null
+                : (isFormValid
+                    ? () async {
+                      await onSubmit();
+                    }
+                    : null),
+        child:
+            isSubmitting
+                ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(),
+                )
+                : const Text('Create'),
+      ),
+    );
+  }
 }

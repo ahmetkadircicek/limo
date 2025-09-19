@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:limo/shared/constants/color_constants.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/radius_constants.dart';
+import 'package:limo/shared/constants/widget_constants.dart';
 
 // Border width constants
 class AppBorderWidth {
@@ -135,63 +136,46 @@ class AppTheme {
 
   // Input Decoration Theme
   static InputDecorationTheme _buildInputDecorationTheme() {
-    return const InputDecorationTheme(
-      filled: true,
-      fillColor: ColorConstants.surfaceContainer,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.all(
+    OutlineInputBorder outline(Color color, double width) {
+      return OutlineInputBorder(
+        borderRadius: const BorderRadius.all(
           Radius.circular(RadiusConstants.standardRadius),
         ),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: color, width: width),
+      );
+    }
+
+    return InputDecorationTheme(
+      filled: false,
+      border: outline(ColorConstants.outline, AppBorderWidth.thin),
+      enabledBorder: outline(ColorConstants.outline, AppBorderWidth.thin),
+      focusedBorder: outline(ColorConstants.primary, AppBorderWidth.medium),
+      disabledBorder: outline(
+        ColorConstants.outline.withValues(alpha: 0.3),
+        AppBorderWidth.thin,
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(RadiusConstants.standardRadius),
-        ),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(RadiusConstants.standardRadius),
-        ),
-        borderSide: BorderSide(
-          color: ColorConstants.primary,
-          width: AppBorderWidth.medium,
-        ),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(RadiusConstants.standardRadius),
-        ),
-        borderSide: BorderSide(
-          color: ColorConstants.error,
-          width: AppBorderWidth.thin,
-        ),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(RadiusConstants.standardRadius),
-        ),
-        borderSide: BorderSide(
-          color: ColorConstants.error,
-          width: AppBorderWidth.medium,
-        ),
-      ),
-      contentPadding: EdgeInsets.symmetric(
+      errorBorder: outline(ColorConstants.error, AppBorderWidth.thin),
+      focusedErrorBorder: outline(ColorConstants.error, AppBorderWidth.medium),
+      contentPadding: const EdgeInsets.symmetric(
         horizontal: PaddingConstants.p16,
-        vertical: PaddingConstants.p16,
+        vertical: 14.0,
       ),
-      hintStyle: TextStyle(
+      constraints: const BoxConstraints(
+        minHeight: WidgetConstants.formFieldHeight,
+        maxHeight: WidgetConstants.formFieldHeight,
+      ),
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      hintStyle: const TextStyle(
         color: ColorConstants.onSurfaceVariant,
         fontSize: AppFontSize.body,
         fontWeight: FontWeight.w400,
       ),
-      labelStyle: TextStyle(
+      labelStyle: const TextStyle(
         color: ColorConstants.onSurfaceVariant,
         fontSize: AppFontSize.body,
         fontWeight: FontWeight.w400,
       ),
-      errorStyle: TextStyle(
+      errorStyle: const TextStyle(
         color: ColorConstants.error,
         fontSize: AppFontSize.small,
         fontWeight: FontWeight.w400,

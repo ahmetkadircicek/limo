@@ -2,15 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:limo/module/login/view/login_view_mixin.dart';
+import 'package:limo/module/login/view_model/login_view_model.dart';
+import 'package:limo/module/login/widgets/logo_section.dart';
+import 'package:limo/module/login/widgets/oauth_buttons_section.dart';
+import 'package:limo/module/login/widgets/terms_section.dart';
 import 'package:limo/shared/constants/image_constants.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
 import 'package:provider/provider.dart';
-
-import '../view_model/login_view_model.dart';
-import '../widgets/logo_section.dart';
-import '../widgets/oauth_buttons_section.dart';
-import '../widgets/terms_section.dart';
 
 /// Modern OAuth-only login screen with extracted widgets
 class LoginView extends StatelessWidget {

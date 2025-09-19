@@ -27,7 +27,7 @@ class LoginViewModel extends ChangeNotifier {
       // 1. Google login
       final oauthUser = await GoogleAuthService.signIn(context.read());
       if (oauthUser == null) {
-        AppSnackbar.error(message: "Google sign-in failed");
+        AppSnackbar.error(message: 'Google sign-in failed');
         return null;
       }
 
@@ -43,19 +43,19 @@ class LoginViewModel extends ChangeNotifier {
       if (user != null) {
         LoggerService.success('Login successful', tag: _tag);
         AppSnackbar.success(
-          message: "Login successful, welcome ${user.userName}",
+          message: 'Login successful, welcome ${user.userName}',
         );
       } else {
         LoggerService.warning('Backend rejected OAuth login', tag: _tag);
         await SharedPreferencesService.clearOAuthModel();
-        AppSnackbar.warning(message: "No user data received from server");
+        AppSnackbar.warning(message: 'No user data received from server');
       }
 
       return user;
     } catch (e, st) {
       LoggerService.error('Login failed: $e', error: e, tag: _tag);
       LoggerService.error('StackTrace: $st', tag: _tag);
-      AppSnackbar.error(message: "An error occurred, please try again");
+      AppSnackbar.error(message: 'An error occurred, please try again');
       return null;
     } finally {
       _setLoading(false);

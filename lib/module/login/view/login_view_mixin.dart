@@ -16,16 +16,16 @@ mixin LoginViewMixin<T extends StatefulWidget> on State<T> {
 
       if (user != null) {
         AppSnackbar.success(
-          message: "Login successful, welcome ${user.userName}",
+          message: 'Login successful, welcome ${user.userName}',
         );
         context.go(RoutePaths.home);
       } else {
         AppSnackbar.warning(
-          message: "Login failed or no data received from server",
+          message: 'Login failed or no data received from server',
         );
       }
     } catch (e) {
-      AppSnackbar.error(message: "An error occurred: $e");
+      AppSnackbar.error(message: 'An error occurred: $e');
     }
   }
 }

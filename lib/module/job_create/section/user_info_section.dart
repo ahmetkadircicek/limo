@@ -5,45 +5,32 @@ class _UserInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<JobCreateViewModel>();
+    final viewModel = context.watch<JobCreateViewModel>();
     return SharedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: PaddingConstants.p12,
+        spacing: PaddingConstants.p20,
         children: [
-          Text('User', style: Theme.of(context).textTheme.titleMedium),
-          _ReadonlyField(label: 'User Name', value: vm.userName),
-          _ReadonlyField(label: 'Company', value: vm.companyName),
-          _ReadonlyField(label: 'Contact Info', value: vm.contactInfo),
+          Text(
+            'User Information',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          SharedSelectableField(
+            label: 'User Name',
+            value: viewModel.userName,
+            enabled: false,
+          ),
+          SharedSelectableField(
+            label: 'Company',
+            value: viewModel.companyName,
+            enabled: false,
+          ),
+          SharedSelectableField(
+            label: 'Contact Info',
+            value: viewModel.contactInfo,
+            enabled: false,
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class _ReadonlyField extends StatelessWidget {
-  final String label;
-  final String? value;
-
-  const _ReadonlyField({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final displayValue = value != null && value!.isNotEmpty ? value! : '-';
-
-    return InputDecorator(
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      child: Text(
-        displayValue,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color:
-              displayValue != '-'
-                  ? Theme.of(context).textTheme.bodyMedium?.color
-                  : Theme.of(context).hintColor,
-        ),
       ),
     );
   }

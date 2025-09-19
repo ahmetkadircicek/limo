@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:limo/core/navigation/navigation_service.dart';
+import 'package:limo/core/navigation/route_paths.dart';
 import 'package:limo/core/providers/brand_provider.dart';
 import 'package:limo/core/providers/category_provider.dart';
 import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/module/car_registration/view/car_registration_view.dart';
 import 'package:provider/provider.dart';
 
 class CarManagementViewModel extends ChangeNotifier {
@@ -19,9 +20,6 @@ class CarManagementViewModel extends ChangeNotifier {
       userId: user.userId,
       accessToken: user.accessToken!,
     );
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const CarRegistrationView()),
-    );
+    NavigationService.push(RoutePaths.carRegistration);
   }
 }
