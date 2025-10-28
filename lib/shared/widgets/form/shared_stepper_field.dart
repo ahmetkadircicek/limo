@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/widget_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
+import 'package:limo/shared/extensions/context_typography_extension.dart';
 
 class SharedStepperField extends StatelessWidget {
   final String label;
@@ -22,33 +24,26 @@ class SharedStepperField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final decoration = InputDecoration(labelText: label);
-
     return SizedBox(
       height: WidgetConstants.formFieldHeight,
       child: InputDecorator(
-        decoration: decoration,
+        decoration: InputDecoration(
+          labelText: label,
+          enabled: true,
+          contentPadding: PaddingConstants.vertical16 + PaddingConstants.left16,
+        ),
         isEmpty: false,
         child: Row(
           children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  valueText,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
+            Expanded(child: Text(valueText, style: context.callout)),
             Row(
-              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
               children: [
                 _buildButton(
                   context,
                   icon: Icons.remove,
                   onPressed: canDecrement ? onDecrement : null,
                 ),
-                const SizedBox(width: 8),
                 _buildButton(
                   context,
                   icon: Icons.add,
@@ -67,28 +62,14 @@ class SharedStepperField extends StatelessWidget {
     required IconData icon,
     required VoidCallback? onPressed,
   }) {
-    final theme = Theme.of(context);
-    final outline = theme.colorScheme.outline;
-    final onSurface = theme.colorScheme.onSurface;
-
-    return SizedBox(
-      width: 40,
-      height: 36,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.zero,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(6)),
-          ),
-          side: BorderSide(color: outline),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: onPressed == null ? theme.disabledColor : onSurface,
-        ),
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      icon: Icon(
+        icon,
+        size: 20,
+        color: onPressed == null ? context.disabled : context.onSurface,
       ),
+      onPressed: onPressed,
     );
   }
 }

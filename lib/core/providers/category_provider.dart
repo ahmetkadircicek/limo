@@ -2,17 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:limo/core/services/category_service.dart';
 import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/category_model.dart';
+import 'package:limo/shared/state/async_status.dart';
 
 class CategoryProvider extends ChangeNotifier {
   static const String _tag = 'CATEGORY_PROVIDER';
 
   List<CategoryModel> _categories = [];
-  bool _isLoading = false;
-  String? _error;
+  AsyncStatus _status = AsyncStatus.idle;
+  String? _errorMessage;
 
   List<CategoryModel> get categories => _categories;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
+  AsyncStatus get status => _status;
+  String? get errorMessage => _errorMessage;
   bool get hasCategories => _categories.isNotEmpty;
 
   /// Fetch categories from API
@@ -21,13 +22,26 @@ class CategoryProvider extends ChangeNotifier {
     required String accessToken,
   }) async {
     try {
-      _setLoading(true);
-      _clearError();
+      _setStatus(AsyncStatus.loading);
+      _errorMessage = null;
 
-      final categories = await CategoryService.getCategories(
+      final result = await CategoryService.getCategories(
         userId: userId,
         accessToken: accessToken,
       );
+
+      if (result.isError) {
+        _categories = [];
+        _errorMessage = result.message;
+        _setStatus(AsyncStatus.error);
+        LoggerService.error(
+          'Failed to load categories to provider: ${result.message}',
+          tag: _tag,
+        );
+        return;
+      }
+
+      final categories = result.data ?? const [];
 
       _setCategories(categories);
 
@@ -35,22 +49,27 @@ class CategoryProvider extends ChangeNotifier {
         'Categories loaded to provider: ${categories.length} categories',
         tag: _tag,
       );
+      _setStatus(categories.isEmpty ? AsyncStatus.empty : AsyncStatus.success);
     } catch (e) {
-      _setError(e.toString());
+      _categories = [];
+      _errorMessage = e.toString();
+      _setStatus(AsyncStatus.error);
       LoggerService.error(
         'Failed to load categories to provider: $e',
         tag: _tag,
       );
     } finally {
-      _setLoading(false);
+      if (_status == AsyncStatus.loading) {
+        _setStatus(AsyncStatus.idle);
+      }
     }
   }
 
   /// Clear categories and reset state
   void clearCategories() {
     _categories = [];
-    _error = null;
-    notifyListeners();
+    _errorMessage = null;
+    _setStatus(AsyncStatus.idle);
   }
 
   void _setCategories(List<CategoryModel> categories) {
@@ -58,18 +77,8 @@ class CategoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  void _setError(String? error) {
-    _error = error;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _error = null;
+  void _setStatus(AsyncStatus status) {
+    _status = status;
     notifyListeners();
   }
 }

@@ -2,17 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:limo/core/services/brand_service.dart';
 import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/brand_model.dart';
+import 'package:limo/shared/state/async_status.dart';
 
 class BrandProvider extends ChangeNotifier {
   static const String _tag = 'BRAND_PROVIDER';
 
   List<BrandModel> _brands = [];
-  bool _isLoading = false;
-  String? _error;
+  AsyncStatus _status = AsyncStatus.idle;
+  String? _errorMessage;
 
   List<BrandModel> get brands => _brands;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
+  AsyncStatus get status => _status;
+  String? get errorMessage => _errorMessage;
   bool get hasBrands => _brands.isNotEmpty;
 
   /// Fetch brands from API
@@ -21,13 +22,26 @@ class BrandProvider extends ChangeNotifier {
     required String accessToken,
   }) async {
     try {
-      _setLoading(true);
-      _clearError();
+      _setStatus(AsyncStatus.loading);
+      _errorMessage = null;
 
-      final brands = await BrandService.getBrands(
+      final result = await BrandService.getBrands(
         userId: userId,
         accessToken: accessToken,
       );
+
+      if (result.isError) {
+        _brands = [];
+        _errorMessage = result.message;
+        _setStatus(AsyncStatus.error);
+        LoggerService.error(
+          'Failed to load brands to provider: ${result.message}',
+          tag: _tag,
+        );
+        return;
+      }
+
+      final brands = result.data ?? const [];
 
       _setBrands(brands);
 
@@ -35,19 +49,25 @@ class BrandProvider extends ChangeNotifier {
         'Brands loaded to provider: ${brands.length} brands',
         tag: _tag,
       );
+
+      _setStatus(brands.isEmpty ? AsyncStatus.empty : AsyncStatus.success);
     } catch (e) {
-      _setError(e.toString());
+      _brands = [];
+      _errorMessage = e.toString();
+      _setStatus(AsyncStatus.error);
       LoggerService.error('Failed to load brands to provider: $e', tag: _tag);
     } finally {
-      _setLoading(false);
+      if (_status == AsyncStatus.loading) {
+        _setStatus(AsyncStatus.idle);
+      }
     }
   }
 
   /// Clear brands and reset state
   void clearBrands() {
     _brands = [];
-    _error = null;
-    notifyListeners();
+    _errorMessage = null;
+    _setStatus(AsyncStatus.idle);
   }
 
   void _setBrands(List<BrandModel> brands) {
@@ -55,18 +75,8 @@ class BrandProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  void _setError(String? error) {
-    _error = error;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _error = null;
+  void _setStatus(AsyncStatus status) {
+    _status = status;
     notifyListeners();
   }
 }

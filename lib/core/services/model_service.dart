@@ -1,3 +1,4 @@
+import 'package:limo/core/services/api_result.dart';
 import 'package:limo/core/services/api_service.dart';
 import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/model_model.dart';
@@ -5,7 +6,7 @@ import 'package:limo/shared/models/model_model.dart';
 class ModelService {
   static const String _tag = 'MODEL_SERVICE';
 
-  static Future<List<ModelModel>> getModels({
+  static Future<ApiResult<List<ModelModel>>> getModels({
     required String userId,
     required String accessToken,
     required int brandId,
@@ -17,11 +18,21 @@ class ModelService {
         'brand_id': brandId,
       };
 
-      final response = await ApiService.post(
+      final result = await ApiService.post(
         '/getmodel',
         data: data,
         accessToken: accessToken,
       );
+
+      if (!result.isSuccess) {
+        LoggerService.error(
+          'Failed to fetch models: ${result.message}',
+          tag: _tag,
+        );
+        return ApiResult.error(result.message ?? 'Failed to fetch models');
+      }
+
+      final response = result.data;
 
       List<dynamic> modelsList;
       if (response is List) {
@@ -34,20 +45,22 @@ class ModelService {
         throw Exception('Unexpected response type: ${response.runtimeType}');
       }
 
-      final models = modelsList
-          .map((modelJson) => ModelModel.fromJson(modelJson as Map<String, dynamic>))
-          .toList();
+      final models =
+          modelsList
+              .map(
+                (modelJson) =>
+                    ModelModel.fromJson(modelJson as Map<String, dynamic>),
+              )
+              .toList();
 
       LoggerService.success(
         'Models fetched successfully: ${models.length} models for brand $brandId',
         tag: _tag,
       );
-      return models;
+      return ApiResult.success(models);
     } catch (e) {
       LoggerService.error('Failed to fetch models: $e', tag: _tag);
-      rethrow;
+      return ApiResult.error(e.toString());
     }
   }
 }
-
-

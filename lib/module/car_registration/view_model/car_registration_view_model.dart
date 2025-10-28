@@ -110,7 +110,7 @@ class CarRegistrationViewModel extends ChangeNotifier {
     _submitting = true;
     notifyListeners();
 
-    final ok = await CarService.addCar(
+    final result = await CarService.addCar(
       context,
       plateNumber: plateNumberController.text.trim(),
       brandId: selectedBrandId!,
@@ -123,8 +123,12 @@ class CarRegistrationViewModel extends ChangeNotifier {
     _submitting = false;
     notifyListeners();
 
-    if (ok) clearForm();
-    return ok;
+    if (result.isSuccess) {
+      clearForm();
+      return true;
+    }
+
+    return false;
   }
 
   void clearForm() {

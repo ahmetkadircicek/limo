@@ -65,6 +65,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
@@ -72,3 +73,8 @@ flutter:
     - assets/png/image/
     - assets/lottie/
     - .env
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/png/image/image_appicon.png

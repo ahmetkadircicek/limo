@@ -1,6 +1,7 @@
 // shared/widgets/app_primary_bar.dart
 import 'package:flutter/material.dart';
 import 'package:limo/shared/constants/image_constants.dart';
+import 'package:limo/shared/extensions/context_color_extension.dart';
 
 class NavigationAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -30,12 +31,10 @@ class NavigationAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return AppBar(
       elevation: 0,
-      backgroundColor: cs.surface,
-      foregroundColor: cs.onSurface,
+      backgroundColor: context.surfaceContainer,
+      foregroundColor: context.onSurface,
       centerTitle: true,
       leading: IconButton(
         icon: const Icon(Icons.menu_rounded),

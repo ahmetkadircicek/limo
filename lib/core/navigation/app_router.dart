@@ -6,6 +6,8 @@ import 'package:limo/module/car_registration/view/car_registration_view.dart';
 import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
 import 'package:limo/module/document_upload/view/document_upload_view.dart';
 import 'package:limo/module/job_create/view/job_create_view.dart';
+import 'package:limo/module/job_details/view/job_details_view.dart';
+import 'package:limo/shared/models/job_model.dart';
 import 'package:limo/module/login/view/login_view.dart';
 import 'package:limo/module/navigation/view/navigation_view.dart';
 import 'package:limo/module/profile/view/profile_view.dart';
@@ -65,6 +67,11 @@ GoRouter createAppRouter({
         path: RoutePaths.jobCreate,
         name: RouteNames.jobCreate,
         builder: (_, _) => const JobCreateView(),
+      ),
+      GoRoute(
+        path: RoutePaths.jobDetails,
+        name: RouteNames.jobDetails,
+        builder: (_, state) => JobDetailsView(job: state.extra as JobModel),
       ),
     ],
   );

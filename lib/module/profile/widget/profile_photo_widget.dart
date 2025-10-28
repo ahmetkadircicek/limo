@@ -1,16 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:limo/core/providers/user_provider.dart';
-import 'package:limo/module/document_upload/enums/document_upload_purpose_enum.dart';
-import 'package:limo/shared/constants/image_constants.dart';
-import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
 import 'package:limo/shared/extensions/context_typography_extension.dart';
-import 'package:limo/shared/widgets/shared_card.dart';
-import 'package:limo/shared/widgets/shared_chip_button.dart';
-import 'package:limo/shared/widgets/shared_info.dart';
+import 'package:limo/shared/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePhotoWidget extends StatelessWidget {
@@ -19,108 +14,77 @@ class ProfilePhotoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
-    final hasPhoto = user?.userPhoto?.isNotEmpty ?? false;
-    return SharedCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: PaddingConstants.p16,
-        children: [
-          _buildTitle(context),
-          _buildProfileSection(context),
-          if (!hasPhoto) _buildAppInfo(),
-        ],
-      ),
-    );
-  }
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
 
-  Row _buildProfileSection(BuildContext context) {
-    return Row(
-      spacing: PaddingConstants.p16,
-      children: [_buildProfilePicture(context), _buildUserGreeting(context)],
-    );
-  }
-
-  Expanded _buildUserGreeting(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: PaddingConstants.p4,
-        children: [
-          Text(
-            'Hello, ${_getFirstName(user?.userName ?? 'User')}!',
-            style: context.headline.copyWith(color: context.onSurface),
-          ),
-          Text(
-            'Welcome back to your profile',
-            style: context.subhead.copyWith(color: context.onSurfaceVariant),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Container _buildProfilePicture(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
-    final hasPhoto = user?.userPhoto?.isNotEmpty ?? false;
-    final double size = 60.0;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle),
-      child: ClipOval(
-        child:
-            hasPhoto
-                ? Image.memory(
-                  base64Decode(user?.userPhoto ?? ''),
-                  width: size,
-                  height: size,
-                  fit: BoxFit.cover,
-                )
-                : Image.asset(
-                  ImageConstants.profile,
-                  width: size,
-                  height: size,
-                  fit: BoxFit.cover,
-                ),
-      ),
-    );
-  }
-
-  SharedInfo _buildAppInfo() {
-    return SharedInfo(
-      label: 'Complete your profile to get more job opportunities',
-      value: 'Add a profile picture',
-      icon: Icons.tips_and_updates,
-    );
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        _buildProfilePicture(context, user),
+        const SizedBox(height: 12),
+        Text(user.userName, textAlign: TextAlign.center, style: context.title3),
         Text(
-          'Profile Picture',
-          style: context.headline.copyWith(color: context.onSurface),
-        ),
-        SharedChipButton(
-          text: 'Change',
-          onPressed: () {
-            context.pushNamed(
-              'documentUpload',
-              extra: DocumentUploadPurpose.profilePhoto,
-            );
-          },
-          backgroundColor: context.primary,
-          foregroundColor: context.onPrimary,
-          icon: Icons.image_outlined,
+          'Welcome back to your profile',
+          textAlign: TextAlign.center,
+          style: context.body.copyWith(color: context.onSurfaceVariant),
         ),
       ],
     );
   }
 
-  String _getFirstName(String fullName) {
-    final parts = fullName.trim().split(' ');
-    return parts.isNotEmpty ? parts.first : 'User';
+  Widget _buildProfilePicture(BuildContext context, UserModel user) {
+    const double size = 200.0;
+    final imageBytes = _decodePhoto(user.userPhoto);
+    final hasPhoto = imageBytes != null;
+    final initials = _getInitials(user.userName);
+
+    return CircleAvatar(
+      radius: size / 2,
+      backgroundColor: context.surface,
+      backgroundImage: hasPhoto ? MemoryImage(imageBytes) : null,
+      child:
+          hasPhoto
+              ? null
+              : Text(
+                initials,
+                style: context.title3.copyWith(
+                  color: context.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+    );
+  }
+
+  String _getInitials(String fullName) {
+    final trimmed = fullName.trim();
+    if (trimmed.isEmpty) {
+      return 'U';
+    }
+
+    final parts =
+        trimmed.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+    if (parts.isEmpty) {
+      return 'U';
+    }
+
+    String initialOf(String value) => value.isEmpty ? '' : value[0];
+
+    final firstInitial = initialOf(parts.first);
+    final lastInitial = parts.length > 1 ? initialOf(parts.last) : '';
+    final initials = (firstInitial + lastInitial).toUpperCase();
+    return initials.isEmpty ? 'U' : initials;
+  }
+
+  Uint8List? _decodePhoto(String? base64Photo) {
+    if (base64Photo == null || base64Photo.isEmpty) {
+      return null;
+    }
+    try {
+      return base64Decode(base64Photo);
+    } catch (_) {
+      return null;
+    }
   }
 }

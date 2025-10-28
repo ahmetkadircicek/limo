@@ -21,18 +21,23 @@ class ProfileUpdateViewModel extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      final success = await UserService.updateUser(
+      final result = await UserService.updateUser(
         context,
         userName: fullNameController.text,
         phone: phoneController.text,
         companyName: companyNameController.text,
       );
 
-      if (success) {
+      if (result.isSuccess) {
         if (context.mounted) Navigator.of(context).pop();
+      } else {
+        _errorMessage = result.message ?? 'Failed to update profile.';
+        notifyListeners();
       }
     } catch (e) {
       LoggerService.error('Failed to update profile: $e');
+      _errorMessage = e.toString();
+      notifyListeners();
     } finally {
       _setLoading(false);
     }

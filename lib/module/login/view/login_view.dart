@@ -73,7 +73,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> with LoginViewMixin {
   /// Build the blur overlay
   Widget _buildBlurOverlay(BuildContext context) {
     return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
       child: Container(color: context.primary.withValues(alpha: 0.6)),
     );
   }

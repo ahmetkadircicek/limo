@@ -99,30 +99,33 @@ class DocumentUploadViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
-      bool success;
-
       switch (purpose.serviceType) {
         case UploadServiceType.userPhoto:
-          success = await UserService.updateUser(
+          final result = await UserService.updateUser(
             context,
             userPhoto: _selectedImageBase64,
           );
-          break;
+          if (result.isSuccess) {
+            _setSuccess('${purpose.title} uploaded successfully!');
+            _selectedImageBase64 = null;
+          } else {
+            _setError(result.message ?? 'Failed to upload ${purpose.title}');
+          }
+          return;
         case UploadServiceType.driverLicense:
-          success = await UserService.updateUser(
+          final result = await UserService.updateUser(
             context,
             driverLicence: _selectedImageBase64,
           );
-          break;
+          if (result.isSuccess) {
+            _setSuccess('${purpose.title} uploaded successfully!');
+            _selectedImageBase64 = null;
+          } else {
+            _setError(result.message ?? 'Failed to upload ${purpose.title}');
+          }
+          return;
         default:
           throw Exception('Invalid service type: ${purpose.serviceType}');
-      }
-
-      if (success) {
-        _setSuccess('${purpose.title} uploaded successfully!');
-        _selectedImageBase64 = null;
-      } else {
-        _setError('Failed to upload ${purpose.title}');
       }
     } catch (e) {
       _setError('Failed to upload ${purpose.title}: $e');

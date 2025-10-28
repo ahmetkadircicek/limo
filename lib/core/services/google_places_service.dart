@@ -11,26 +11,17 @@ class GoogleApiKeys {
 
 class GooglePlacesService {
   GooglePlacesService()
-    : _places = Dio(
-        BaseOptions(
-          baseUrl: 'https://maps.googleapis.com/maps/api/place/',
-          connectTimeout: const Duration(seconds: 15),
-          receiveTimeout: const Duration(seconds: 15),
-          // Optional: validateStatus ile 200 dışını da loglamak için
-          validateStatus: (code) => code != null && code < 500,
-        ),
-      ),
-      _geocode = Dio(
-        BaseOptions(
-          baseUrl: 'https://maps.googleapis.com/maps/api/geocode/',
-          connectTimeout: const Duration(seconds: 15),
-          receiveTimeout: const Duration(seconds: 15),
-          validateStatus: (code) => code != null && code < 500,
-        ),
-      );
+      : _places = Dio(
+          BaseOptions(
+            baseUrl: 'https://maps.googleapis.com/maps/api/place/',
+            connectTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 15),
+            // Optional: validateStatus ile 200 dışını da loglamak için
+            validateStatus: (code) => code != null && code < 500,
+          ),
+        );
 
   final Dio _places; // /place/*
-  final Dio _geocode; // /geocode/*
 
   String get _apiKey => GoogleApiKeys.placesWebService;
 
@@ -145,51 +136,6 @@ class GooglePlacesService {
       return null;
     } catch (e) {
       LoggerService.error('[PLACES][DETAILS][ERR] $e', tag: 'GooglePlaces');
-      return null;
-    }
-  }
-
-  /// Reverse Geocoding (lat/lng → formatted address, place_id)
-  Future<({String formattedAddress, String? placeId})?> reverseGeocode({
-    required double lat,
-    required double lng,
-    String language = 'en',
-  }) async {
-    try {
-      final res = await _geocode.get(
-        'json',
-        queryParameters: {
-          'latlng': '$lat,$lng',
-          'key': _apiKey,
-          'language': language,
-        },
-      );
-      final data = (res.data as Map?)?.cast<String, dynamic>() ?? const {};
-      final status = data['status'] as String? ?? 'UNKNOWN';
-
-      if (status == 'OK') {
-        final results = (data['results'] as List?) ?? const [];
-        if (results.isEmpty) return null;
-        final first = (results.first as Map).cast<String, dynamic>();
-        final addr = (first['formatted_address'] as String?) ?? '';
-        final pid = first['place_id'] as String?;
-        return (formattedAddress: addr, placeId: pid);
-      }
-
-      LoggerService.warning(
-        '[GEOCODE][REVERSE] status=$status code=${res.statusCode} err=${data['error_message']}',
-        tag: 'GooglePlaces',
-      );
-      return null;
-    } on DioException catch (e) {
-      LoggerService.error(
-        '[GEOCODE][REVERSE][HTTP] ${e.response?.statusCode} ${e.response?.data}',
-        error: e,
-        tag: 'GooglePlaces',
-      );
-      return null;
-    } catch (e) {
-      LoggerService.error('[GEOCODE][REVERSE][ERR] $e', tag: 'GooglePlaces');
       return null;
     }
   }

@@ -1,6 +1,7 @@
 import 'package:limo/core/providers/brand_provider.dart';
 import 'package:limo/core/providers/car_provider.dart';
 import 'package:limo/core/providers/category_provider.dart';
+import 'package:limo/core/providers/job_provider.dart';
 import 'package:limo/core/providers/job_type_provider.dart';
 import 'package:limo/core/providers/model_provider.dart';
 import 'package:limo/core/providers/oauth_provider.dart';
@@ -35,6 +36,7 @@ class ProviderInitializer {
     ChangeNotifierProvider(create: (context) => ModelProvider()),
     ChangeNotifierProvider(create: (context) => CarProvider()),
     ChangeNotifierProvider(create: (context) => JobTypeProvider()),
+    ChangeNotifierProvider(create: (context) => JobProvider()),
   ];
 
   // ViewModels for features

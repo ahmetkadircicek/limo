@@ -11,24 +11,28 @@ class _UserInfoSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: PaddingConstants.p20,
         children: [
-          Text(
-            'User Information',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          SharedSelectableField(
-            label: 'User Name',
-            value: viewModel.userName,
-            enabled: false,
-          ),
-          SharedSelectableField(
-            label: 'Company',
-            value: viewModel.companyName,
-            enabled: false,
-          ),
-          SharedSelectableField(
+          Text('User Information', style: context.callout),
+          SharedReadOnlyField(label: 'User Name', value: viewModel.userName),
+          SharedReadOnlyField(label: 'Company', value: viewModel.companyName),
+          SharedReadOnlyField(
             label: 'Contact Info',
-            value: viewModel.contactInfo,
-            enabled: false,
+            value: viewModel.maskedContactInfo,
+            trailing:
+                (viewModel.contactInfo == null ||
+                        viewModel.contactInfo!.isEmpty)
+                    ? null
+                    : IconButton(
+                      icon: Icon(
+                        viewModel.shareNumber
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                      tooltip:
+                          viewModel.shareNumber
+                              ? 'Hide contact info'
+                              : 'Show contact info',
+                      onPressed: viewModel.toggleShareNumber,
+                    ),
           ),
         ],
       ),

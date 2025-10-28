@@ -1,3 +1,4 @@
+import 'package:limo/core/services/api_result.dart';
 import 'package:limo/core/services/api_service.dart';
 import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/models/brand_model.dart';
@@ -5,18 +6,28 @@ import 'package:limo/shared/models/brand_model.dart';
 class BrandService {
   static const String _tag = 'BRAND_SERVICE';
 
-  static Future<List<BrandModel>> getBrands({
+  static Future<ApiResult<List<BrandModel>>> getBrands({
     required String userId,
     required String accessToken,
   }) async {
     try {
       final data = {'user_id': userId, 'access_token': accessToken};
 
-      final response = await ApiService.post(
+      final result = await ApiService.post(
         '/getbrands',
         data: data,
         accessToken: accessToken,
       );
+
+      if (!result.isSuccess) {
+        LoggerService.error(
+          'Failed to fetch brands: ${result.message}',
+          tag: _tag,
+        );
+        return ApiResult.error(result.message ?? 'Failed to fetch brands');
+      }
+
+      final response = result.data;
 
       List<dynamic> brandsList;
 
@@ -30,21 +41,23 @@ class BrandService {
         throw Exception('Unexpected response type: ${response.runtimeType}');
       }
 
-      final brands = brandsList
-          .map((brandJson) => BrandModel.fromJson(brandJson as Map<String, dynamic>))
-          .toList();
+      final brands =
+          brandsList
+              .map(
+                (brandJson) =>
+                    BrandModel.fromJson(brandJson as Map<String, dynamic>),
+              )
+              .toList();
 
       LoggerService.success(
         'Brands fetched successfully: ${brands.length} brands',
         tag: _tag,
       );
 
-      return brands;
+      return ApiResult.success(brands);
     } catch (e) {
       LoggerService.error('Failed to fetch brands: $e', tag: _tag);
-      rethrow;
+      return ApiResult.error(e.toString());
     }
   }
 }
-
-

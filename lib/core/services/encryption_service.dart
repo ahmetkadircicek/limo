@@ -91,7 +91,7 @@ class EncryptionService {
     }
   }
 
-  /// Decrypt raw encrypted data and return as Map<String, dynamic>
+  /// Decrypt raw encrypted data and return as `Map<String, dynamic>`
   /// This method handles the case where response body is raw encrypted data
   static Map<String, dynamic>? decryptRawResponse(String encryptedData) {
     try {

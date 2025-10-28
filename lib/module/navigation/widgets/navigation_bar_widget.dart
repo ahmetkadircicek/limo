@@ -22,7 +22,7 @@ class NavigationBarWidget extends StatelessWidget {
             height: 60,
             padding: PaddingConstants.top8,
             decoration: BoxDecoration(
-              color: context.surface,
+              color: context.surfaceContainer,
               border: Border(top: BorderSide(color: context.surfaceContainer)),
             ),
             child: Column(children: [_buildNavRow(context, navVm)]),

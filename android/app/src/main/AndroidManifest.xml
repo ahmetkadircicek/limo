@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
-        android:label="Limo"
+        android:label="Limousine"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

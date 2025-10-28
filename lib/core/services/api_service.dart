@@ -1,26 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
-import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/services/api_result.dart';
 import 'package:limo/core/services/encryption_service.dart';
 import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/constants/app_constants.dart';
 import 'package:limo/shared/models/oauth_model.dart';
 import 'package:limo/shared/models/user_model.dart';
-import 'package:provider/provider.dart';
 
 class ApiService {
   static const String _tag = 'API_SERVICE';
   static const String _contentType = 'application/json';
 
   /// Generic POST request - returns dynamic (List or Map)
-  static Future<dynamic> post(
+  static Future<ApiResult<dynamic>> post(
     String endpoint, {
     required Map<String, dynamic> data,
     Duration? timeout,
     String? accessToken,
   }) async {
+    final client = HttpClient();
     try {
       final url = Uri.parse(AppConstants.apiBaseUrl + endpoint);
 
@@ -47,7 +46,7 @@ class ApiService {
         tag: _tag,
       );
 
-      final request = await HttpClient().postUrl(url);
+      final request = await client.postUrl(url);
       request.headers.contentType = ContentType.parse(_contentType);
       request.headers.set('Accept', _contentType);
 
@@ -91,8 +90,18 @@ class ApiService {
               );
             }
 
+            if (decryptedData == null) {
+              return ApiResult.error(
+                'Empty response body',
+                statusCode: response.statusCode,
+              );
+            }
+
             // Decrypted data'yı olduğu gibi döndür (List veya Map)
-            return decryptedData;
+            return ApiResult.success(
+              decryptedData,
+              statusCode: response.statusCode,
+            );
           }
         }
 
@@ -101,45 +110,59 @@ class ApiService {
           'Direct response format: ${responseData.runtimeType}',
           tag: _tag,
         );
-        return responseData;
+
+        if (responseData == null) {
+          return ApiResult.error(
+            'Empty response body',
+            statusCode: response.statusCode,
+          );
+        }
+
+        return ApiResult.success(responseData, statusCode: response.statusCode);
       } else {
-        throw Exception('HTTP ${response.statusCode}: $body');
+        return ApiResult.error(
+          'HTTP ${response.statusCode}: $body',
+          statusCode: response.statusCode,
+        );
       }
     } catch (e, st) {
       LoggerService.error('API error: $e', error: e, tag: _tag);
       LoggerService.error('StackTrace: $st', tag: _tag);
-      rethrow;
+      return ApiResult.error(e.toString());
+    } finally {
+      client.close(force: true);
     }
   }
 
   /// Send OAuth data to backend and update UserProvider
   static Future<UserModel?> sendOAuthData({
     required OAuthModel oauthUser,
-    required BuildContext context,
   }) async {
     try {
       final data = oauthUser.toJson();
 
-      final response = await post('/login', data: data);
+      final result = await post('/login', data: data);
+
+      if (!result.isSuccess) {
+        LoggerService.error(
+          'Login request failed: ${result.message}',
+          tag: _tag,
+        );
+        return null;
+      }
+
+      final response = result.data;
 
       // Response Map olmalı (UserModel için)
       if (response is! Map<String, dynamic>) {
-        throw Exception(
+        LoggerService.error(
           'Expected Map response for login, got: ${response.runtimeType}',
+          tag: _tag,
         );
+        return null;
       }
 
       final user = UserModel.fromJson(response);
-
-      if (!context.mounted) return null;
-
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.setUser(user);
-
-      LoggerService.success(
-        'UserProvider updated from OAuth response',
-        tag: _tag,
-      );
 
       return user;
     } catch (e) {

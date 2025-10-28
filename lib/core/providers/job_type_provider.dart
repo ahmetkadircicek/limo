@@ -2,29 +2,53 @@
 import 'package:flutter/material.dart';
 import 'package:limo/module/job_create/services/job_type_service.dart';
 import 'package:limo/shared/models/job_type_model.dart';
+import 'package:limo/shared/state/async_status.dart';
 
 class JobTypeProvider extends ChangeNotifier {
-  bool _loading = false;
+  AsyncStatus _status = AsyncStatus.idle;
   List<JobTypeModel> _jobTypes = [];
   JobTypeModel? _selected;
+  String? _errorMessage;
 
-  bool get loading => _loading;
   List<JobTypeModel> get jobTypes => _jobTypes;
   JobTypeModel? get selected => _selected;
+  AsyncStatus get status => _status;
+  String? get errorMessage => _errorMessage;
 
   Future<void> loadJobTypes(BuildContext context) async {
-    _loading = true;
-    notifyListeners();
+    _setStatus(AsyncStatus.loading);
+    _errorMessage = null;
     try {
-      _jobTypes = await JobTypeService.getJobTypes(context);
+      final result = await JobTypeService.getJobTypes(context);
+      if (result.isError) {
+        _jobTypes = [];
+        _errorMessage = result.message;
+        _setStatus(AsyncStatus.error);
+        return;
+      }
+
+      _jobTypes = result.data ?? const [];
+      if (_selected == null && _jobTypes.isNotEmpty) {
+        _selected = _jobTypes.firstWhere(
+          (type) => type.jobTypeName.toLowerCase().contains('route'),
+          orElse: () => _jobTypes.first,
+        );
+      }
+      _setStatus(_jobTypes.isEmpty ? AsyncStatus.empty : AsyncStatus.success);
     } finally {
-      _loading = false;
-      notifyListeners();
+      if (_status == AsyncStatus.loading) {
+        _setStatus(AsyncStatus.idle);
+      }
     }
   }
 
   void select(JobTypeModel? jobType) {
     _selected = jobType;
+    notifyListeners();
+  }
+
+  void _setStatus(AsyncStatus status) {
+    _status = status;
     notifyListeners();
   }
 }

@@ -5,101 +5,140 @@ import 'package:limo/core/services/logger_service.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/radius_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
-import 'package:limo/shared/extensions/context_typography_extension.dart';
 import 'package:limo/shared/models/car_model.dart';
 import 'package:limo/shared/widgets/app_snackbar.dart';
 import 'package:limo/shared/widgets/shared_card.dart';
-import 'package:limo/shared/widgets/shared_chip_button.dart';
 import 'package:provider/provider.dart';
 
 class CarCard extends StatelessWidget {
-  final CarModel carModel;
   const CarCard({super.key, required this.carModel});
 
-  Future<void> _deleteCar(BuildContext context) async {
-    final ok = await CarService.deleteCar(context, carsId: carModel.carsId);
-    LoggerService.info('Delete car id: ${carModel.carsId}, result: $ok');
-    if (ok) {
-      context.read<CarProvider>().loadCars(context);
+  final CarModel carModel;
+
+  Future<bool> _deleteCar(BuildContext context) async {
+    final result = await CarService.deleteCar(context, carsId: carModel.carsId);
+    if (!context.mounted) return false;
+    LoggerService.info(
+      'Delete car id: ${carModel.carsId}, result: ${result.isSuccess}',
+    );
+    if (result.isSuccess) {
+      await context.read<CarProvider>().loadCars(context);
       AppSnackbar.success(message: 'Car deleted');
-    } else {
-      AppSnackbar.error(message: 'Failed to delete car');
+      return true;
     }
+    AppSnackbar.error(message: result.message ?? 'Failed to delete car');
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final plate = carModel.plateNumber;
-    final year = carModel.modelYear?.toString() ?? '-';
     final brand = carModel.brandName ?? '${carModel.brandId ?? '-'}';
     final model = carModel.modelName ?? '${carModel.modelId ?? '-'}';
     final category = carModel.categoryName ?? '${carModel.categoryId ?? '-'}';
     final capacity = carModel.capacity?.toString() ?? '-';
+    final year = carModel.modelYear?.toString() ?? '-';
 
-    return SharedCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: PaddingConstants.p12,
-        children: [
-          // Brand • Model
-          Text(
-            '$brand • $model',
-            style: context.body.copyWith(color: context.onSurface),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Wrap(
-            spacing: PaddingConstants.p8,
-            children: [
-              _MetaPill(text: plate, icon: Icons.directions_car_filled),
-              _MetaPill(text: year, icon: Icons.calendar_month_outlined),
-              _MetaPill(text: category, icon: Icons.label_rounded),
-              _MetaPill(text: capacity, icon: Icons.event_seat),
-            ],
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: SharedChipButton(
-              text: 'Delete',
-              icon: Icons.delete_outline,
-              backgroundColor: context.error.withValues(alpha: 0.12),
-              foregroundColor: context.error,
-              onPressed: () async {
-                await _deleteCar(context);
-              },
+    return Dismissible(
+      key: ValueKey(carModel.carsId),
+      direction: DismissDirection.endToStart,
+      background: _DismissBackground(
+        color: context.error,
+        iconColor: context.onError,
+      ),
+      confirmDismiss: (_) => _deleteCar(context),
+      child: SharedCard(
+        child: SizedBox(
+          height: 60,
+          child: Padding(
+            padding: PaddingConstants.all8,
+            child: Row(
+              children: [
+                _LeadingBadge(plate: plate),
+                const SizedBox(width: PaddingConstants.p8),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 4,
+                    children: [
+                      Text(
+                        '$brand $model',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: context.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        '$plate • $category • $capacity seats • $year',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: context.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: PaddingConstants.p12),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _MetaPill extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  const _MetaPill({required this.text, required this.icon});
+class _LeadingBadge extends StatelessWidget {
+  const _LeadingBadge({required this.plate});
+
+  final String plate;
+
+  @override
+  Widget build(BuildContext context) {
+    final initials =
+        plate.isNotEmpty
+            ? plate.substring(0, plate.length >= 2 ? 2 : 1).toUpperCase()
+            : '??';
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: RadiusConstants.standard,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initials,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+class _DismissBackground extends StatelessWidget {
+  const _DismissBackground({required this.color, required this.iconColor});
+
+  final Color color;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: PaddingConstants.all4 + PaddingConstants.horizontal8,
       decoration: BoxDecoration(
-        color: context.surfaceContainer,
-        borderRadius: RadiusConstants.round, // TODO: move to theme
-        border: Border.all(color: context.outline.withValues(alpha: 0.1)),
+        color: color,
+        borderRadius: RadiusConstants.standard,
       ),
-      child: Row(
-        spacing: PaddingConstants.p8,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: context.onSurface),
-          Text(
-            text,
-            style: context.caption1.copyWith(color: context.onSurface),
-          ),
-        ],
-      ),
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Icon(Icons.delete_outline, color: iconColor, size: 26),
     );
   }
 }

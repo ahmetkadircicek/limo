@@ -8,6 +8,7 @@ class RoutePaths {
   static const carRegistration = '/cars/register';
   static const documentUpload = '/document/upload';
   static const jobCreate = '/job/create';
+  static const jobDetails = '/job/details';
 }
 
 class RouteNames {
@@ -19,4 +20,5 @@ class RouteNames {
   static const carRegistration = 'carRegistration';
   static const documentUpload = 'documentUpload';
   static const jobCreate = 'jobCreate';
+  static const jobDetails = 'jobDetails';
 }

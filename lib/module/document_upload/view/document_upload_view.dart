@@ -20,10 +20,7 @@ class DocumentUploadView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SharedAppBar(
-        title: purpose.title,
-        backPath: RoutePaths.profile,
-      ),
+      appBar: SharedAppBar(title: purpose.title, backPath: RoutePaths.profile),
       body: Consumer<DocumentUploadViewModel>(
         builder: (context, viewModel, child) {
           return Padding(

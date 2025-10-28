@@ -1,3 +1,5 @@
+import 'package:limo/shared/utils/date_time_formatter.dart';
+
 /// User model for storing essential authentication and profile information
 class UserModel {
   final String userId;
@@ -101,8 +103,8 @@ class UserModel {
       'phone': phone,
       'user_name': userName,
       'company_name': companyName,
-      'created_at': createdAt.toIso8601String(),
-      'last_login': lastLogin.toIso8601String(),
+      'created_at': DateTimeFormatter.formatApi(createdAt),
+      'last_login': DateTimeFormatter.formatApi(lastLogin),
       'access_token': accessToken,
       'is_active': isActive,
       'user_photo': userPhoto,

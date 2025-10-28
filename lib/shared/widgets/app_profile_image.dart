@@ -68,7 +68,7 @@ class AppProfileImage extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.black.withOpacity(.25),
+                color: Colors.black.withValues(alpha: 0.25),
               ),
               child: Icon(Icons.edit, size: size * 0.28, color: Colors.white),
             ),

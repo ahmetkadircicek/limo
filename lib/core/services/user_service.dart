@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:limo/core/providers/user_provider.dart';
+import 'package:limo/core/services/api_result.dart';
 import 'package:limo/core/services/api_service.dart';
 import 'package:limo/core/services/logger_service.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,7 @@ class UserService {
   static const String _tag = 'USER_UPDATE_SERVICE';
 
   /// Update user profile. Only non-null parameters are sent to backend.
-  static Future<bool> updateUser(
+  static Future<ApiResult<Map<String, dynamic>>> updateUser(
     BuildContext context, {
     String? userName,
     String? email,
@@ -26,7 +27,7 @@ class UserService {
       final currentUser = userProvider.user;
       if (currentUser == null) {
         LoggerService.error('No current user found', tag: _tag);
-        return false;
+        return ApiResult.error('No current user found');
       }
 
       // Prepare request data with fallback to current user
@@ -47,12 +48,19 @@ class UserService {
         'user_photo': userPhoto ?? currentUser.userPhoto,
       };
 
-      final response = await ApiService.post(
+      final result = await ApiService.post(
         '/user_update',
         data: requestData,
         accessToken: currentUser.accessToken ?? '',
         timeout: const Duration(seconds: 15),
       );
+
+      if (!result.isSuccess) {
+        LoggerService.error('User update failed: ${result.message}', tag: _tag);
+        return ApiResult.error(result.message ?? 'Failed to update user');
+      }
+
+      final response = result.data;
 
       if (response is Map<String, dynamic>) {
         final success = response['user_id'] != null;
@@ -68,13 +76,16 @@ class UserService {
           tag: _tag,
         );
 
-        return success;
+        if (success) {
+          return ApiResult.success(response);
+        }
+        return ApiResult.error('User update failed');
       } else {
         LoggerService.error(
           'Unexpected response type: ${response.runtimeType}',
           tag: _tag,
         );
-        return false;
+        return ApiResult.error('Unexpected response type');
       }
     } catch (error) {
       LoggerService.error(
@@ -82,7 +93,7 @@ class UserService {
         error: error,
         tag: _tag,
       );
-      return false;
+      return ApiResult.error(error.toString());
     }
   }
 }
