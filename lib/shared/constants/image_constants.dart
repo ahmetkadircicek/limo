@@ -14,6 +14,7 @@ final class ImageConstants {
   static final String addFile = ImageTokens.addFile;
   static final String confirmed = ImageTokens.confirmed;
   static final String success = ImageTokens.success;
+  static final String background = ImageTokens.background;
 
   static final String lottieLoader = ImageTokens.lottieLoader;
   static final String lottieLoaderReplace = ImageTokens.lottieLoaderReplace;

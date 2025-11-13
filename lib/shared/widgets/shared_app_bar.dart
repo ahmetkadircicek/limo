@@ -6,8 +6,9 @@ import 'package:limo/shared/extensions/context_typography_extension.dart';
 class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? backPath;
+  final List<Widget>? actions;
 
-  const SharedAppBar({super.key, required this.title, this.backPath});
+  const SharedAppBar({super.key, required this.title, this.backPath, this.actions});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -16,6 +17,8 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       backgroundColor: context.surface,
       foregroundColor: context.onSurface,
       centerTitle: true,
@@ -33,6 +36,7 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
         title,
         style: context.body.copyWith(color: context.onSurface),
       ),
+      actions: actions,
     );
   }
 }

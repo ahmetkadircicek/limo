@@ -17,7 +17,7 @@ class _JobDetailsSection extends StatelessWidget {
     return SharedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: PaddingConstants.p20,
+        spacing: PaddingConstants.p8,
         children: [
           // Move section title to the top
           Text('Job Details', style: theme.textTheme.titleMedium),
@@ -81,7 +81,7 @@ class _JobDetailsSection extends StatelessWidget {
                             message ?? 'Failed to load job types.',
                             style: Theme.of(ctx).textTheme.bodyMedium,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: PaddingConstants.p8),
                           Align(
                             alignment: Alignment.centerLeft,
                             child: TextButton.icon(

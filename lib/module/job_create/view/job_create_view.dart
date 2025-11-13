@@ -81,12 +81,12 @@ class _JobCreateScaffoldState extends State<_JobCreateScaffold>
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: context.surfaceContainer,
+        backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Form(
             key: jobFormKey,
             child: ListView.separated(
-              padding: PaddingConstants.all20,
+              padding: PaddingConstants.all24,
               itemBuilder: (context, index) {
                 switch (index) {
                   case 0:
@@ -120,7 +120,7 @@ class _JobCreateScaffoldState extends State<_JobCreateScaffold>
               },
               separatorBuilder:
                   (context, index) =>
-                      const SizedBox(height: PaddingConstants.p20),
+                      const SizedBox(height: PaddingConstants.p16),
               itemCount: 4,
             ),
           ),

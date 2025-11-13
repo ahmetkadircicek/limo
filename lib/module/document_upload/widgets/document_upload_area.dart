@@ -39,7 +39,7 @@ class DocumentUploadArea extends StatelessWidget {
               borderRadius: RadiusConstants.standard,
             ),
             child: Column(
-              spacing: PaddingConstants.p16,
+              spacing: PaddingConstants.p8,
               children: [
                 Icon(
                   hasSelectedDocument ? Icons.check_circle : Icons.upload_file,

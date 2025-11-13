@@ -29,13 +29,13 @@ class _ProfileEditViewState extends State<ProfileEditView>
       ),
       backgroundColor: context.surfaceContainer,
       body: Padding(
-        padding: PaddingConstants.all20,
+        padding: PaddingConstants.all24,
         child: Form(
           key: profileFormKey,
           child: SharedCard(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              spacing: PaddingConstants.p20,
+              spacing: PaddingConstants.p8,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildUserUpdateForm(viewModel),
@@ -50,7 +50,7 @@ class _ProfileEditViewState extends State<ProfileEditView>
 
   Column _buildUserUpdateForm(ProfileUpdateViewModel vm) {
     return Column(
-      spacing: PaddingConstants.p16,
+      spacing: PaddingConstants.p8,
       children: [
         SharedTextField(
           controller: vm.fullNameController,

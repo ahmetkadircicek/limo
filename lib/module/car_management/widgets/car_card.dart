@@ -61,7 +61,7 @@ class CarCard extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 4,
+                    spacing: PaddingConstants.p8,
                     children: [
                       Text(
                         '$brand $model',
@@ -83,7 +83,7 @@ class CarCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: PaddingConstants.p12),
+                const SizedBox(width: PaddingConstants.p8),
               ],
             ),
           ),

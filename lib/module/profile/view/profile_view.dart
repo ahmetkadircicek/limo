@@ -23,14 +23,14 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.surfaceContainer,
+      backgroundColor: Colors.transparent,
       body: _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     return SingleChildScrollView(
-      padding: PaddingConstants.all20,
+      padding: PaddingConstants.all24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: PaddingConstants.p16,
@@ -42,7 +42,7 @@ class _ProfileViewState extends State<ProfileView> {
           SharedCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: PaddingConstants.p24,
+              spacing: PaddingConstants.p8,
               children: const [
                 PersonalInfoWidget(),
                 _ProfilePrimaryActions(),
@@ -70,7 +70,7 @@ class _ProfilePrimaryActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
-      spacing: PaddingConstants.p12,
+      spacing: PaddingConstants.p8,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SharedButton(

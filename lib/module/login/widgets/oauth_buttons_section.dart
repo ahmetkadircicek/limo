@@ -27,7 +27,6 @@ class OAuthButtonsSection extends StatelessWidget {
           icon: FontAwesomeIcons.google,
           color: googleRed,
           textColor: context.onPrimary,
-          isLoading: viewModel.isLoading,
           onPressed: () async {
             final user = await viewModel.signInWithGoogle(context);
             if (user != null && context.mounted) {

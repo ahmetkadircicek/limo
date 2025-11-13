@@ -48,7 +48,7 @@ class _CarRegistrationViewState extends State<CarRegistrationView>
         return Form(
           key: carFormKey,
           child: SingleChildScrollView(
-            padding: PaddingConstants.all20,
+            padding: PaddingConstants.all24,
             child: SharedCard(
               child: _buildFormBody(context, carRegistrationViewModel),
             ),
@@ -65,7 +65,7 @@ class _CarRegistrationViewState extends State<CarRegistrationView>
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: PaddingConstants.p20,
+      spacing: PaddingConstants.p8,
       children: [
         _buildPlateField(viewModel),
         _buildBrandDropdown(viewModel),

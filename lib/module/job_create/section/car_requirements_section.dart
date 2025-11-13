@@ -11,7 +11,7 @@ class _CarRequirementsSection extends StatelessWidget {
     return SharedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: PaddingConstants.p20,
+        spacing: PaddingConstants.p8,
         children: [
           _Header(onAddPressed: () => vm.onAddCarRequirement(context)),
           if (cars.isEmpty)

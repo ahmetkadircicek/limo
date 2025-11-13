@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:limo/shared/constants/color_constants.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/radius_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
@@ -17,32 +18,37 @@ class JobCard extends StatelessWidget {
     final title =
         (job.title ?? '').trim().isEmpty ? 'Untitled job' : job.title!;
     final code = job.jobId != null ? 'JOB-${job.jobId}' : '';
-    final jobType = job.jobType ?? '—';
+    final jobType = job.jobType ?? job.jobTypeName ?? '—';
     final isRoute = _isRoute(jobType);
 
-    return Container(
-      padding: PaddingConstants.horizontal16 + PaddingConstants.vertical12,
-      decoration: BoxDecoration(
-        color: context.surface,
-        border: Border.all(color: context.outline),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: RadiusConstants.standard,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context, title: title, code: code, jobType: jobType),
-          const SizedBox(height: 8),
-          _buildTypeRow(context),
-          const SizedBox(height: 8),
-          _buildDateRow(context, isRoute: isRoute),
-          const SizedBox(height: 8),
-          _buildLocationRow(context, isRoute: isRoute),
-        ],
+        onTap: onTap,
+        child: Container(
+          padding: PaddingConstants.horizontal16 + PaddingConstants.vertical8,
+          decoration: BoxDecoration(
+            color: ColorConstants.alabaster,
+            border: Border.all(color: context.outline),
+            borderRadius: RadiusConstants.standard,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context, title: title, code: code, jobType: jobType),
+              const SizedBox(height: PaddingConstants.p8),
+              _buildTypeRow(context),
+              const SizedBox(height: PaddingConstants.p8),
+              _buildDateRow(context, isRoute: isRoute),
+              const SizedBox(height: PaddingConstants.p8),
+              _buildLocationRow(context, isRoute: isRoute),
+            ],
+          ),
+        ),
       ),
     );
   }
-
-  // ===== parts
 
   Widget _buildHeader(
     BuildContext context, {
@@ -54,6 +60,21 @@ class JobCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Container(
+          margin: const EdgeInsets.only(right: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            jobType,
+            style: context.caption1.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,33 +88,27 @@ class JobCard extends StatelessWidget {
               if (code.isNotEmpty)
                 Text(
                   code,
-                  style: context.caption1.copyWith(
-                    color: context.onSurfaceVariant,
-                  ),
+                  style: context.caption1.copyWith(color: context.secondary),
                 ),
             ],
           ),
         ),
-        TextButton.icon(
+        IconButton(
           onPressed: onTap,
-          style: TextButton.styleFrom(
-            foregroundColor: context.onSurface, // details tam siyah (onSurface)
-          ),
-          icon: const Icon(Icons.chevron_right),
-          label: const Text('Details'),
-          iconAlignment: IconAlignment.end,
+          icon: Icon(Icons.chevron_right, color: context.onSurfaceVariant),
+          tooltip: 'Details',
         ),
       ],
     );
   }
 
   Widget _buildTypeRow(BuildContext context) {
-    final type = job.jobType ?? '—';
+    final type = job.jobType ?? job.jobTypeName ?? '—';
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(Icons.work_outline, color: context.onSurfaceVariant),
-        const SizedBox(width: 8),
+        const SizedBox(width: PaddingConstants.p8),
         Expanded(child: _labeledValue(context, 'Job Type', type)),
       ],
     );
@@ -104,10 +119,10 @@ class JobCard extends StatelessWidget {
     final dropoffTxt = _fmt(job.dropoffDate);
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(Icons.event, color: context.onSurfaceVariant),
-        const SizedBox(width: 8),
+        const SizedBox(width: PaddingConstants.p8),
         Expanded(
           child:
               isRoute
@@ -116,7 +131,7 @@ class JobCard extends StatelessWidget {
                       Expanded(
                         child: _labeledValue(context, 'Pickup', pickupTxt),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: PaddingConstants.p8),
                       Expanded(
                         child: _labeledValue(context, 'Drop-off', dropoffTxt),
                       ),
@@ -133,17 +148,17 @@ class JobCard extends StatelessWidget {
     final to = job.dropoffLocation?.address ?? '—';
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(Icons.place_outlined, color: context.onSurfaceVariant),
-        const SizedBox(width: 8),
+        const SizedBox(width: PaddingConstants.p8),
         Expanded(
           child:
               isRoute
                   ? Row(
                     children: [
                       Expanded(child: _labeledValue(context, 'From', from)),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: PaddingConstants.p8),
                       Expanded(child: _labeledValue(context, 'To', to)),
                     ],
                   )
@@ -152,8 +167,6 @@ class JobCard extends StatelessWidget {
       ],
     );
   }
-
-  // ===== atoms
 
   Widget _labeledValue(BuildContext context, String label, String value) {
     return Column(
@@ -174,8 +187,6 @@ class JobCard extends StatelessWidget {
     );
   }
 
-  // ===== helpers
-
   static bool _isRoute(String jobType) {
     final s = jobType.trim().toLowerCase();
     return s == 'route' || s == 'routed' || s.contains('route');
@@ -184,5 +195,3 @@ class JobCard extends StatelessWidget {
   static final _fmtDate = DateFormat('d MMMM, HH:mm');
   static String _fmt(DateTime? d) => d == null ? '—' : _fmtDate.format(d);
 }
-
-// Job type chip removed; job type is shown like other properties.

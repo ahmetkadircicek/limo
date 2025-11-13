@@ -13,7 +13,10 @@ class CarProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  Future<void> loadCars(BuildContext context) async {
+  Future<void> loadCars(BuildContext context, {bool force = false}) async {
+    if (!force && _cars.isNotEmpty && _status == AsyncStatus.success) {
+      return;
+    }
     _setStatus(AsyncStatus.loading);
     _errorMessage = null;
 

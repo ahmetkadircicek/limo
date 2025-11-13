@@ -15,7 +15,7 @@ class DriverLicenseWidget extends StatelessWidget {
     final hasLicense = licenseNumber != null && licenseNumber.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: PaddingConstants.p16,
+      spacing: PaddingConstants.p8,
       children: [
         SharedReadOnlyField(
           label: 'Status',

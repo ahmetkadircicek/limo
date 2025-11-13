@@ -17,16 +17,14 @@ class NavigationBarWidget extends StatelessWidget {
   Widget _buildNavBar(BuildContext context) {
     return Consumer<NavigationViewModel>(
       builder: (context, navVm, child) {
-        return SafeArea(
-          child: Container(
-            height: 60,
-            padding: PaddingConstants.top8,
-            decoration: BoxDecoration(
-              color: context.surfaceContainer,
-              border: Border(top: BorderSide(color: context.surfaceContainer)),
-            ),
-            child: Column(children: [_buildNavRow(context, navVm)]),
+        return Container(
+          height: 90,
+          padding: PaddingConstants.top8,
+          decoration: BoxDecoration(
+            color: context.surfaceContainer,
+            border: Border(top: BorderSide(color: context.surfaceContainer)),
           ),
+          child: Column(children: [_buildNavRow(context, navVm)]),
         );
       },
     );

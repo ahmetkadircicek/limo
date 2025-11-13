@@ -6,19 +6,22 @@ class JobModel {
   final String userId;
   int? jobId;
   int? jobTypeId;
-  String? jobType;
-  String? jobTypeName;
-  DateTime? pickupDate;
-  DateTime? dropoffDate;
+  String? jobType; // API: job_type
+  String? jobTypeName; // API: job_type_name
+  DateTime? pickupDate; // API: expected_start_date / pickup_date
+  DateTime? dropoffDate; // API: expected_end_date / dropoff_date
   PickedLocation? pickupLocation;
   PickedLocation? dropoffLocation;
-  String? title;
-  String? description;
-  double? distanceRoad;
-  double? durationMinutes;
-  String? status;
-  bool shareNumber;
-  List<CarRequirementModel> cars;
+  String? title; // API: title / job_title
+  String? description; // API: description / job_description
+  double? distanceRoad; // API: distance_road / distance
+  double? durationMinutes; // API: duration_minutes / duration
+  String? status; // API: status / job_status
+  bool shareNumber; // API: share_number
+  List<CarRequirementModel> cars; // API: cars / vehicles
+  DateTime? createdAt; // API: job_created_at
+  String? contactPhone; // API: contact_phone / creator_phone / phone
+  String? contactEmail; // API: contact_email / creator_email / email
 
   JobModel({
     required this.userId,
@@ -37,6 +40,9 @@ class JobModel {
     String? statusValue,
     bool shareNumberValue = true,
     List<CarRequirementModel>? cars,
+    this.createdAt,
+    this.contactPhone,
+    this.contactEmail,
   }) : status = statusValue ?? 'active',
        shareNumber = shareNumberValue,
        cars = cars ?? [];
@@ -95,11 +101,12 @@ class JobModel {
       placeId: json['dropoff_place_id'],
     );
 
-    final carsJson = json['cars'];
-    final cars =
-        carsJson is List
-            ? carsJson
-                .whereType<Map>()
+    // Vehicles / Cars list (supports both keys: 'cars' and 'vehicles')
+    final vehiclesJson = json['cars'] ?? json['vehicles'];
+    final parsedCars =
+        vehiclesJson is List
+            ? vehiclesJson
+                .whereType<Map<String, dynamic>>()
                 .map(
                   (e) => CarRequirementModel(
                     brandId: toInt(e['brand_id']) ?? 0,
@@ -109,6 +116,16 @@ class JobModel {
                     categoryId: toInt(e['category_id']) ?? 0,
                     mileFee: toInt(e['mile_fee']) ?? 0,
                     hourlyFee: toInt(e['hourly_fee']) ?? 0,
+                    jobVehicleId: toInt(e['job_vehicle_id']),
+                    brandName: e['brand_name']?.toString(),
+                    modelName: e['model_name']?.toString(),
+                    categoryName: e['category_name']?.toString(),
+                    createdAt:
+                        e['vehicle_created_at'] == null
+                            ? null
+                            : DateTime.tryParse(
+                              e['vehicle_created_at'].toString(),
+                            ),
                   ),
                 )
                 .toList()
@@ -118,25 +135,33 @@ class JobModel {
       userId: userIdValue,
       jobId: toInt(json['job_id']),
       jobTypeId: toInt(json['job_type_id']),
-
-      jobType:
-          json['job_type_name']?.toString() ?? json['job_type']?.toString(),
+      jobType: json['job_type']?.toString(),
+      jobTypeName: json['job_type_name']?.toString(),
       pickupDate: toDate(json['expected_start_date'] ?? json['pickup_date']),
       dropoffDate: toDate(json['expected_end_date'] ?? json['dropoff_date']),
       pickupLocation: pickupLocation,
       dropoffLocation: dropoffLocation,
       title: json['title']?.toString() ?? json['job_title']?.toString(),
-      description: json['description']?.toString(),
+      description:
+          json['description']?.toString() ??
+          json['job_description']?.toString(),
       distanceRoad: toDouble(json['distance_road'] ?? json['distance']),
       durationMinutes: toDouble(json['duration_minutes'] ?? json['duration']),
-      statusValue: json['status']?.toString(),
+      statusValue: json['status']?.toString() ?? json['job_status']?.toString(),
       shareNumberValue:
           json['share_number'] == null
               ? true
-              : json['share_number'] == true ||
+              : (json['share_number'] == true ||
                   json['share_number'] == 1 ||
-                  json['share_number'] == '1',
-      cars: cars,
+                  json['share_number'] == '1'),
+      cars: parsedCars,
+      createdAt: toDate(json['job_created_at']),
+      contactPhone:
+          (json['contact_phone'] ?? json['creator_phone'] ?? json['phone'])
+              ?.toString(),
+      contactEmail:
+          (json['contact_email'] ?? json['creator_email'] ?? json['email'])
+              ?.toString(),
     );
   }
 
@@ -151,6 +176,8 @@ class JobModel {
     return {
       'user_id': userId,
       'job_type_id': jobTypeId,
+      'job_type': jobType,
+      'job_type_name': jobTypeName,
       'pickup_location_text': pickupLocation?.address,
       'pickup_latitude': pickupLocation?.lat,
       'pickup_longitude': pickupLocation?.lng,
@@ -164,9 +191,13 @@ class JobModel {
       'expected_start_date': DateTimeFormatter.formatApi(pickupDate),
       'expected_end_date': DateTimeFormatter.formatApi(dropoffDate),
       'status': status,
+      'job_created_at': createdAt?.toIso8601String(),
+      if (contactPhone != null) 'contact_phone': contactPhone,
+      if (contactEmail != null) 'contact_email': contactEmail,
       'title': title,
       'description': description,
-      'cars': carPayload,
+      'cars':
+          carPayload, // server bazı uçlarda 'vehicles' bekliyorsa adaptörde dönüştür
       'share_number': shareNumber,
     };
   }
@@ -175,6 +206,7 @@ class JobModel {
     int? jobId,
     int? jobTypeId,
     String? jobType,
+    String? jobTypeName,
     DateTime? pickupDate,
     DateTime? dropoffDate,
     PickedLocation? pickupLocation,
@@ -186,12 +218,16 @@ class JobModel {
     String? status,
     bool? shareNumber,
     List<CarRequirementModel>? cars,
+    DateTime? createdAt,
+    String? contactPhone,
+    String? contactEmail,
   }) {
     return JobModel(
       userId: userId,
       jobId: jobId ?? this.jobId,
       jobTypeId: jobTypeId ?? this.jobTypeId,
       jobType: jobType ?? this.jobType,
+      jobTypeName: jobTypeName ?? this.jobTypeName,
       pickupDate: pickupDate ?? this.pickupDate,
       dropoffDate: dropoffDate ?? this.dropoffDate,
       pickupLocation: pickupLocation ?? this.pickupLocation,
@@ -203,6 +239,9 @@ class JobModel {
       statusValue: status ?? this.status,
       shareNumberValue: shareNumber ?? this.shareNumber,
       cars: cars ?? this.cars,
+      createdAt: createdAt ?? this.createdAt,
+      contactPhone: contactPhone ?? this.contactPhone,
+      contactEmail: contactEmail ?? this.contactEmail,
     );
   }
 }

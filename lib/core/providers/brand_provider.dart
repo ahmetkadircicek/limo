@@ -20,8 +20,12 @@ class BrandProvider extends ChangeNotifier {
   Future<void> fetchBrands({
     required String userId,
     required String accessToken,
+    bool force = false,
   }) async {
     try {
+      if (!force && _brands.isNotEmpty && _status == AsyncStatus.success) {
+        return;
+      }
       _setStatus(AsyncStatus.loading);
       _errorMessage = null;
 

@@ -46,10 +46,10 @@ class _CarManagementViewState extends State<CarManagementView> {
 
   Widget _buildEmptyState(BuildContext context) {
     return ListView(
-      padding: PaddingConstants.all20,
+      padding: PaddingConstants.all24,
       children: [
         _buildHeader(context, carCount: 0),
-        const SizedBox(height: PaddingConstants.p32),
+        const SizedBox(height: PaddingConstants.p16),
         Icon(
           Icons.directions_car_filled_outlined,
           size: 64,
@@ -80,10 +80,10 @@ class _CarManagementViewState extends State<CarManagementView> {
 
   Widget _buildErrorState(BuildContext context, String? message) {
     return ListView(
-      padding: PaddingConstants.all20,
+      padding: PaddingConstants.all24,
       children: [
         _buildHeader(context, carCount: 0),
-        const SizedBox(height: PaddingConstants.p32),
+        const SizedBox(height: PaddingConstants.p16),
         Icon(
           Icons.error_outline,
           size: 64,
@@ -116,7 +116,7 @@ class _CarManagementViewState extends State<CarManagementView> {
     return RefreshIndicator(
       onRefresh: () => context.read<CarProvider>().loadCars(context),
       child: ListView.builder(
-        padding: PaddingConstants.all16,
+        padding: PaddingConstants.all24,
         itemCount: cars.length + 1,
         itemBuilder: (_, i) {
           if (i == 0) {

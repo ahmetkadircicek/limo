@@ -20,8 +20,12 @@ class CategoryProvider extends ChangeNotifier {
   Future<void> fetchCategories({
     required String userId,
     required String accessToken,
+    bool force = false,
   }) async {
     try {
+      if (!force && _categories.isNotEmpty && _status == AsyncStatus.success) {
+        return;
+      }
       _setStatus(AsyncStatus.loading);
       _errorMessage = null;
 

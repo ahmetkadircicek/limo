@@ -24,12 +24,12 @@ class DocumentUploadView extends StatelessWidget {
       body: Consumer<DocumentUploadViewModel>(
         builder: (context, viewModel, child) {
           return Padding(
-            padding: PaddingConstants.all20,
+            padding: PaddingConstants.all24,
             child: SharedCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
-                spacing: PaddingConstants.p20,
+                spacing: PaddingConstants.p8,
                 children: [
                   DocumentUploadHeader(title: purpose.title),
                   DocumentUploadArea(purpose: purpose),

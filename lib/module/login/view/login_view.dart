@@ -97,7 +97,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> with LoginViewMixin {
       child: Padding(
         padding: PaddingConstants.horizontal20,
         child: Column(
-          spacing: PaddingConstants.p20,
+          spacing: PaddingConstants.p16,
           children: [
             const Spacer(),
             const LogoSection(),

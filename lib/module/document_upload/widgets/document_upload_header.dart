@@ -11,7 +11,7 @@ class DocumentUploadHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: PaddingConstants.p12,
+      spacing: PaddingConstants.p8,
       children: [
         Icon(Icons.upload, color: context.primary, size: 24),
         Text('Upload $title', style: context.body),

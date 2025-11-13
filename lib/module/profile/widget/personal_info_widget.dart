@@ -11,7 +11,7 @@ class PersonalInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     return Column(
-      spacing: PaddingConstants.p16,
+      spacing: PaddingConstants.p8,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SharedReadOnlyField(label: 'Full Name', value: user?.userName),

@@ -15,7 +15,10 @@ class JobTypeProvider extends ChangeNotifier {
   AsyncStatus get status => _status;
   String? get errorMessage => _errorMessage;
 
-  Future<void> loadJobTypes(BuildContext context) async {
+  Future<void> loadJobTypes(BuildContext context, {bool force = false}) async {
+    if (!force && _jobTypes.isNotEmpty && _status == AsyncStatus.success) {
+      return;
+    }
     _setStatus(AsyncStatus.loading);
     _errorMessage = null;
     try {

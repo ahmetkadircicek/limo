@@ -8,6 +8,8 @@ import 'package:limo/module/document_upload/view/document_upload_view.dart';
 import 'package:limo/module/job_create/view/job_create_view.dart';
 import 'package:limo/module/job_details/view/job_details_view.dart';
 import 'package:limo/shared/models/job_model.dart';
+import 'package:limo/core/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:limo/module/login/view/login_view.dart';
 import 'package:limo/module/navigation/view/navigation_view.dart';
 import 'package:limo/module/profile/view/profile_view.dart';
@@ -71,7 +73,20 @@ GoRouter createAppRouter({
       GoRoute(
         path: RoutePaths.jobDetails,
         name: RouteNames.jobDetails,
-        builder: (_, state) => JobDetailsView(job: state.extra as JobModel),
+        builder: (ctx, state) {
+          final extra = state.extra;
+          late JobModel job;
+          if (extra is JobModel) {
+            job = extra;
+          } else if (extra is Map<String, dynamic>) {
+            final uid = ctx.read<UserProvider>().user?.userId?.toString() ?? '';
+            job = JobModel.fromJson(extra, fallbackUserId: uid);
+          } else {
+            final uid = ctx.read<UserProvider>().user?.userId?.toString() ?? '';
+            job = JobModel.fromJson(<String, dynamic>{}, fallbackUserId: uid);
+          }
+          return JobDetailsView(job: job);
+        },
       ),
     ],
   );

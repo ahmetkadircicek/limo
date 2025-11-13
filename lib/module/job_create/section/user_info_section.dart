@@ -9,7 +9,7 @@ class _UserInfoSection extends StatelessWidget {
     return SharedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: PaddingConstants.p20,
+        spacing: PaddingConstants.p8,
         children: [
           Text('User Information', style: context.callout),
           SharedReadOnlyField(label: 'User Name', value: viewModel.userName),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:limo/shared/constants/color_constants.dart';
 import 'package:limo/shared/constants/padding_constants.dart';
 import 'package:limo/shared/constants/radius_constants.dart';
 import 'package:limo/shared/extensions/context_color_extension.dart';
@@ -26,7 +27,7 @@ class SharedCard extends StatelessWidget {
       width: width,
       padding: PaddingConstants.all16,
       decoration: BoxDecoration(
-        color: backgroundColor ?? context.surface,
+        color: backgroundColor ?? ColorConstants.alabaster,
         borderRadius: RadiusConstants.standard,
         border: Border.all(color: context.outline, width: 1),
       ),

@@ -46,12 +46,12 @@ class _AddCarRequirementViewState extends State<AddCarRequirementView> {
               return Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: PaddingConstants.all20,
+                  padding: PaddingConstants.all24,
                   child: SharedCard(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: PaddingConstants.p20,
+                      spacing: PaddingConstants.p8,
                       children: [
                         _BrandDropdown(viewModel: viewModel),
                         if (viewModel.selectedBrand != null)
@@ -312,7 +312,7 @@ class _FeeFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: PaddingConstants.p12,
+      spacing: PaddingConstants.p8,
       children: [
         SharedTextField(
           controller: viewModel.mileFeeController,

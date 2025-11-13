@@ -20,6 +20,7 @@ class ImageTokens {
   static final String addFile = 'assets/png/image/image_add_file.png';
   static final String confirmed = 'assets/png/image/image_confirmed.png';
   static final String success = 'assets/png/image/image_success.png';
+  static final String background = 'assets/png/image/image_background.png';
 
   static final String lottieLoader = 'assets/lottie/lottie_loader.json';
   static final String lottieLoaderReplace =
