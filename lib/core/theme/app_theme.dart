@@ -52,7 +52,7 @@ class AppTheme {
         vertical: PaddingConstants.p16,
       ),
       filled: true,
-      fillColor: colorScheme.surfaceContainer,
+      fillColor: colorScheme.surface,
       floatingLabelBehavior: FloatingLabelBehavior.always,
       constraints: const BoxConstraints.tightFor(
         height: WidgetConstants.formFieldHeight,

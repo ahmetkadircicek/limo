@@ -114,10 +114,10 @@ class AddressPickerViewModel extends ChangeNotifier {
     _clearSelection(retainSearch: false, notify: true);
   }
 
-  PickedLocation? buildResult() {
+  LocationModel? buildResult() {
     final name = _resolvedAddress;
     if (name.isEmpty) return null;
-    return PickedLocation(
+    return LocationModel(
       address: name,
       lat: _selectedLat,
       lng: _selectedLng,

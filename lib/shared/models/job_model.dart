@@ -10,8 +10,8 @@ class JobModel {
   String? jobTypeName; // API: job_type_name
   DateTime? pickupDate; // API: expected_start_date / pickup_date
   DateTime? dropoffDate; // API: expected_end_date / dropoff_date
-  PickedLocation? pickupLocation;
-  PickedLocation? dropoffLocation;
+  LocationModel? pickupLocation;
+  LocationModel? dropoffLocation;
   String? title; // API: title / job_title
   String? description; // API: description / job_description
   double? distanceRoad; // API: distance_road / distance
@@ -69,7 +69,7 @@ class JobModel {
       return DateTime.tryParse(v.toString());
     }
 
-    PickedLocation? locationFromJson({
+    LocationModel? locationFromJson({
       dynamic address,
       dynamic lat,
       dynamic lng,
@@ -77,7 +77,7 @@ class JobModel {
     }) {
       final addr = address?.toString();
       if (addr == null || addr.isEmpty) return null;
-      return PickedLocation(
+      return LocationModel(
         address: addr,
         lat: toDouble(lat),
         lng: toDouble(lng),
@@ -209,8 +209,8 @@ class JobModel {
     String? jobTypeName,
     DateTime? pickupDate,
     DateTime? dropoffDate,
-    PickedLocation? pickupLocation,
-    PickedLocation? dropoffLocation,
+    LocationModel? pickupLocation,
+    LocationModel? dropoffLocation,
     String? title,
     String? description,
     double? distanceRoad,

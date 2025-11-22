@@ -28,6 +28,7 @@ class JobCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: PaddingConstants.horizontal16 + PaddingConstants.vertical8,
+          margin: PaddingConstants.bottom16,
           decoration: BoxDecoration(
             color: ColorConstants.alabaster,
             border: Border.all(color: context.outline),

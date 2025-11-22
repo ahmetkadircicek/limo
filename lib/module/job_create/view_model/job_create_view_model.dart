@@ -39,8 +39,8 @@ class JobCreateViewModel extends ChangeNotifier {
   JobTypeModel? get selectedJobType => _selectedJobType;
   bool get requiresDropoff =>
       (_selectedJobType?.jobTypeName.toLowerCase().contains('route') ?? false);
-  PickedLocation? get pickupLocation => job.pickupLocation;
-  PickedLocation? get dropoffLocation => job.dropoffLocation;
+  LocationModel? get pickupLocation => job.pickupLocation;
+  LocationModel? get dropoffLocation => job.dropoffLocation;
   bool get hasPickup => job.pickupDate != null && job.pickupLocation != null;
   bool get hasDropoff => job.dropoffDate != null && job.dropoffLocation != null;
   bool get shareNumber => job.shareNumber;
@@ -79,12 +79,12 @@ class JobCreateViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setPickupLocation(PickedLocation location) {
+  void setPickupLocation(LocationModel location) {
     job = job.copyWith(pickupLocation: location);
     notifyListeners();
   }
 
-  void setDropoffLocation(PickedLocation location) {
+  void setDropoffLocation(LocationModel location) {
     job = job.copyWith(dropoffLocation: location);
     notifyListeners();
   }

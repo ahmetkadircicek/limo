@@ -16,8 +16,8 @@ class LocationSearchField extends StatefulWidget {
   });
 
   final String label;
-  final PickedLocation? initialLocation;
-  final ValueChanged<PickedLocation> onLocationSelected;
+  final LocationModel? initialLocation;
+  final ValueChanged<LocationModel> onLocationSelected;
   final bool enabled;
 
   @override
@@ -252,7 +252,7 @@ class _LocationSearchFieldState extends State<LocationSearchField>
     if (details != null) {
       _controller.text = details.address;
       widget.onLocationSelected(
-        PickedLocation(
+        LocationModel(
           address: details.address,
           lat: details.lat,
           lng: details.lng,
@@ -262,7 +262,7 @@ class _LocationSearchFieldState extends State<LocationSearchField>
     } else {
       _controller.text = prediction.description;
       widget.onLocationSelected(
-        PickedLocation(
+        LocationModel(
           address: prediction.description,
           placeId: prediction.placeId,
         ),
@@ -277,6 +277,6 @@ class _LocationSearchFieldState extends State<LocationSearchField>
     setState(() {
       _predictions.clear();
     });
-    widget.onLocationSelected(PickedLocation(address: trimmed));
+    widget.onLocationSelected(LocationModel(address: trimmed));
   }
 }

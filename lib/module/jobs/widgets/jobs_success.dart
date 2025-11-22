@@ -22,12 +22,10 @@ class JobsSuccess extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => jobProvider.loadJobs(context, force: true),
-      child: ListView.separated(
+      child: ListView.builder(
         controller: scrollController,
         padding: PaddingConstants.all24,
         itemCount: jobProvider.visibleJobs.length + 1,
-        separatorBuilder:
-            (context, index) => const SizedBox(height: PaddingConstants.p16),
         itemBuilder: (context, index) {
           if (index == 0) {
             return _JobsHeader(

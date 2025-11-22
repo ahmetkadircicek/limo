@@ -5,11 +5,11 @@ import 'package:limo/core/services/google_places_service.dart';
 import 'package:limo/module/address_picker/models/address_prediction.dart';
 import 'package:limo/shared/models/picked_location_model.dart';
 
-Future<PickedLocation?> showLocationSearchSheet(
+Future<LocationModel?> showLocationSearchSheet(
   BuildContext context, {
   String? initialQuery,
 }) {
-  return showModalBottomSheet<PickedLocation>(
+  return showModalBottomSheet<LocationModel>(
     context: context,
     isScrollControlled: true,
     builder: (ctx) => _LocationSearchSheet(initialQuery: initialQuery),
@@ -137,7 +137,7 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
                           if (name.isEmpty) return;
                           Navigator.of(
                             context,
-                          ).pop(PickedLocation(address: name));
+                          ).pop(LocationModel(address: name));
                         },
                 icon:
                     _resolving
@@ -232,7 +232,7 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
 
     if (details != null) {
       Navigator.of(context).pop(
-        PickedLocation(
+        LocationModel(
           address: details.address,
           lat: details.lat,
           lng: details.lng,
@@ -241,7 +241,7 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
       );
     } else {
       Navigator.of(context).pop(
-        PickedLocation(
+        LocationModel(
           address: prediction.description,
           placeId: prediction.placeId,
         ),
