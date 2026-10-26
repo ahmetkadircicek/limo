@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Limo Platform Banner](docs/banner.svg)
+![Limo](docs/cover.png)
 
 ### VIP chauffeured transfer booking, fleet dispatching, and real-time navigation.
 
